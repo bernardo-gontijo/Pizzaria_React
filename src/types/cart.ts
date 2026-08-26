@@ -2,6 +2,7 @@ import type { Pizza, PizzaSize } from './pizza';
 
 export interface CartItem {
   id: string;
+  nome : string;
   pizza: Pizza;
   tamanho: PizzaSize;
   borda?: string;
