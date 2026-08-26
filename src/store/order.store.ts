@@ -1,5 +1,5 @@
-import type { PaymentMethod } from './tenant';
-import type { CartItem } from './cart';
+import type { PaymentMethod } from '../features/loja/types/tenant';
+import type { CartItem } from './cart.store';
 
 export type OrderStatus =
   | 'recebido'
@@ -7,7 +7,7 @@ export type OrderStatus =
   | 'saiu_para_entrega'
   | 'entregue';
 
-export interface CustomerData {
+export interface DadosCliente {
   nome: string;
   telefone: string;
   endereco: string;
@@ -19,7 +19,7 @@ export interface CustomerData {
 export interface Order {
   id: string;
   itens: CartItem[];
-  cliente: CustomerData;
+  cliente: DadosCliente;
   formaPagamento: PaymentMethod;
   subtotal: number;
   taxaEntrega: number;

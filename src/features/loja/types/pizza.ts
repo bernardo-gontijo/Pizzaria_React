@@ -7,14 +7,14 @@ export type PizzaCategory =
 export type PizzaSize = 'broto' | 'media' | 'grande' | 'familia';
 
 export interface Pizza {
-  id: string;
-  nome: string;
-  descricao: string;
-  preco: number;
-  ingredientes: string[];
-  imagem: string;
-  categoria: PizzaCategory;
-  disponivel: boolean;
+  readonly id: string;
+  readonly nome: string;
+  readonly descricao: string;
+  readonly preco: number;
+  readonly ingredientes: string[];
+  readonly imagem: string;
+  readonly categoria: PizzaCategory;
+  readonly disponivel: boolean;
 }
 
 export interface PizzaFilter {
