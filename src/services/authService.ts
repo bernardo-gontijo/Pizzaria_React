@@ -35,7 +35,7 @@ export async function login(
     'auth-user',
     JSON.stringify(usuario),
   );
-
+  localStorage.setItem('auth-user', JSON.stringify(usuario));
   return usuario;
 }
 
@@ -55,4 +55,7 @@ export function getAuthenticatedUser(): AuthUser | null {
   } catch {
     return null;
   }
+}
+export function isAuthenticated(): boolean {
+  return getAuthenticatedUser() !== null;
 }

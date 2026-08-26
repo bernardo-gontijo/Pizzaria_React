@@ -1,22 +1,26 @@
-import { CartProvider } from './context/CartContext';
+
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
-import { TenantConfigProvider } from './context/TenantConfigContext';
+import { CartProvider } from './context/CartContext'; 
+import { Login } from './admin/Login';
+import { Dashboard } from './admin/Dashboard';
+import { Home } from './pages/Home';
+import { Menu } from './pages/Menu';
 
 function App() {
   return (
-    <TenantConfigProvider>
-      <AuthProvider>
-        <CartProvider>
-          <main>
-            <h1>PizzaShop</h1>
-
-            <p>
-              Plataforma de pedidos de pizza
-            </p>
-          </main>
-        </CartProvider>
-      </AuthProvider>
-    </TenantConfigProvider>
+    <AuthProvider>
+      <CartProvider>  
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/menu" element={<Menu />} />
+            <Route path="/admin/login" element={<Login />} />
+            <Route path="/admin/dashboard" element={<Dashboard />} />
+          </Routes>
+        </BrowserRouter>
+      </CartProvider>
+    </AuthProvider>
   );
 }
 
