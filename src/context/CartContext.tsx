@@ -7,7 +7,7 @@ import {
   type ReactNode,
 } from 'react';
 
-import type { CartItem, CartContextData } from '../types/cart';
+import type { CartItem, CartContextData } from '../store/cart.store';
 
 type CartAction =
   | {

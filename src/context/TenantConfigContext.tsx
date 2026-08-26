@@ -6,7 +6,7 @@ import {
   type ReactNode,
 } from 'react';
 
-import type { TenantConfig } from '../types/tenant';
+import type { TenantConfig } from '../features/loja/types/tenant';
 
 interface TenantConfigContextData {
   config: TenantConfig;

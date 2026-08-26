@@ -1,4 +1,4 @@
-import type { Pizza, PizzaSize } from './pizza';
+import type { Pizza, PizzaSize } from '../features/loja/types/pizza';
 
 export interface CartItem {
   id: string;
