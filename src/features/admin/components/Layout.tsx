@@ -1,18 +1,12 @@
-import { Navigate, Outlet } from 'react-router-dom';
-import { useAuth } from '../hooks/AuthContext';
+import { Outlet } from 'react-router';
 import { SideBar } from './SideBar';
 
-export function AdminLayout() {
-  const { user } = useAuth();
-
-  if (!user) {
-    return <Navigate to="/admin/login" replace />;
-  }
-
+export function Layout() {
   return (
-    <div className="flex min-h-screen">
+    <div className="admin-layout">
       <SideBar />
-      <main className="flex-1 p-6">
+
+      <main className="admin-layout__conteudo">
         <Outlet />
       </main>
     </div>

@@ -3,60 +3,52 @@ import {
   useContext,
   useMemo,
   useReducer,
-  useState,
   type ReactNode,
-} from 'react';
+} from "react";
 
-import type { CartItem, CartContextData } from '../store/cart.store';
+import type { CartItem, CartContextData } from "../store/cart.store";
 
 type CartAction =
   | {
-      type: 'ADICIONAR';
+      type: "ADICIONAR";
       payload: CartItem;
     }
   | {
-      type: 'REMOVER';
+      type: "REMOVER";
       payload: string;
     }
   | {
-      type: 'ALTERAR_QUANTIDADE';
+      type: "ALTERAR_QUANTIDADE";
       payload: {
         id: string;
         quantidade: number;
       };
     }
   | {
-      type: 'LIMPAR';
+      type: "LIMPAR";
     };
 
 interface CartState {
   items: CartItem[];
 }
 
-const CartContext = createContext<CartContextData | undefined>(
-  undefined,
-);
+const CartContext = createContext<CartContextData | undefined>(undefined);
 
-function reducer(
-  state: CartState,
-  action: CartAction,
-): CartState {
+function reducer(state: CartState, action: CartAction): CartState {
   switch (action.type) {
-    case 'ADICIONAR':
+    case "ADICIONAR":
       return {
         ...state,
         items: [...state.items, action.payload],
       };
 
-    case 'REMOVER':
+    case "REMOVER":
       return {
         ...state,
-        items: state.items.filter(
-          (item) => item.id !== action.payload,
-        ),
+        items: state.items.filter((item) => item.id !== action.payload),
       };
 
-    case 'ALTERAR_QUANTIDADE':
+    case "ALTERAR_QUANTIDADE":
       return {
         ...state,
         items: state.items.map((item) =>
@@ -69,7 +61,7 @@ function reducer(
         ),
       };
 
-    case 'LIMPAR':
+    case "LIMPAR":
       return {
         items: [],
       };
@@ -80,7 +72,7 @@ function reducer(
 }
 
 function carregarCarrinho(): CartState {
-  const saved = localStorage.getItem('cart');
+  const saved = localStorage.getItem("cart");
 
   if (!saved) {
     return { items: [] };
@@ -93,24 +85,15 @@ function carregarCarrinho(): CartState {
   }
 }
 
-export function CartProvider({
-  children,
-}: {
-  children: ReactNode;
-}) {
-  const [state, dispatch] = useReducer(
-    reducer,
-    undefined,
-    carregarCarrinho,
-  );
+export function CartProvider({ children }: { children: ReactNode }) {
+  const [state, dispatch] = useReducer(reducer, undefined, carregarCarrinho);
 
-  localStorage.setItem('cart', JSON.stringify(state));
+  localStorage.setItem("cart", JSON.stringify(state));
 
   const subtotal = useMemo(
     () =>
       state.items.reduce(
-        (total, item) =>
-          total + item.precoUnitario * item.quantidade,
+        (total, item) => total + item.precoUnitario * item.quantidade,
         0,
       ),
     [state.items],
@@ -125,19 +108,19 @@ export function CartProvider({
 
     adicionarItem: (item) =>
       dispatch({
-        type: 'ADICIONAR',
+        type: "ADICIONAR",
         payload: item,
       }),
 
     removerItem: (id) =>
       dispatch({
-        type: 'REMOVER',
+        type: "REMOVER",
         payload: id,
       }),
 
     alterarQuantidade: (id, quantidade) =>
       dispatch({
-        type: 'ALTERAR_QUANTIDADE',
+        type: "ALTERAR_QUANTIDADE",
         payload: {
           id,
           quantidade,
@@ -146,7 +129,7 @@ export function CartProvider({
 
     limparCarrinho: () =>
       dispatch({
-        type: 'LIMPAR',
+        type: "LIMPAR",
       }),
 
     subtotal,
@@ -154,20 +137,14 @@ export function CartProvider({
     total,
   };
 
-  return (
-    <CartContext.Provider value={value}>
-      {children}
-    </CartContext.Provider>
-  );
+  return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 }
 
 export function useCart() {
   const context = useContext(CartContext);
 
   if (!context) {
-    throw new Error(
-      'useCart deve ser utilizado dentro de CartProvider',
-    );
+    throw new Error("useCart deve ser utilizado dentro de CartProvider");
   }
 
   return context;
