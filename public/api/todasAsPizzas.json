@@ -15,7 +15,7 @@
     "descricao": "Molho de tomate, muçarela, tomate fresco e manjericão.",
     "preco": 39.9,
     "ingredientes": ["molho de tomate", "muçarela", "tomate", "manjericão"],
-    "imagem": "/images/pizzas/propagandaPizza.jpg",
+    "imagem": "/images/pizzas/pizzaMarguerita.jpg",
     "categoria": "tradicional",
     "disponivel": true
   },
@@ -38,5 +38,67 @@
     "imagem": "/images/pizzas/pizzaCalabresa.jpg",
     "categoria": "doce",
     "disponivel": true
+  },
+
+  {
+    "id": "frango-com-catupiry",
+    "nome": "Frango com Catupiry",
+    "descricao": "Molho de tomate, muçarela, frango desfiado temperado e o autêntico catupiry.",
+    "preco": 45.9,
+    "ingredientes": ["molho de tomate", "muçarela", "frango desfiado", "catupiry"],
+    "imagem": "/images/pizzas/pizzaFrangoCatupiry.jpg",
+    "categoria": "tradicional",
+    "disponivel": true
+  },
+  {
+    "id": "portuguesa",
+    "nome": "Portuguesa",
+    "descricao": "Molho de tomate, muçarela, presunto, ovos, cebola, ervilha e azeitonas.",
+    "preco": 46.9,
+    "ingredientes": ["molho de tomate", "muçarela", "presunto", "ovo", "cebola", "ervilha", "azeitona"],
+    "imagem": "/images/pizzas/pizzaPortuguesa.jpg",
+    "categoria": "tradicional",
+    "disponivel": true
+  },
+  {
+    "id": "pepperoni",
+    "nome": "Pepperoni",
+    "descricao": "Molho de tomate, muçarela, fatias de pepperoni e um toque de orégano.",
+    "preco": 49.9,
+    "ingredientes": ["molho de tomate", "muçarela", "pepperoni"],
+    "imagem": "/images/pizzas/pizzaPepperoni.jpg",
+    "categoria": "especial",
+    "disponivel": true
+  },
+  {
+    "id": "vegetariana",
+    "nome": "Vegetariana",
+    "descricao": "Molho de tomate, muçarela, brócolis, palmito, milho, tomate e pimentão.",
+    "preco": 44.9,
+    "ingredientes": ["molho de tomate", "muçarela", "brócolis", "palmito", "milho", "tomate", "pimentão"],
+    "imagem": "/images/pizzas/pizzaVegetariana.jpg",
+    "categoria": "especial",
+    "disponivel": true
+  },
+  {
+    "id": "romeu-e-julieta",
+    "nome": "Romeu e Julieta",
+    "descricao": "Muçarela de búfala e a combinação perfeita de goiabada cremosa.",
+    "preco": 41.9,
+    "ingredientes": ["muçarela de búfala", "goiabada cascão"],
+    "imagem": "/images/pizzas/pizzaRomeuJulieta.jpg",
+    "categoria": "doce",
+    "disponivel": true
+  },
+  {
+    "id": "banana-com-canela",
+    "nome": "Banana com Canela",
+    "descricao": "Muçarela, fatias de banana, açúcar, canela e leite condensado.",
+    "preco": 39.9,
+    "ingredientes": ["muçarela", "banana", "açúcar", "canela", "leite condensado"],
+    "imagem": "/images/pizzas/pizzaBananaCanela.jpg",
+    "categoria": "doce",
+    "disponivel": true
   }
 ]
+

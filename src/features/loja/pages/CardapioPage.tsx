@@ -1,21 +1,29 @@
-import { Loading } from "../../../components/Loading";
-import { MensagemErro } from "../../../components/MensagemErro";
-import { ListaPizzas } from "../components/ListaPizzas";
 import { usePizzas } from "../hooks/usePizzas";
+import { useCart } from "../../../context/CartContext";
+import { ListaPizzas } from "../components/ListaPizzas";
+import type { Pizza } from "../types/pizza";
 
 export function CardapioPage() {
-  const { pizzas, loading, erro } = usePizzas();
+    const { pizzas, loading, erro } = usePizzas();
+    const { adicionarItem } = useCart();
 
-  if (loading) return <Loading />;
-  if (erro) return <MensagemErro mensagem={erro.message} />;
-  return (
-    <section className="pagina-cardapio">
-      <div className="cabecalho-pagina">
-        <p className="sobretitulo">Feitas na hora</p>
-        <h1>Nosso cardápio</h1>
-        <p>Escolha um sabor e monte seu pedido.</p>
-      </div>
-      <ListaPizzas pizzas={pizzas.filter((pizza) => pizza.disponivel)} />
-    </section>
-  );
+    function handleAdicionar(pizza: Pizza) {
+        adicionarItem({
+            id: pizza.id,
+            nome: pizza.nome,
+            precoUnitario: pizza.preco,
+            quantidade: 1,
+            observacoes: "",
+        });
+    }
+
+    if (loading) return <p>Carregando cardápio...</p>;
+    if (erro) return <p>Erro: {erro.message}</p>;
+
+    return (
+        <div className="cardapio-page">
+            <h1>Cardápio</h1>
+            <ListaPizzas pizzas={pizzas} />
+        </div>
+    );
 }
