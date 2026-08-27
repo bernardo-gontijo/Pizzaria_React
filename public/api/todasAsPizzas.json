@@ -1,0 +1,42 @@
+[
+  {
+    "id": "calabresa",
+    "nome": "Calabresa",
+    "descricao": "Molho de tomate, muçarela, calabresa fatiada e cebola.",
+    "preco": 42.9,
+    "ingredientes": ["molho de tomate", "muçarela", "calabresa", "cebola"],
+    "imagem": "/images/pizzas/pizzaCalabresa.jpg",
+    "categoria": "tradicional",
+    "disponivel": true
+  },
+  {
+    "id": "marguerita",
+    "nome": "Marguerita",
+    "descricao": "Molho de tomate, muçarela, tomate fresco e manjericão.",
+    "preco": 39.9,
+    "ingredientes": ["molho de tomate", "muçarela", "tomate", "manjericão"],
+    "imagem": "/images/pizzas/propagandaPizza.jpg",
+    "categoria": "tradicional",
+    "disponivel": true
+  },
+  {
+    "id": "quatro-queijos",
+    "nome": "Quatro Queijos",
+    "descricao": "Muçarela, provolone, parmesão e catupiry.",
+    "preco": 48.9,
+    "ingredientes": ["muçarela", "provolone", "parmesão", "catupiry"],
+    "imagem": "/images/pizzas/propagandaPizza.jpg",
+    "categoria": "especial",
+    "disponivel": true
+  },
+  {
+    "id": "chocolate",
+    "nome": "Chocolate",
+    "descricao": "Chocolate ao leite, morangos e granulado.",
+    "preco": 44.9,
+    "ingredientes": ["chocolate", "morango", "granulado"],
+    "imagem": "/images/pizzas/pizzaCalabresa.jpg",
+    "categoria": "doce",
+    "disponivel": true
+  }
+]

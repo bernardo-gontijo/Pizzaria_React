@@ -6,11 +6,11 @@ import {
 } from 'react';
 
 import {
-  getAuthenticatedUser,
-  login as loginService,
-  logout as logoutService,
-  type AuthUser,
-} from '../services/authService';
+  getAuthenticatedUser, login as loginService,
+  logout as logoutService} from
+  '../api/auth.service';
+
+import type { AuthUser } from '../types/auth';
 
 interface AuthContextData {
   user: AuthUser | null;
