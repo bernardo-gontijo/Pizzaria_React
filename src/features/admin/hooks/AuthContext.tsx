@@ -10,7 +10,7 @@ import {
   login as loginService,
   logout as logoutService,
   type AuthUser,
-} from '../services/authService';
+} from '../api/auth.service';
 
 interface AuthContextData {
   user: AuthUser | null;
