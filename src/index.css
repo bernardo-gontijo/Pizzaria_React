@@ -142,6 +142,111 @@ a {
   font-size: 1.15rem;
 }
 
+.pizza-card__link {
+  display: inline-block;
+  margin-top: 16px;
+  color: var(--cor-primaria);
+  font-weight: 700;
+}
+
+.pagina-loja,
+.pizza-detalhe-page,
+.pagamento-page,
+.acompanhar-page,
+.cardapio-page,
+.categoria-page {
+  width: min(100%, 820px);
+}
+
+.pagina-loja h1,
+.pizza-detalhe-page h1,
+.pagamento-page h1,
+.acompanhar-page h1,
+.cardapio-page h1,
+.categoria-page h1 {
+  color: var(--cor-secundaria);
+}
+
+.carrinho-resumo,
+.checkout-page form,
+.pagamento-page form,
+.pizza-detalhe-page {
+  display: grid;
+  gap: 16px;
+  margin-top: 24px;
+  padding: 24px;
+  border: 1px solid var(--borda);
+  border-radius: 14px;
+  background: white;
+}
+
+.carrinho-item {
+  display: grid;
+  grid-template-columns: 1fr auto auto auto;
+  align-items: center;
+  gap: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--borda);
+}
+
+.carrinho-item button,
+.carrinho-resumo > button,
+.checkout-page button,
+.pagamento-page button,
+.pizza-detalhe-page button,
+.carrinho-vazio button {
+  padding: 9px 14px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--cor-primaria);
+  color: white;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.carrinho-item > div {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.carrinho-total {
+  text-align: right;
+  color: var(--cor-secundaria);
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.checkout-page form > div,
+.pagamento-page form > div {
+  display: grid;
+  gap: 6px;
+}
+
+.checkout-page input,
+.checkout-page select,
+.pagamento-page select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #cfc4bb;
+  border-radius: 8px;
+  font: inherit;
+}
+
+.pizza-detalhe-page > img {
+  width: min(100%, 480px);
+  border-radius: 12px;
+}
+
+.pizza-detalhe-page ul {
+  padding-left: 20px;
+}
+
+.erro {
+  color: #a61b26;
+}
+
 .feedback,
 .pagina-vazia {
   padding: 48px 0;
@@ -475,5 +580,9 @@ a {
 
   .admin-layout__conteudo {
     padding: 24px 16px;
+  }
+
+  .carrinho-item {
+    grid-template-columns: 1fr auto;
   }
 }
