@@ -6,7 +6,10 @@ import { AppProviders } from "./app/providers";
 import { router } from "./app/router";
 import { TenantConfigProvider } from "./context/TenantConfigContext";
 import { CartProvider } from './context/CartContext';
+import { registerServiceWorker } from "./pwa/registerServiceWorker";
 import "./index.css";
+
+registerServiceWorker();
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
