@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/triple-slash-reference -- padrão recomendado pela documentação do Vitest
 /// <reference types="vitest/config" />
 import { defineConfig, mergeConfig } from 'vitest/config'
 import viteConfig from './vite.config.ts'
@@ -10,10 +11,6 @@ export default mergeConfig(
       globals: true,
       setupFiles: ['./src/test/setupTests.ts'],
       css: true,
-      // Node 24+ expõe um localStorage global experimental que conflita
-      // com o localStorage fornecido pelo ambiente jsdom, quebrando testes
-      // que usam localStorage.clear()/setItem(). Desabilitamos esse recurso
-      // nativo do Node apenas durante os testes.
       execArgv: ['--no-experimental-webstorage', '--no-warnings'],
       coverage: {
         provider: 'v8',
