@@ -21,7 +21,7 @@ Rode o projeto: npm run dev
 
 O terminal vai mostrar um endereço tipo:
 
-   ➜  Local:   http://localhost:5173/
+➜ Local: http://localhost:5173/
 
 Segure Ctrl (ou Cmd no Mac) e clique no link, ou copie e cole no navegador.
 

@@ -1,4 +1,4 @@
-import { registerSW } from 'virtual:pwa-register'
+import { registerSW } from "virtual:pwa-register";
 
 /**
  * Registra o service worker do app.
@@ -10,17 +10,17 @@ import { registerSW } from 'virtual:pwa-register'
  *   (útil para exibir um aviso discreto ao usuário, se desejado no futuro).
  */
 export function registerServiceWorker() {
-  if (import.meta.env.MODE === 'test') {
-    return
+  if (import.meta.env.MODE === "test") {
+    return;
   }
 
   registerSW({
     immediate: true,
     onOfflineReady() {
-      console.info('Pizzaria Callidus está pronta para uso offline.')
+      console.info("Pizzaria Callidus está pronta para uso offline.");
     },
     onRegisterError(error) {
-      console.error('Falha ao registrar o service worker do PWA:', error)
+      console.error("Falha ao registrar o service worker do PWA:", error);
     },
-  })
+  });
 }

@@ -1,11 +1,8 @@
-import type { PaymentMethod } from '../features/loja/types/tenant';
-import type { CartItem } from './cart.store';
+import type { PaymentMethod } from "../features/loja/types/tenant";
+import type { CartItem } from "./cart.store";
 
 export type OrderStatus =
-  | 'recebido'
-  | 'preparo'
-  | 'saiu_para_entrega'
-  | 'entregue';
+  "recebido" | "preparo" | "saiu_para_entrega" | "entregue";
 
 export interface DadosCliente {
   nome: string;

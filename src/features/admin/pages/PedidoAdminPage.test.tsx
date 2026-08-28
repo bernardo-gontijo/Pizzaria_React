@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 
-import '@testing-library/jest-dom/vitest';
+import "@testing-library/jest-dom/vitest";
 
 import {
   cleanup,
@@ -8,43 +8,36 @@ import {
   render,
   screen,
   waitFor,
-} from '@testing-library/react';
+} from "@testing-library/react";
 
-import {
-  afterEach,
-  beforeEach,
-  describe,
-  expect,
-  it,
-  vi,
-} from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { Pedido } from '../../loja/types/pedido';
-import type { PedidoAdminPage as PedidoAdminPageComponent } from './PedidoAdminPage';
+import type { Pedido } from "../../loja/types/pedido";
+import type { PedidoAdminPage as PedidoAdminPageComponent } from "./PedidoAdminPage";
 
 const agora = new Date().toISOString();
 
 const pedidoTeste = {
-  id: 'pedido-1',
+  id: "pedido-1",
   cliente: {
-    nome: 'João',
-    telefone: '92999999999',
+    nome: "João",
+    telefone: "92999999999",
   },
   endereco: {
-    cep: '69000-000',
-    rua: 'Rua Principal',
-    numero: '100',
-    bairro: 'Centro',
-    cidade: 'Manaus',
-    estado: 'AM',
+    cep: "69000-000",
+    rua: "Rua Principal",
+    numero: "100",
+    bairro: "Centro",
+    cidade: "Manaus",
+    estado: "AM",
   },
   itens: [],
   subtotal: 50,
   taxaEntrega: 5,
   desconto: 0,
   total: 55,
-  formaPagamento: 'pix',
-  status: 'pendente',
+  formaPagamento: "pix",
+  status: "pendente",
   statusHistorico: [],
   createdAt: agora,
   updatedAt: agora,
@@ -57,7 +50,7 @@ beforeEach(async () => {
 
   // Chave usada por pedidos.service.ts (initPedidos), que estrutura os
   // pedidos de forma diferente do antigo store/order.store.ts.
-  localStorage.setItem('pedidos_loja', JSON.stringify([pedidoTeste]));
+  localStorage.setItem("pedidos_loja", JSON.stringify([pedidoTeste]));
 
   // pedidos.service.ts lê o localStorage apenas uma vez, no momento em
   // que o módulo é importado (initPedidos() roda no topo do arquivo).
@@ -65,7 +58,7 @@ beforeEach(async () => {
   // popular o localStorage, garantindo que o cache em memória do
   // serviço reflita os dados deste teste.
   vi.resetModules();
-  ({ PedidoAdminPage } = await import('./PedidoAdminPage'));
+  ({ PedidoAdminPage } = await import("./PedidoAdminPage"));
 });
 
 afterEach(() => {
@@ -73,48 +66,39 @@ afterEach(() => {
   localStorage.clear();
 });
 
-describe('PedidoAdminPage', () => {
-  it('carrega os pedidos cadastrados', async () => {
+describe("PedidoAdminPage", () => {
+  it("carrega os pedidos cadastrados", async () => {
     render(<PedidoAdminPage />);
 
-    expect(
-      await screen.findByText('João'),
-    ).toBeInTheDocument();
+    expect(await screen.findByText("João")).toBeInTheDocument();
 
-    expect(
-      screen.getByText('R$ 55,00'),
-    ).toBeInTheDocument();
+    expect(screen.getByText("R$ 55,00")).toBeInTheDocument();
 
-    const status = screen.getByLabelText(
-      'Status do pedido pedido-1',
-    );
+    const status = screen.getByLabelText("Status do pedido pedido-1");
 
-    expect(status).toHaveValue('pendente');
+    expect(status).toHaveValue("pendente");
   });
 
-  it('permite alterar o status do pedido', async () => {
+  it("permite alterar o status do pedido", async () => {
     render(<PedidoAdminPage />);
 
-    const campoStatus =
-      await screen.findByLabelText(
-        'Status do pedido pedido-1',
-        {},
-        { timeout: 3000 },
-      );
+    const campoStatus = await screen.findByLabelText(
+      "Status do pedido pedido-1",
+      {},
+      { timeout: 3000 },
+    );
 
     fireEvent.change(campoStatus, {
       target: {
-        value: 'preparando',
+        value: "preparando",
       },
     });
 
     await waitFor(
       () => {
-        expect(
-          screen.getByLabelText(
-            'Status do pedido pedido-1',
-          ),
-        ).toHaveValue('preparando');
+        expect(screen.getByLabelText("Status do pedido pedido-1")).toHaveValue(
+          "preparando",
+        );
       },
       // O serviço simula atraso de rede: 500ms (atualizar status) +
       // 300ms (recarregar pedidos) = até 800ms encadeados. Margem
@@ -123,13 +107,9 @@ describe('PedidoAdminPage', () => {
     );
 
     const pedidosSalvos = JSON.parse(
-      localStorage.getItem(
-        'pedidos_loja',
-      ) ?? '[]',
+      localStorage.getItem("pedidos_loja") ?? "[]",
     ) as Pedido[];
 
-    expect(
-      pedidosSalvos[0].status,
-    ).toBe('preparando');
+    expect(pedidosSalvos[0].status).toBe("preparando");
   }, 10000);
 });

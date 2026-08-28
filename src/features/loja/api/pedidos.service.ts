@@ -21,23 +21,24 @@ function initPedidos() {
         message: string;
       }
 
-      interface PedidoSerializado extends Omit<Pedido, "createdAt" | "updatedAt" | "statusHistorico"> {
+      interface PedidoSerializado extends Omit<
+        Pedido,
+        "createdAt" | "updatedAt" | "statusHistorico"
+      > {
         createdAt: string;
         updatedAt: string;
         statusHistorico: StatusHistoricoSerializado[];
       }
 
-      pedidosCache = (JSON.parse(stored) as PedidoSerializado[]).map(
-        (p) => ({
-          ...p,
-          createdAt: new Date(p.createdAt),
-          updatedAt: new Date(p.updatedAt),
-          statusHistorico: p.statusHistorico.map((h) => ({
-            ...h,
-            timestamp: new Date(h.timestamp),
-          })),
-        }),
-      );
+      pedidosCache = (JSON.parse(stored) as PedidoSerializado[]).map((p) => ({
+        ...p,
+        createdAt: new Date(p.createdAt),
+        updatedAt: new Date(p.updatedAt),
+        statusHistorico: p.statusHistorico.map((h) => ({
+          ...h,
+          timestamp: new Date(h.timestamp),
+        })),
+      }));
     } catch (error) {
       console.error("Erro ao carregar pedidos:", error);
       pedidosCache = [];
