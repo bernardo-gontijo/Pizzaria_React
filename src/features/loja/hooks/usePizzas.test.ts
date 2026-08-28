@@ -1,5 +1,5 @@
 import { renderHook, waitFor } from "@testing-library/react";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { usePizzas } from "./usePizzas";
 import type { Pizza } from "../types/pizza";
@@ -27,7 +27,14 @@ const pizzasTeste: Pizza[] = [
   },
 ];
 
+beforeEach(() => {
+  // buscarPizzas() agora cacheia o resultado no localStorage; sem
+  // limpar entre os testes, um teste "vazaria" dados para o próximo.
+  localStorage.clear();
+});
+
 afterEach(() => {
+  localStorage.clear();
   vi.restoreAllMocks();
 });
 
@@ -35,7 +42,7 @@ describe("usePizzas", () => {
   it("inicia em estado de carregamento", async () => {
     vi.spyOn(globalThis, "fetch").mockResolvedValue({
       ok: true,
-      json: async () => pizzasTeste,
+      text: async () => JSON.stringify(pizzasTeste),
     } as Response);
 
     const { result } = renderHook(() => usePizzas());
@@ -44,8 +51,6 @@ describe("usePizzas", () => {
     expect(result.current.pizzas).toEqual([]);
     expect(result.current.erro).toBeNull();
 
-    // Aguarda a resolução da promise para evitar warning de act()
-    // sobre atualização de estado fora de um bloco act().
     await waitFor(() => {
       expect(result.current.loading).toBe(false);
     });
@@ -54,7 +59,7 @@ describe("usePizzas", () => {
   it("carrega as pizzas com sucesso", async () => {
     vi.spyOn(globalThis, "fetch").mockResolvedValue({
       ok: true,
-      json: async () => pizzasTeste,
+      text: async () => JSON.stringify(pizzasTeste),
     } as Response);
 
     const { result } = renderHook(() => usePizzas());
@@ -70,7 +75,7 @@ describe("usePizzas", () => {
   it("retorna erro quando a resposta não é ok", async () => {
     vi.spyOn(globalThis, "fetch").mockResolvedValue({
       ok: false,
-      json: async () => ({}),
+      text: async () => "",
     } as Response);
 
     const { result } = renderHook(() => usePizzas());
@@ -82,7 +87,7 @@ describe("usePizzas", () => {
     expect(result.current.pizzas).toEqual([]);
     expect(result.current.erro).not.toBeNull();
     expect(result.current.erro?.message).toBe(
-      "Não foi possível carregar o catalogo de pizzas",
+      "Não foi possível carregar o catálogo de pizzas",
     );
   });
 

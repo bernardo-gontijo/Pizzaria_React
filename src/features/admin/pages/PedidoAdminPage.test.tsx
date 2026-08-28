@@ -16,42 +16,56 @@ import {
   describe,
   expect,
   it,
+  vi,
 } from 'vitest';
 
-import type { Order } from '../../../store/order.store';
-import { PedidoAdminPage } from './PedidoAdminPage';
+import type { Pedido } from '../../loja/types/pedido';
+import type { PedidoAdminPage as PedidoAdminPageComponent } from './PedidoAdminPage';
+
+const agora = new Date().toISOString();
 
 const pedidoTeste = {
   id: 'pedido-1',
-
-  itens: [],
-
   cliente: {
     nome: 'João',
     telefone: '92999999999',
-    endereco: 'Rua Principal',
+  },
+  endereco: {
+    cep: '69000-000',
+    rua: 'Rua Principal',
     numero: '100',
     bairro: 'Centro',
+    cidade: 'Manaus',
+    estado: 'AM',
   },
-
-  formaPagamento: 'pix',
-
+  itens: [],
   subtotal: 50,
   taxaEntrega: 5,
+  desconto: 0,
   total: 55,
+  formaPagamento: 'pix',
+  status: 'pendente',
+  statusHistorico: [],
+  createdAt: agora,
+  updatedAt: agora,
+} as unknown as Pedido;
 
-  status: 'recebido',
+let PedidoAdminPage: typeof PedidoAdminPageComponent;
 
-  criadoEm: new Date().toISOString(),
-} as Order;
-
-beforeEach(() => {
+beforeEach(async () => {
   localStorage.clear();
 
-  localStorage.setItem(
-    'pizzashop-pedidos',
-    JSON.stringify([pedidoTeste]),
-  );
+  // Chave usada por pedidos.service.ts (initPedidos), que estrutura os
+  // pedidos de forma diferente do antigo store/order.store.ts.
+  localStorage.setItem('pedidos_loja', JSON.stringify([pedidoTeste]));
+
+  // pedidos.service.ts lê o localStorage apenas uma vez, no momento em
+  // que o módulo é importado (initPedidos() roda no topo do arquivo).
+  // Por isso, resetamos os módulos e reimportamos a página DEPOIS de
+  // popular o localStorage, garantindo que o cache em memória do
+  // serviço reflita os dados deste teste.
+  vi.resetModules();
+  ({ PedidoAdminPage } = await import('./PedidoAdminPage'));
 });
 
 afterEach(() => {
@@ -75,7 +89,7 @@ describe('PedidoAdminPage', () => {
       'Status do pedido pedido-1',
     );
 
-    expect(status).toHaveValue('recebido');
+    expect(status).toHaveValue('pendente');
   });
 
   it('permite alterar o status do pedido', async () => {
@@ -84,28 +98,38 @@ describe('PedidoAdminPage', () => {
     const campoStatus =
       await screen.findByLabelText(
         'Status do pedido pedido-1',
+        {},
+        { timeout: 3000 },
       );
 
     fireEvent.change(campoStatus, {
       target: {
-        value: 'preparo',
+        value: 'preparando',
       },
     });
 
-    await waitFor(() => {
-      expect(campoStatus).toHaveValue(
-        'preparo',
-      );
-    });
+    await waitFor(
+      () => {
+        expect(
+          screen.getByLabelText(
+            'Status do pedido pedido-1',
+          ),
+        ).toHaveValue('preparando');
+      },
+      // O serviço simula atraso de rede: 500ms (atualizar status) +
+      // 300ms (recarregar pedidos) = até 800ms encadeados. Margem
+      // generosa para não flackear em ambientes de CI mais lentos.
+      { timeout: 5000 },
+    );
 
     const pedidosSalvos = JSON.parse(
       localStorage.getItem(
-        'pizzashop-pedidos',
+        'pedidos_loja',
       ) ?? '[]',
-    ) as Order[];
+    ) as Pedido[];
 
     expect(
       pedidosSalvos[0].status,
-    ).toBe('preparo');
-  });
+    ).toBe('preparando');
+  }, 10000);
 });

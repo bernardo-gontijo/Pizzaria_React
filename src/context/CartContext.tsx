@@ -7,10 +7,12 @@ import {
   type ReactNode,
 } from "react";
 
+import type { Pizza } from "../features/loja/types/pizza";
+
 // ========== TIPOS ==========
 export interface CartItem {
   id: string;
-  pizza?: any;
+  pizza?: Pizza;
   nome: string;
   precoUnitario: number;
   quantidade: number;

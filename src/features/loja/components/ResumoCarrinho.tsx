@@ -20,7 +20,7 @@ export function ResumoCarrinho({ showCheckoutButton = true }: ResumoCarrinhoProp
 
     return (
         <div className="carrinho-resumo">
-            {items.map((item: any) => (
+            {items.map((item) => (
                 <div key={item.id} className="carrinho-item">
                     <div className="carrinho-item__descricao">
                         <strong>{item.nome}</strong>
