@@ -4,6 +4,8 @@ import type {
   AtualizarStatusPedidoDTO,
 } from "../types/pedido";
 
+export const PEDIDOS_ATUALIZADOS_EVENT = "pizzashop:pedidos-atualizados";
+
 // Mock de pedidos em memória
 let pedidosCache: Pedido[] = [];
 
@@ -26,41 +28,7 @@ function initPedidos() {
       pedidosCache = [];
     }
   } else {
-    // Criar pedidos de exemplo
-    pedidosCache = [
-      {
-        id: "1",
-        cliente: {
-          nome: "João Silva",
-          telefone: "(11) 99999-9999",
-        },
-        endereco: {
-          cep: "01234-567",
-          rua: "Rua das Flores",
-          numero: "123",
-          bairro: "Centro",
-          cidade: "São Paulo",
-          estado: "SP",
-        },
-        itens: [],
-        subtotal: 0,
-        taxaEntrega: 5,
-        desconto: 0,
-        total: 0,
-        formaPagamento: "pix",
-        status: "pendente",
-        statusHistorico: [
-          {
-            id: "hist-1",
-            status: "pendente",
-            timestamp: new Date(),
-            message: "Pedido recebido",
-          },
-        ],
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-    ];
+    pedidosCache = [];
   }
 }
 
@@ -70,6 +38,7 @@ initPedidos();
 function salvarPedidos() {
   try {
     localStorage.setItem("pedidos_loja", JSON.stringify(pedidosCache));
+    window.dispatchEvent(new Event(PEDIDOS_ATUALIZADOS_EVENT));
   } catch (error) {
     console.error("Erro ao salvar pedidos:", error);
   }
