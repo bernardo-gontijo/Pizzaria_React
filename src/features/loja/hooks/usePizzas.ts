@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { buscarPizzas } from "../api/loja.service";
+import { buscarPizzas, PIZZAS_ATUALIZADAS_EVENT } from "../api/loja.service";
 import type { Pizza } from "../types/pizza";
 
 export function usePizzas() {
@@ -26,6 +26,18 @@ export function usePizzas() {
     }
 
     void carregarPizzas();
+
+    function atualizarCardapio() {
+      void carregarPizzas();
+    }
+
+    window.addEventListener(PIZZAS_ATUALIZADAS_EVENT, atualizarCardapio);
+    window.addEventListener("storage", atualizarCardapio);
+
+    return () => {
+      window.removeEventListener(PIZZAS_ATUALIZADAS_EVENT, atualizarCardapio);
+      window.removeEventListener("storage", atualizarCardapio);
+    };
   }, []);
 
   return { pizzas, loading, erro };

@@ -1,97 +1,46 @@
-import { useCallback, useState } from 'react';
-import type { Pizza } from '../../loja/types/pizza';
-import type { PizzaFormData } from '../components/PizzaForm';
+import { useCallback, useState } from "react";
+
+import {
+  adicionarPizza as adicionarPizzaService,
+  buscarPizzas,
+  editarPizza as editarPizzaService,
+  excluirPizza as excluirPizzaService,
+} from "../../loja/api/loja.service";
+import type { Pizza } from "../../loja/types/pizza";
+import type { PizzaFormData } from "../components/PizzaForm";
 
 export function useAdminPizzas() {
   const [pizzas, setPizzas] = useState<Pizza[]>([]);
+  const [carregando, setCarregando] = useState(false);
+  const [erro, setErro] = useState<string | null>(null);
 
-  const [carregando, setCarregando] =
-    useState(false);
+  const carregarPizzas = useCallback(async () => {
+    try {
+      setCarregando(true);
+      setErro(null);
+      setPizzas(await buscarPizzas());
+    } catch (error) {
+      setErro(
+        error instanceof Error ? error.message : "Ocorreu um erro desconhecido",
+      );
+    } finally {
+      setCarregando(false);
+    }
+  }, []);
 
-  const [erro, setErro] =
-    useState<string | null>(null);
-
-  const carregarPizzas = useCallback(
-    async () => {
-      try {
-        setCarregando(true);
-        setErro(null);
-
-        const resposta = await fetch(
-          '/api/todasAsPizzas.json',
-        );
-
-        if (!resposta.ok) {
-          throw new Error(
-            'Não foi possível carregar as pizzas',
-          );
-        }
-
-        /*
-         * O JSON atual do projeto está vazio.
-         * Por isso lemos como texto primeiro.
-         *
-         * Se estiver vazio, usamos [].
-         */
-        const texto = await resposta.text();
-
-        const dados: Pizza[] =
-          texto.trim().length > 0
-            ? (JSON.parse(texto) as Pizza[])
-            : [];
-
-        setPizzas(dados);
-      } catch (error) {
-        if (error instanceof Error) {
-          setErro(error.message);
-        } else {
-          setErro(
-            'Ocorreu um erro desconhecido',
-          );
-        }
-      } finally {
-        setCarregando(false);
-      }
-    },
-    [],
-  );
-
-  function adicionarPizza(
-    dados: PizzaFormData,
-  ) {
-    const novaPizza: Pizza = {
-      id: crypto.randomUUID(),
-      ...dados,
-    };
-
-    setPizzas((pizzasAtuais) => [
-      ...pizzasAtuais,
-      novaPizza,
-    ]);
+  async function adicionarPizza(dados: PizzaFormData) {
+    await adicionarPizzaService(dados);
+    await carregarPizzas();
   }
 
-  function editarPizza(
-    id: string,
-    dados: PizzaFormData,
-  ) {
-    setPizzas((pizzasAtuais) =>
-      pizzasAtuais.map((pizza) =>
-        pizza.id === id
-          ? {
-              ...pizza,
-              ...dados,
-            }
-          : pizza,
-      ),
-    );
+  async function editarPizza(id: string, dados: PizzaFormData) {
+    await editarPizzaService(id, dados);
+    await carregarPizzas();
   }
 
-  function excluirPizza(id: string) {
-    setPizzas((pizzasAtuais) =>
-      pizzasAtuais.filter(
-        (pizza) => pizza.id !== id,
-      ),
-    );
+  async function excluirPizza(id: string) {
+    await excluirPizzaService(id);
+    await carregarPizzas();
   }
 
   return {

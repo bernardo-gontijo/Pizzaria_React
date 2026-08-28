@@ -1,22 +1,22 @@
-import { NavLink } from 'react-router';
+import { NavLink } from "react-router-dom";
 
 export function SideBar() {
   const links = [
     {
-      nome: 'Dashboard',
-      caminho: '/admin/dashboard',
+      nome: "Dashboard",
+      caminho: "/admin/dashboard",
     },
     {
-      nome: 'Pizzas',
-      caminho: '/admin/pizzas',
+      nome: "Pizzas",
+      caminho: "/admin/pizzas",
     },
     {
-      nome: 'Pedidos',
-      caminho: '/admin/pedidos',
+      nome: "Pedidos",
+      caminho: "/admin/pedidos",
     },
     {
-      nome: 'Configurações',
-      caminho: '/admin/configuracao',
+      nome: "Configurações",
+      caminho: "/admin/configuracao",
     },
   ];
 
@@ -34,8 +34,8 @@ export function SideBar() {
                 to={link.caminho}
                 className={({ isActive }) =>
                   isActive
-                    ? 'admin-sidebar__link admin-sidebar__link--ativo'
-                    : 'admin-sidebar__link'
+                    ? "admin-sidebar__link admin-sidebar__link--ativo"
+                    : "admin-sidebar__link"
                 }
               >
                 {link.nome}

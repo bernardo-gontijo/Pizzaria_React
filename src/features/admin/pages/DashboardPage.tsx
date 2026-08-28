@@ -1,15 +1,10 @@
-import { useEffect } from 'react';
+import { useEffect } from "react";
 
-import { DashboardCard } from '../components/DasboardCard';
-import { useAdminPedidos } from '../hooks/useAdminPedidos';
+import { DashboardCard } from "../components/DasboardCard";
+import { useAdminPedidos } from "../hooks/useAdminPedidos";
 
 export function DashboardPage() {
-  const {
-    pedidos,
-    carregando,
-    erro,
-    carregarPedidos,
-  } = useAdminPedidos();
+  const { pedidos, carregando, erro, carregarPedidos } = useAdminPedidos();
 
   useEffect(() => {
     carregarPedidos();
@@ -18,7 +13,7 @@ export function DashboardPage() {
   const hoje = new Date();
 
   const pedidosHoje = pedidos.filter((pedido) => {
-    const dataPedido = new Date(pedido.criadoEm);
+    const dataPedido = new Date(pedido.createdAt);
 
     return (
       dataPedido.getDate() === hoje.getDate() &&
@@ -28,7 +23,7 @@ export function DashboardPage() {
   });
 
   const pedidosMes = pedidos.filter((pedido) => {
-    const dataPedido = new Date(pedido.criadoEm);
+    const dataPedido = new Date(pedido.createdAt);
 
     return (
       dataPedido.getMonth() === hoje.getMonth() &&
@@ -37,7 +32,7 @@ export function DashboardPage() {
   });
 
   const pedidosEntregues = pedidos.filter(
-    (pedido) => pedido.status === 'entregue',
+    (pedido) => pedido.status === "entregue",
   );
 
   const faturamentoHoje = pedidosHoje.reduce(
@@ -51,9 +46,9 @@ export function DashboardPage() {
   );
 
   function formatarMoeda(valor: number) {
-    return valor.toLocaleString('pt-BR', {
-      style: 'currency',
-      currency: 'BRL',
+    return valor.toLocaleString("pt-BR", {
+      style: "currency",
+      currency: "BRL",
     });
   }
 

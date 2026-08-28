@@ -1,21 +1,32 @@
-import { Loading } from "../../../components/Loading";
-import { MensagemErro } from "../../../components/MensagemErro";
+import { Link } from "react-router-dom";
+
 import { ListaPizzas } from "../components/ListaPizzas";
 import { usePizzas } from "../hooks/usePizzas";
+
+const categorias = ["tradicional", "especial", "vegetariana", "doce"];
 
 export function CardapioPage() {
   const { pizzas, loading, erro } = usePizzas();
 
-  if (loading) return <Loading />;
-  if (erro) return <MensagemErro mensagem={erro.message} />;
+  if (loading) return <p>Carregando cardápio...</p>;
+  if (erro) return <p>Erro: {erro.message}</p>;
+
   return (
-    <section className="pagina-cardapio">
-      <div className="cabecalho-pagina">
-        <p className="sobretitulo">Feitas na hora</p>
-        <h1>Nosso cardápio</h1>
-        <p>Escolha um sabor e monte seu pedido.</p>
-      </div>
-      <ListaPizzas pizzas={pizzas.filter((pizza) => pizza.disponivel)} />
-    </section>
+    <div className="cardapio-page">
+      <section className="cardapio-banner">
+        <h1>Cardápio</h1>
+      </section>
+      <section className="cardapio-catalogo">
+        <nav aria-label="Categorias do cardápio" className="categorias-menu">
+          <Link to="/cardapio">Todos os sabores</Link>
+          {categorias.map((categoria) => (
+            <Link key={categoria} to={`/categoria/${categoria}`}>
+              {categoria}
+            </Link>
+          ))}
+        </nav>
+        <ListaPizzas pizzas={pizzas.filter((pizza) => pizza.disponivel)} />
+      </section>
+    </div>
   );
 }

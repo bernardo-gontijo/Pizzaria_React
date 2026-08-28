@@ -5,6 +5,7 @@ import { AuthProvider } from "./features/admin/hooks/AuthContext";
 import { AppProviders } from "./app/providers";
 import { router } from "./app/router";
 import { TenantConfigProvider } from "./context/TenantConfigContext";
+import { CartProvider } from './context/CartContext';
 import { registerServiceWorker } from "./pwa/registerServiceWorker";
 import "./index.css";
 
@@ -15,7 +16,9 @@ createRoot(document.getElementById("root")!).render(
     <AppProviders>
       <AuthProvider>
         <TenantConfigProvider>
-          <RouterProvider router={router} />
+            <CartProvider>
+              <RouterProvider router={router} />
+              </CartProvider>
         </TenantConfigProvider>
       </AuthProvider>
     </AppProviders>
