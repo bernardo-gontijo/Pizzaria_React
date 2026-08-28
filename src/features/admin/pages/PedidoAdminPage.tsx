@@ -1,16 +1,11 @@
-import { useEffect } from 'react';
+import { useEffect } from "react";
 
-import { PedidoTable } from '../components/PedidoTable';
-import { useAdminPedidos } from '../hooks/useAdminPedidos';
+import { PedidoTable } from "../components/PedidoTable";
+import { useAdminPedidos } from "../hooks/useAdminPedidos";
 
 export function PedidoAdminPage() {
-  const {
-    pedidos,
-    carregando,
-    erro,
-    carregarPedidos,
-    atualizarStatus,
-  } = useAdminPedidos();
+  const { pedidos, carregando, erro, carregarPedidos, atualizarStatus } =
+    useAdminPedidos();
 
   useEffect(() => {
     carregarPedidos();
@@ -20,26 +15,14 @@ export function PedidoAdminPage() {
     <main>
       <h1>Gerenciamento de Pedidos</h1>
 
-      <p>
-        Consulte os pedidos recebidos e
-        atualize o status de cada entrega.
-      </p>
+      <p>Consulte os pedidos recebidos e atualize o status de cada entrega.</p>
 
-      {carregando && (
-        <p>Carregando pedidos...</p>
-      )}
+      {carregando && <p>Carregando pedidos...</p>}
 
-      {erro && (
-        <p role="alert">{erro}</p>
-      )}
+      {erro && <p role="alert">{erro}</p>}
 
       {!carregando && !erro && (
-        <PedidoTable
-          pedidos={pedidos}
-          onAtualizarStatus={
-            atualizarStatus
-          }
-        />
+        <PedidoTable pedidos={pedidos} onAtualizarStatus={atualizarStatus} />
       )}
     </main>
   );

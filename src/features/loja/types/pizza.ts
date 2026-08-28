@@ -1,10 +1,6 @@
-export type PizzaCategory =
-  | 'tradicional'
-  | 'especial'
-  | 'vegetariana'
-  | 'doce';
+export type PizzaCategory = "tradicional" | "especial" | "vegetariana" | "doce";
 
-export type PizzaSize = 'broto' | 'media' | 'grande' | 'familia';
+export type PizzaSize = "broto" | "media" | "grande" | "familia";
 
 export interface Pizza {
   readonly id: string;

@@ -1,4 +1,4 @@
-export type PaymentMethod = 'pix' | 'cartao' | 'dinheiro';
+export type PaymentMethod = "pix" | "cartao" | "dinheiro";
 
 export interface TenantConfig {
   id: string;

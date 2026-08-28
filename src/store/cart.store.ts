@@ -1,8 +1,8 @@
-import type { Pizza, PizzaSize } from '../features/loja/types/pizza';
+import type { Pizza, PizzaSize } from "../features/loja/types/pizza";
 
 export interface CartItem {
   id: string;
-  nome : string;
+  nome: string;
   pizza: Pizza;
   tamanho: PizzaSize;
   borda?: string;

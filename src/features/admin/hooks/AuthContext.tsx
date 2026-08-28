@@ -1,16 +1,12 @@
-import {
-  createContext,
-  useContext,
-  useState,
-  type ReactNode,
-} from 'react';
+import { createContext, useContext, useState, type ReactNode } from "react";
 
 import {
-  getAuthenticatedUser, login as loginService,
-  logout as logoutService} from
-  '../api/auth.service';
+  getAuthenticatedUser,
+  login as loginService,
+  logout as logoutService,
+} from "../api/auth.service";
 
-import type { AuthUser } from '../types/auth';
+import type { AuthUser } from "../types/auth";
 
 interface AuthContextData {
   user: AuthUser | null;
@@ -19,18 +15,10 @@ interface AuthContextData {
   logout: () => void;
 }
 
-const AuthContext = createContext<
-  AuthContextData | undefined
->(undefined);
+const AuthContext = createContext<AuthContextData | undefined>(undefined);
 
-export function AuthProvider({
-  children,
-}: {
-  children: ReactNode;
-}) {
-  const [user, setUser] = useState<AuthUser | null>(
-    getAuthenticatedUser(),
-  );
+export function AuthProvider({ children }: { children: ReactNode }) {
+  const [user, setUser] = useState<AuthUser | null>(getAuthenticatedUser());
 
   const [loading, setLoading] = useState(false);
 
@@ -38,8 +26,7 @@ export function AuthProvider({
     try {
       setLoading(true);
 
-      const authenticatedUser =
-        await loginService(email, senha);
+      const authenticatedUser = await loginService(email, senha);
 
       setUser(authenticatedUser);
     } finally {
@@ -70,9 +57,7 @@ export function useAuth() {
   const context = useContext(AuthContext);
 
   if (!context) {
-    throw new Error(
-      'useAuth deve ser utilizado dentro de AuthProvider',
-    );
+    throw new Error("useAuth deve ser utilizado dentro de AuthProvider");
   }
 
   return context;

@@ -92,9 +92,7 @@ describe("usePizzas", () => {
   });
 
   it("retorna erro quando o fetch rejeita (ex: sem conexão)", async () => {
-    vi.spyOn(globalThis, "fetch").mockRejectedValue(
-      new Error("Falha de rede"),
-    );
+    vi.spyOn(globalThis, "fetch").mockRejectedValue(new Error("Falha de rede"));
 
     const { result } = renderHook(() => usePizzas());
 

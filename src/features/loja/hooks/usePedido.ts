@@ -16,15 +16,18 @@ interface DadosPedido {
     | string;
 }
 
-const FORMAS_PAGAMENTO_VALIDAS: readonly CriarPedidoDTO["formaPagamento"][] =
-  ["dinheiro", "cartao_credito", "cartao_debito", "pix", "vale_refeicao"];
+const FORMAS_PAGAMENTO_VALIDAS: readonly CriarPedidoDTO["formaPagamento"][] = [
+  "dinheiro",
+  "cartao_credito",
+  "cartao_debito",
+  "pix",
+  "vale_refeicao",
+];
 
 function validarFormaPagamento(
   valor: string,
 ): CriarPedidoDTO["formaPagamento"] {
-  if (
-    (FORMAS_PAGAMENTO_VALIDAS as readonly string[]).includes(valor)
-  ) {
+  if ((FORMAS_PAGAMENTO_VALIDAS as readonly string[]).includes(valor)) {
     return valor as CriarPedidoDTO["formaPagamento"];
   }
 

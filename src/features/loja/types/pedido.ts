@@ -1,4 +1,4 @@
-import { type Pizza } from './pizza';
+import { type Pizza } from "./pizza";
 
 export interface ItemPedido {
   id: string;
@@ -6,18 +6,18 @@ export interface ItemPedido {
   pizzaName: string;
   quantity: number;
   price: number;
-  size: 'P' | 'M' | 'G' | 'GG';
+  size: "P" | "M" | "G" | "GG";
   observations?: string;
   pizza?: Pizza;
 }
 
-export type StatusPedidoType = 
-  | 'pendente'
-  | 'confirmado'
-  | 'preparando'
-  | 'pronto'
-  | 'entregue'
-  | 'cancelado';
+export type StatusPedidoType =
+  | "pendente"
+  | "confirmado"
+  | "preparando"
+  | "pronto"
+  | "entregue"
+  | "cancelado";
 
 export interface StatusHistorico {
   id: string;
@@ -50,7 +50,8 @@ export interface Pedido {
   taxaEntrega: number;
   desconto: number;
   total: number;
-  formaPagamento: 'dinheiro' | 'cartao_credito' | 'cartao_debito' | 'pix' | 'vale_refeicao';
+  formaPagamento:
+    "dinheiro" | "cartao_credito" | "cartao_debito" | "pix" | "vale_refeicao";
   trocoPara?: number;
   status: StatusPedidoType;
   statusHistorico: StatusHistorico[];
@@ -66,8 +67,9 @@ export interface CriarPedidoDTO {
     telefone: string;
   };
   endereco: EnderecoEntrega;
-  itens: Omit<ItemPedido, 'id'>[];
-  formaPagamento: 'dinheiro' | 'cartao_credito' | 'cartao_debito' | 'pix' | 'vale_refeicao';
+  itens: Omit<ItemPedido, "id">[];
+  formaPagamento:
+    "dinheiro" | "cartao_credito" | "cartao_debito" | "pix" | "vale_refeicao";
   trocoPara?: number;
   observacoes?: string;
 }
