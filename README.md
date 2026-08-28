@@ -32,3 +32,11 @@ Acessando o painel admin
 Acesse http://localhost:5173/admin/login com:
 E-mail: admin@pizzashop.com
 Senha: 123456
+
+* para testar:
+
+npm test
+npx tsc -b --noEmit
+npx eslint .
+npm run build
+npm run dev
