@@ -19,6 +19,11 @@ a {
   color: inherit;
   text-decoration: none;
 }
+img,
+svg {
+  max-width: 100%;
+  height: auto;
+}
 
 .aplicacao {
   min-height: 100vh;
@@ -53,6 +58,7 @@ a {
 }
 .navegacao {
   display: flex;
+  flex-wrap: wrap;
   gap: 18px;
 }
 .navegacao a.active {
@@ -584,5 +590,36 @@ a {
 
   .carrinho-item {
     grid-template-columns: 1fr auto;
+  }
+}
+
+/* Telas bem pequenas (celulares menores, ~320-480px) */
+@media (max-width: 480px) {
+  .conteudo {
+    padding-block: 20px 40px;
+  }
+
+  .carrinho-item {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .carrinho-item > div {
+    flex-wrap: wrap;
+  }
+
+  .admin-sidebar__menu {
+    grid-template-columns: 1fr;
+  }
+
+  .checkout-page form,
+  .pagamento-page form,
+  .pizza-detalhe-page,
+  .carrinho-resumo {
+    padding: 16px;
+  }
+
+  .admin-layout__conteudo {
+    padding: 16px 12px;
   }
 }
