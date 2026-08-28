@@ -1,27 +1,20 @@
-import type {
-  Order,
-  OrderStatus,
-} from '../../../store/order.store';
+import type { Pedido, StatusPedidoType } from "../../loja/types/pedido";
 
 interface PedidoTableProps {
-  pedidos: Order[];
-  onAtualizarStatus: (
-    id: string,
-    status: OrderStatus,
-  ) => void;
+  pedidos: Pedido[];
+  onAtualizarStatus: (id: string, status: StatusPedidoType) => void;
 }
 
-const nomesStatus: Record<OrderStatus, string> = {
-  recebido: 'Recebido',
-  preparo: 'Em preparo',
-  saiu_para_entrega: 'Saiu para entrega',
-  entregue: 'Entregue',
+const nomesStatus: Record<StatusPedidoType, string> = {
+  pendente: "Pendente",
+  confirmado: "Confirmado",
+  preparando: "Em preparo",
+  pronto: "Pronto para entrega",
+  entregue: "Entregue",
+  cancelado: "Cancelado",
 };
 
-export function PedidoTable({
-  pedidos,
-  onAtualizarStatus,
-}: PedidoTableProps) {
+export function PedidoTable({ pedidos, onAtualizarStatus }: PedidoTableProps) {
   if (pedidos.length === 0) {
     return <p>Nenhum pedido encontrado.</p>;
   }
@@ -44,68 +37,39 @@ export function PedidoTable({
         {pedidos.map((pedido) => (
           <tr key={pedido.id}>
             <td>{pedido.id}</td>
-
             <td>
               <strong>{pedido.cliente.nome}</strong>
-
               <br />
-
               {pedido.cliente.telefone}
             </td>
-
             <td>{pedido.itens.length}</td>
-
             <td>{pedido.formaPagamento}</td>
-
             <td>
-              {pedido.total.toLocaleString(
-                'pt-BR',
-                {
-                  style: 'currency',
-                  currency: 'BRL',
-                },
-              )}
+              {pedido.total.toLocaleString("pt-BR", {
+                style: "currency",
+                currency: "BRL",
+              })}
             </td>
-
             <td>
               <select
                 value={pedido.status}
                 onChange={(event) =>
                   onAtualizarStatus(
                     pedido.id,
-                    event.target
-                      .value as OrderStatus,
+                    event.target.value as StatusPedidoType,
                   )
                 }
                 aria-label={`Status do pedido ${pedido.id}`}
               >
-                <option value="recebido">
-                  Recebido
-                </option>
-
-                <option value="preparo">
-                  Em preparo
-                </option>
-
-                <option value="saiu_para_entrega">
-                  Saiu para entrega
-                </option>
-
-                <option value="entregue">
-                  Entregue
-                </option>
+                {Object.entries(nomesStatus).map(([status, nome]) => (
+                  <option key={status} value={status}>
+                    {nome}
+                  </option>
+                ))}
               </select>
-
-              <small>
-                {nomesStatus[pedido.status]}
-              </small>
+              <small>{nomesStatus[pedido.status]}</small>
             </td>
-
-            <td>
-              {new Date(
-                pedido.criadoEm,
-              ).toLocaleString('pt-BR')}
-            </td>
+            <td>{new Date(pedido.createdAt).toLocaleString("pt-BR")}</td>
           </tr>
         ))}
       </tbody>
