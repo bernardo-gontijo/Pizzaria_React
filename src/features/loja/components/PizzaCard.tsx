@@ -1,3 +1,4 @@
+import type { SyntheticEvent } from "react";
 import type { Pizza } from "../types/pizza";
 import { Link } from "react-router-dom";
 
@@ -6,9 +7,14 @@ interface PizzaCardProps {
 }
 
 export function PizzaCard({ pizza }: PizzaCardProps) {
+  function usarImagemReserva(event: SyntheticEvent<HTMLImageElement>) {
+    event.currentTarget.onerror = null;
+    event.currentTarget.src = "/images/banner-pizzaria.jpg";
+  }
+
   return (
     <article className="pizza-card">
-      <img alt={pizza.nome} src={pizza.imagem} />
+      <img alt={pizza.nome} src={pizza.imagem} onError={usarImagemReserva} />
       <div className="pizza-card__conteudo">
         <span className="categoria">{pizza.categoria}</span>
         <h2>{pizza.nome}</h2>

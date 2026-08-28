@@ -1,6 +1,5 @@
 import { NavLink } from "react-router-dom";
 
-import logoPizza from "../assets/logoPizza.png";
 import { useCart } from "../context/CartContext";
 import { useTenantConfig } from "../context/TenantConfigContext";
 
@@ -11,8 +10,10 @@ export function Header() {
   return (
     <header className="header">
       <NavLink className="marca" to="/">
-        <img alt="" src={logoPizza} />
-        <span>{config.nome}</span>
+        <img
+          alt={`Logotipo da ${config.nome}`}
+          src={config.logoUrl || "/images/hero-pizzaria.png"}
+        />
       </NavLink>
       <nav aria-label="Navegação principal" className="navegacao">
         <NavLink to="/">Início</NavLink>

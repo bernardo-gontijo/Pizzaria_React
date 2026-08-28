@@ -23,17 +23,19 @@ export function StatusPedido({ pedido }: StatusPedidoProps) {
 
     return (
         <div className="status-pedido">
-            <h3>Pedido #{pedido.id.slice(-6)}</h3>
-            <p>{STATUS_MAP[pedido.status] || pedido.status}</p>
+            <div className="status-pedido__cabecalho">
+                <span>Pedido #{pedido.id.slice(-6)}</span>
+                <h2>{STATUS_MAP[pedido.status] || pedido.status}</h2>
+            </div>
 
-            <div className="status-timeline">
+            <ol className="status-timeline">
                 {steps.map((step, index) => (
-                    <div key={step} className={index <= currentIndex ? "completed" : ""}>
+                    <li key={step} className={index <= currentIndex ? "completed" : ""}>
                         <span>{index + 1}</span>
                         <span>{STATUS_MAP[step]}</span>
-                    </div>
+                    </li>
                 ))}
-            </div>
+            </ol>
 
             <div className="status-detalhes">
                 <p><strong>Cliente:</strong> {pedido.cliente.nome}</p>

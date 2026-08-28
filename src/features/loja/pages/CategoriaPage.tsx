@@ -1,13 +1,14 @@
-import { useParams } from "react-router-dom";
-import { usePizzas } from "../hooks/usePizzas";
+import { Link, useParams } from "react-router-dom";
+
 import { ListaPizzas } from "../components/ListaPizzas";
+import { usePizzas } from "../hooks/usePizzas";
 
 export function CategoriaPage() {
   const { categoria } = useParams<{ categoria: string }>();
   const { pizzas, loading, erro } = usePizzas();
 
   const pizzasFiltradas = pizzas.filter(
-    (p) => p.categoria.toLowerCase() === categoria?.toLowerCase(),
+    (pizza) => pizza.categoria.toLowerCase() === categoria?.toLowerCase(),
   );
 
   if (loading) return <p>Carregando...</p>;
@@ -15,8 +16,15 @@ export function CategoriaPage() {
 
   return (
     <div className="categoria-page">
-      <h1>{categoria}</h1>
-      <ListaPizzas pizzas={pizzasFiltradas} />
+      <section className="cardapio-banner">
+        <h1>{categoria}</h1>
+      </section>
+      <section className="cardapio-catalogo">
+        <Link className="voltar-cardapio" to="/cardapio">
+          Todos os sabores
+        </Link>
+        <ListaPizzas pizzas={pizzasFiltradas} />
+      </section>
     </div>
   );
 }

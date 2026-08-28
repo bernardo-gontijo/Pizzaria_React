@@ -46,41 +46,37 @@ export function PizzaDetalhePage() {
     if (!pizza) return <p>Pizza não encontrada</p>;
 
     return (
-        <div className="pizza-detalhe-page">
-            <img src={pizza.imagem} alt={pizza.nome} />
-            
-            <h1>{pizza.nome}</h1>
-            <p>{pizza.descricao}</p>
-            
-            <div>
-                <strong>Categoria:</strong> {pizza.categoria}
-            </div>
-            
-            <div>
-                <strong>Ingredientes:</strong>
-                <ul>
-                    {pizza.ingredientes.map((ing, index) => (
-                        <li key={index}>{ing}</li>
-                    ))}
-                </ul>
-            </div>
+        <section className="pizza-detalhe-page">
+            <img className="pizza-detalhe-page__imagem" src={pizza.imagem} alt={pizza.nome} />
 
-            <div>
-                <label>Quantidade:</label>
-                <button onClick={() => setQuantidade(Math.max(1, quantidade - 1))}>-</button>
-                <span>{quantidade}</span>
-                <button onClick={() => setQuantidade(quantidade + 1)}>+</button>
+            <div className="pizza-detalhe-page__conteudo">
+                <span className="categoria">{pizza.categoria}</span>
+                <h1>{pizza.nome}</h1>
+                <p className="pizza-detalhe-page__descricao">{pizza.descricao}</p>
+
+                <div className="pizza-detalhe-page__ingredientes">
+                    <strong>Ingredientes</strong>
+                    <ul>
+                        {pizza.ingredientes.map((ing, index) => (
+                            <li key={index}>{ing}</li>
+                        ))}
+                    </ul>
+                </div>
+
+                <div className="seletor-quantidade">
+                    <span>Quantidade</span>
+                    <div>
+                        <button aria-label="Diminuir quantidade" onClick={() => setQuantidade(Math.max(1, quantidade - 1))}>−</button>
+                        <strong>{quantidade}</strong>
+                        <button aria-label="Aumentar quantidade" onClick={() => setQuantidade(quantidade + 1)}>+</button>
+                    </div>
+                </div>
+
+                <p className="pizza-detalhe-page__preco">R$ {pizza.preco.toFixed(2)}</p>
+                <button className="pizza-detalhe-page__adicionar" onClick={handleAdicionar} disabled={!pizza.disponivel}>
+                    {pizza.disponivel ? "Adicionar ao carrinho" : "Indisponível no momento"}
+                </button>
             </div>
-
-            <div>
-                <strong>Preço: R$ {pizza.preco.toFixed(2)}</strong>
-            </div>
-
-            <button onClick={handleAdicionar} disabled={!pizza.disponivel}>
-                Adicionar ao Carrinho
-            </button>
-
-            {!pizza.disponivel && <p>Indisponível no momento</p>}
-        </div>
+        </section>
     );
 }

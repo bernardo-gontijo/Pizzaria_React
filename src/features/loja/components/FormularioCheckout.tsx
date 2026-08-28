@@ -27,12 +27,14 @@ export function FormularioCheckout({
     }
 
     return (
-        <form onSubmit={handleSubmit}>
+        <form className="formulario-checkout" onSubmit={handleSubmit}>
             {erro && <p className="erro">{erro}</p>}
 
-            <div>
-                <label>Nome *</label>
+            <div className="formulario-checkout__campo">
+                <label htmlFor="nome">Nome *</label>
                 <input 
+                    id="nome"
+                    type="text"
                     value={nome} 
                     onChange={(e) => setNome(e.target.value)} 
                     disabled={loading} 
@@ -40,9 +42,11 @@ export function FormularioCheckout({
                 />
             </div>
 
-            <div>
-                <label>Telefone *</label>
+            <div className="formulario-checkout__campo">
+                <label htmlFor="telefone">Telefone *</label>
                 <input 
+                    id="telefone"
+                    type="tel"
                     value={telefone} 
                     onChange={(e) => setTelefone(e.target.value)} 
                     disabled={loading} 
@@ -50,9 +54,11 @@ export function FormularioCheckout({
                 />
             </div>
 
-            <div>
-                <label>Endereço *</label>
+            <div className="formulario-checkout__campo">
+                <label htmlFor="endereco">Endereço *</label>
                 <input 
+                    id="endereco"
+                    type="text"
                     value={endereco} 
                     onChange={(e) => setEndereco(e.target.value)} 
                     disabled={loading} 
@@ -60,9 +66,10 @@ export function FormularioCheckout({
                 />
             </div>
 
-            <div>
-                <label>Pagamento *</label>
+            <div className="formulario-checkout__campo">
+                <label htmlFor="pagamento">Pagamento *</label>
                 <select 
+                    id="pagamento"
                     value={pagamento} 
                     onChange={(e) => setPagamento(e.target.value)} 
                     disabled={loading}
@@ -74,7 +81,7 @@ export function FormularioCheckout({
                 </select>
             </div>
 
-            <button type="submit" disabled={loading}>
+            <button className="formulario-checkout__botao" type="submit" disabled={loading}>
                 {loading ? "Processando..." : "Finalizar Pedido"}
             </button>
         </form>
