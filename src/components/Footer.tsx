@@ -2,11 +2,12 @@ import { useTenantConfig } from "../context/TenantConfigContext";
 
 export function Footer() {
   const { config } = useTenantConfig();
+
   return (
-    <footer className="footer">
+    <footer className="footer" id="contato">
       <strong>{config.nome}</strong>
       <span>{config.endereco}</span>
-      <span>{config.horarioFuncionamento}</span>
+      <span>Atendimento: {config.horarioFuncionamento}</span>
     </footer>
   );
 }

@@ -1,6 +1,6 @@
 [
   {
-    "id": "1",
+    "id": "calabresa",
     "nome": "Calabresa",
     "descricao": "Molho de tomate, muçarela, calabresa fatiada e cebola.",
     "preco": 42.9,
@@ -8,76 +8,35 @@
     "imagem": "/images/pizzas/pizzaCalabresaNova.jpg",
     "categoria": "tradicional",
     "disponivel": true
-
   },
   {
-    "id": "2",
-    "nome": "Pepperoni",
-    "descricao": "Molho de tomate, muçarela e pepperoni fatiado.",
-    "preco": 47.9,
-    "ingredientes": ["molho de tomate", "muçarela", "pepperoni"],
-    "imagem": "/images/pizzas/pizzaPeperoni.jpeg",
+    "id": "marguerita",
+    "nome": "Marguerita",
+    "descricao": "Molho de tomate, muçarela, tomate fresco e manjericão.",
+    "preco": 39.9,
+    "ingredientes": ["molho de tomate", "muçarela", "tomate", "manjericão"],
+    "imagem": "/images/pizzas/pizzaMarguerita.jpg",
     "categoria": "tradicional",
-    "disponivel": true    
+    "disponivel": true
   },
   {
-    "id": "3",
-    "nome": "Pepperoni com Catupiry",
-    "descricao": "Molho de tomate, muçarela, pepperoni e catupiry.",
-    "preco": 46.9,
-    "ingredientes": ["molho de tomate", "muçarela", "pepperoni", "catupiry"],
+    "id": "quatro-queijos",
+    "nome": "Quatro Queijos",
+    "descricao": "Muçarela, provolone, parmesão e catupiry.",
+    "preco": 48.9,
+    "ingredientes": ["muçarela", "provolone", "parmesão", "catupiry"],
     "imagem": "/images/pizzas/pizzaCatuperoni.jpeg",
-    "categoria": "tradicional",
+    "categoria": "especial",
     "disponivel": true
   },
   {
-    "id": "4",
-    "nome": "Napolitana",
-    "descricao": "Molho de tomate, muçarela, tomate fresco, parmesão e orégano.",
-    "preco": 43.9,
-    "ingredientes": ["molho de tomate", "muçarela", "tomate", "parmesão", "orégano"],
-    "imagem": "/images/pizzas/pizzaNapolitana.jpeg",
-    "categoria": "tradicional",
-    "disponivel": true
-  },
-  {
-    "id": "5",
-    "nome": "Banana Chocolate",
-    "descricao": "Banana fatiada, chocolate ao leite e canela.",
-    "preco": 45.9,
-    "ingredientes": ["banana", "chocolate ao leite", "canela"],
+    "id": "chocolate",
+    "nome": "Chocolate",
+    "descricao": "Chocolate ao leite, morangos e granulado.",
+    "preco": 44.9,
+    "ingredientes": ["chocolate", "morango", "granulado"],
     "imagem": "/images/pizzas/pizzaBananaChocolate.jpg",
     "categoria": "doce",
-    "disponivel": true
-  },
-  {
-    "id": "6",
-    "nome": "Banana Nevada",
-    "descricao": "Chocolate branco, banana e canela gratinados.",
-    "preco": 45.9,
-    "ingredientes": ["chocolate branco", "banana", "canela"],
-    "imagem": "/images/pizzas/pizzaBananaNevada.webp",
-    "categoria": "doce",
-    "disponivel": true
-  },
-  {
-    "id": "7",
-    "nome": "Rúcula com Tomate Seco",
-    "descricao": "Molho de tomate, muçarela, rúcula e tomate seco.",
-    "preco": 46.9,
-    "ingredientes": ["molho de tomate", "muçarela", "rúcula", "tomate seco"],
-    "imagem": "/images/pizzas/pizzaRuculaTomateSeco.jpeg",
-    "categoria": "especial",
-    "disponivel": true
-  },
-  {
-    "id": "8",
-    "nome": "Alho",
-    "descricao": "Molho de tomate, muçarela e alho tostado.",
-    "preco": 46.9,
-    "ingredientes": ["molho de tomate", "muçarela", "alho"],
-    "imagem": "/images/pizzas/pizzaAlho.jpg",
-    "categoria": "especial",
     "disponivel": true
   }
 ]
