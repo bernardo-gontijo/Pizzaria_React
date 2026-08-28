@@ -1,33 +1,34 @@
-# React + TypeScript + Vite
+# PizzaShop — Plataforma White-Label de Venda de Pizzas Online
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Projeto React + TypeScript + Vite, com módulo de loja (cliente) e painel administrativo para customização white-label da pizzaria.
 
-Currently, two official plugins are available:
+Pré-requisitos
+Node.js 18+ (verifique com node -v)
+npm (vem junto com o Node)
+VSCode
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Como rodar
+Abra o projeto no VSCode
+File → Open Folder... e selecione a pasta Pizzaria_React
+Ou pelo terminal: code . dentro da pasta do projeto
+Abra o terminal integrado Atalho Ctrl+` (ou Terminal → New Terminal), e confirme que está na raiz do projeto (onde fica o package.json).
 
-## React Compiler
+Instale as dependências: npm install
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Isso baixa todas as bibliotecas do projeto para a pasta node_modules/.
 
-## Expanding the Oxlint configuration
+Rode o projeto: npm run dev
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
+O terminal vai mostrar um endereço tipo:
 
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
-```
+   ➜  Local:   http://localhost:5173/
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
-"# Pizzaria_React" 
+Segure Ctrl (ou Cmd no Mac) e clique no link, ou copie e cole no navegador.
+
+Para parar o servidor: Ctrl + C no terminal.
+
+Acessando o painel admin
+
+Acesse http://localhost:5173/admin/login com:
+E-mail: admin@pizzashop.com
+Senha: 123456
