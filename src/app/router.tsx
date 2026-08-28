@@ -1,22 +1,79 @@
+import { lazy, Suspense } from "react";
 import { createBrowserRouter, Navigate } from "react-router-dom";
 
 import { Layout } from "../components/Layout";
 import { Layout as AdminLayout } from "../features/admin/components/Layout";
 import { ProtectedRoute } from "../features/admin/components/ProtectedRoute";
-import { ConfiguracaoPage } from "../features/admin/pages/ConfiguracaoPage";
-import { DashboardPage } from "../features/admin/pages/DashboardPage";
-import { LoginPage } from "../features/admin/pages/LoginPage";
-import { PedidoAdminPage } from "../features/admin/pages/PedidoAdminPage";
-import { PizzasPage } from "../features/admin/pages/PizzasPage";
-import { AcompanharPedidoPage } from "../features/loja/pages/AcompanharPedidoPage";
-import { CardapioPage } from "../features/loja/pages/CardapioPage";
-import { CarrinhoPage } from "../features/loja/pages/CarrinhoPage";
-import { CategoriaPage } from "../features/loja/pages/CategoriaPage";
-import { CheckoutPage } from "../features/loja/pages/CheckoutPage";
-import { PagamentoPage } from "../features/loja/pages/PagamentoPage";
-import { PizzaDetalhePage } from "../features/loja/pages/PizzaDetalhePage";
-import { HomePage } from "../pages/HomePage";
-import { NotFoundPage } from "../pages/NotFoundPage";
+import { Loading } from "../components/Loading";
+
+const ConfiguracaoPage = lazy(() =>
+  import("../features/admin/pages/ConfiguracaoPage").then((m) => ({
+    default: m.ConfiguracaoPage,
+  })),
+);
+const DashboardPage = lazy(() =>
+  import("../features/admin/pages/DashboardPage").then((m) => ({
+    default: m.DashboardPage,
+  })),
+);
+const LoginPage = lazy(() =>
+  import("../features/admin/pages/LoginPage").then((m) => ({
+    default: m.LoginPage,
+  })),
+);
+const PedidoAdminPage = lazy(() =>
+  import("../features/admin/pages/PedidoAdminPage").then((m) => ({
+    default: m.PedidoAdminPage,
+  })),
+);
+const PizzasPage = lazy(() =>
+  import("../features/admin/pages/PizzasPage").then((m) => ({
+    default: m.PizzasPage,
+  })),
+);
+const AcompanharPedidoPage = lazy(() =>
+  import("../features/loja/pages/AcompanharPedidoPage").then((m) => ({
+    default: m.AcompanharPedidoPage,
+  })),
+);
+const CardapioPage = lazy(() =>
+  import("../features/loja/pages/CardapioPage").then((m) => ({
+    default: m.CardapioPage,
+  })),
+);
+const CarrinhoPage = lazy(() =>
+  import("../features/loja/pages/CarrinhoPage").then((m) => ({
+    default: m.CarrinhoPage,
+  })),
+);
+const CategoriaPage = lazy(() =>
+  import("../features/loja/pages/CategoriaPage").then((m) => ({
+    default: m.CategoriaPage,
+  })),
+);
+const CheckoutPage = lazy(() =>
+  import("../features/loja/pages/CheckoutPage").then((m) => ({
+    default: m.CheckoutPage,
+  })),
+);
+const PagamentoPage = lazy(() =>
+  import("../features/loja/pages/PagamentoPage").then((m) => ({
+    default: m.PagamentoPage,
+  })),
+);
+const PizzaDetalhePage = lazy(() =>
+  import("../features/loja/pages/PizzaDetalhePage").then((m) => ({
+    default: m.PizzaDetalhePage,
+  })),
+);
+const HomePage = lazy(() =>
+  import("../pages/HomePage").then((m) => ({ default: m.HomePage })),
+);
+const NotFoundPage = lazy(() =>
+  import("../pages/NotFoundPage").then((m) => ({
+    default: m.NotFoundPage,
+  })),
+);
 
 export const router = createBrowserRouter([
   {
@@ -36,7 +93,11 @@ export const router = createBrowserRouter([
   },
   {
     path: "/admin/login",
-    Component: LoginPage,
+    element: (
+      <Suspense fallback={<Loading />}>
+        <LoginPage />
+      </Suspense>
+    ),
   },
   {
     path: "/admin",
