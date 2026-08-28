@@ -3,9 +3,24 @@ import type { Pizza } from "../types/pizza";
 const PIZZAS_URL = "/api/todasAsPizzas.json";
 const PIZZAS_STORAGE_KEY = "pizzashop-pizzas";
 
+// Incrementa este número sempre que o catálogo padrão em
+// public/api/todasAsPizzas.json for alterado intencionalmente (pizzas
+// adicionadas, removidas ou renomeadas no arquivo-fonte). Isso invalida
+// automaticamente o cache salvo no navegador de quem já usou o site
+// antes, evitando que fiquem presos numa versão antiga do cardápio
+// para sempre. Atenção: subir a versão também descarta pizzas
+// cadastradas manualmente via admin que ainda não tiverem sido
+// migradas para um backend real.
+const CATALOGO_VERSION = 2;
+
 export const PIZZAS_ATUALIZADAS_EVENT = "pizzashop:pizzas-atualizadas";
 
 export type PizzaInput = Omit<Pizza, "id">;
+
+interface PizzasArmazenadas {
+  version: number;
+  pizzas: Pizza[];
+}
 
 function lerPizzasSalvas(): Pizza[] | null {
   const dadosSalvos = localStorage.getItem(PIZZAS_STORAGE_KEY);
@@ -13,7 +28,16 @@ function lerPizzasSalvas(): Pizza[] | null {
   if (!dadosSalvos) return null;
 
   try {
-    return JSON.parse(dadosSalvos) as Pizza[];
+    const armazenado = JSON.parse(dadosSalvos) as PizzasArmazenadas;
+
+    if (armazenado.version !== CATALOGO_VERSION) {
+      // Catálogo padrão mudou desde o último acesso deste navegador:
+      // descarta o cache antigo para exibir o catálogo atualizado.
+      localStorage.removeItem(PIZZAS_STORAGE_KEY);
+      return null;
+    }
+
+    return armazenado.pizzas;
   } catch {
     localStorage.removeItem(PIZZAS_STORAGE_KEY);
     return null;
@@ -21,7 +45,12 @@ function lerPizzasSalvas(): Pizza[] | null {
 }
 
 function salvarPizzas(pizzas: Pizza[]): void {
-  localStorage.setItem(PIZZAS_STORAGE_KEY, JSON.stringify(pizzas));
+  const armazenado: PizzasArmazenadas = {
+    version: CATALOGO_VERSION,
+    pizzas,
+  };
+
+  localStorage.setItem(PIZZAS_STORAGE_KEY, JSON.stringify(armazenado));
   window.dispatchEvent(new Event(PIZZAS_ATUALIZADAS_EVENT));
 }
 
