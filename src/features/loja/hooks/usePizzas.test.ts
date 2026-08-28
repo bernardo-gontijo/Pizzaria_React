@@ -33,7 +33,7 @@ afterEach(() => {
 
 describe("usePizzas", () => {
   it("inicia em estado de carregamento", async () => {
-    vi.spyOn(global, "fetch").mockResolvedValue({
+    vi.spyOn(globalThis, "fetch").mockResolvedValue({
       ok: true,
       json: async () => pizzasTeste,
     } as Response);
@@ -52,7 +52,7 @@ describe("usePizzas", () => {
   });
 
   it("carrega as pizzas com sucesso", async () => {
-    vi.spyOn(global, "fetch").mockResolvedValue({
+    vi.spyOn(globalThis, "fetch").mockResolvedValue({
       ok: true,
       json: async () => pizzasTeste,
     } as Response);
@@ -68,7 +68,7 @@ describe("usePizzas", () => {
   });
 
   it("retorna erro quando a resposta não é ok", async () => {
-    vi.spyOn(global, "fetch").mockResolvedValue({
+    vi.spyOn(globalThis, "fetch").mockResolvedValue({
       ok: false,
       json: async () => ({}),
     } as Response);
@@ -87,7 +87,7 @@ describe("usePizzas", () => {
   });
 
   it("retorna erro quando o fetch rejeita (ex: sem conexão)", async () => {
-    vi.spyOn(global, "fetch").mockRejectedValue(
+    vi.spyOn(globalThis, "fetch").mockRejectedValue(
       new Error("Falha de rede"),
     );
 

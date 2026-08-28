@@ -1,4 +1,6 @@
+import { Suspense } from "react";
 import { Outlet } from "react-router-dom";
+import { Loading } from "../../../components/Loading";
 import { SideBar } from "./SideBar";
 
 export function Layout() {
@@ -7,7 +9,9 @@ export function Layout() {
       <SideBar />
 
       <main className="admin-layout__conteudo">
-        <Outlet />
+        <Suspense fallback={<Loading />}>
+          <Outlet />
+        </Suspense>
       </main>
     </div>
   );

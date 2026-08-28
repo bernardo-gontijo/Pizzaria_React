@@ -1,3 +1,3 @@
 export function Loading() {
-  return <p className="feedback">Carregando cardápio...</p>;
+  return <p className="feedback">Carregando...</p>;
 }
