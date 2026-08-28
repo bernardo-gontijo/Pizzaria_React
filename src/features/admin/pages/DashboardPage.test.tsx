@@ -16,57 +16,78 @@ import {
   describe,
   expect,
   it,
+  vi,
 } from 'vitest';
 
-import type { Order } from '../../../store/order.store';
-import { DashboardPage } from './DashboardPage';
+import type { Pedido } from '../../loja/types/pedido';
+import type { DashboardPage as DashboardPageComponent } from './DashboardPage';
 
 const agora = new Date().toISOString();
 
-const pedidosTeste = [
-  {
+function criarPedidoTeste(overrides: Partial<Pedido>): Pedido {
+  return {
     id: 'pedido-1',
-    itens: [],
     cliente: {
       nome: 'João',
       telefone: '92999999999',
-      endereco: 'Rua Principal',
+    },
+    endereco: {
+      cep: '69000-000',
+      rua: 'Rua Principal',
       numero: '100',
       bairro: 'Centro',
+      cidade: 'Manaus',
+      estado: 'AM',
     },
+    itens: [],
+    subtotal: 50,
+    taxaEntrega: 5,
+    desconto: 0,
+    total: 55,
     formaPagamento: 'pix',
+    status: 'entregue',
+    statusHistorico: [],
+    createdAt: agora as unknown as Date,
+    updatedAt: agora as unknown as Date,
+    ...overrides,
+  } as Pedido;
+}
+
+const pedidosTeste: Pedido[] = [
+  criarPedidoTeste({
+    id: 'pedido-1',
+    cliente: { nome: 'João', telefone: '92999999999' },
     subtotal: 50,
     taxaEntrega: 5,
     total: 55,
     status: 'entregue',
-    criadoEm: agora,
-  },
-  {
+  }),
+  criarPedidoTeste({
     id: 'pedido-2',
-    itens: [],
-    cliente: {
-      nome: 'Maria',
-      telefone: '92988888888',
-      endereco: 'Rua Dois',
-      numero: '200',
-      bairro: 'Centro',
-    },
-    formaPagamento: 'pix',
+    cliente: { nome: 'Maria', telefone: '92988888888' },
     subtotal: 25,
     taxaEntrega: 5,
     total: 30,
-    status: 'preparo',
-    criadoEm: agora,
-  },
-] as Order[];
+    status: 'preparando',
+  }),
+];
 
-beforeEach(() => {
+let DashboardPage: typeof DashboardPageComponent;
+
+beforeEach(async () => {
   localStorage.clear();
 
-  localStorage.setItem(
-    'pizzashop-pedidos',
-    JSON.stringify(pedidosTeste),
-  );
+  // Chave usada por pedidos.service.ts (initPedidos), que estrutura os
+  // pedidos de forma diferente do antigo store/order.store.ts.
+  localStorage.setItem('pedidos_loja', JSON.stringify(pedidosTeste));
+
+  // pedidos.service.ts lê o localStorage apenas uma vez, no momento em
+  // que o módulo é importado (initPedidos() roda no topo do arquivo).
+  // Por isso, resetamos os módulos e reimportamos a página DEPOIS de
+  // popular o localStorage, garantindo que o cache em memória do
+  // serviço reflita os dados deste teste.
+  vi.resetModules();
+  ({ DashboardPage } = await import('./DashboardPage'));
 });
 
 afterEach(() => {

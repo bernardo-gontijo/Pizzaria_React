@@ -22,6 +22,12 @@ import {
 import { PizzasPage } from './PizzasPage';
 
 beforeEach(() => {
+  // buscarPizzas() agora cacheia o resultado no localStorage; sem
+  // limpar entre os testes, o cadastro de um teste "vazaria" para o
+  // próximo (ex: o teste de editar/excluir veria a pizza cadastrada
+  // no teste anterior em vez de começar com o catálogo vazio).
+  localStorage.clear();
+
   const fetchMock = vi.fn().mockResolvedValue({
     ok: true,
     text: async () => '[]',
@@ -87,7 +93,7 @@ describe('PizzasPage', () => {
     );
 
     expect(
-      screen.getByRole('heading', {
+      await screen.findByRole('heading', {
         name: 'Calabresa',
       }),
     ).toBeInTheDocument();
@@ -147,7 +153,7 @@ describe('PizzasPage', () => {
     );
 
     fireEvent.click(
-      screen.getByRole('button', {
+      await screen.findByRole('button', {
         name: 'Editar',
       }),
     );
@@ -174,7 +180,7 @@ describe('PizzasPage', () => {
     );
 
     expect(
-      screen.getByRole('heading', {
+      await screen.findByRole('heading', {
         name: 'Calabresa Especial',
       }),
     ).toBeInTheDocument();
@@ -234,7 +240,7 @@ describe('PizzasPage', () => {
     );
 
     expect(
-      screen.getByRole('heading', {
+      await screen.findByRole('heading', {
         name: 'Portuguesa',
       }),
     ).toBeInTheDocument();
