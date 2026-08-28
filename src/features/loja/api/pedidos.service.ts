@@ -14,15 +14,30 @@ function initPedidos() {
   const stored = localStorage.getItem("pedidos_loja");
   if (stored) {
     try {
-      pedidosCache = JSON.parse(stored).map((p: any) => ({
-        ...p,
-        createdAt: new Date(p.createdAt),
-        updatedAt: new Date(p.updatedAt),
-        statusHistorico: p.statusHistorico.map((h: any) => ({
-          ...h,
-          timestamp: new Date(h.timestamp),
-        })),
-      }));
+      interface StatusHistoricoSerializado {
+        id: string;
+        status: Pedido["statusHistorico"][number]["status"];
+        timestamp: string;
+        message: string;
+      }
+
+      interface PedidoSerializado extends Omit<Pedido, "createdAt" | "updatedAt" | "statusHistorico"> {
+        createdAt: string;
+        updatedAt: string;
+        statusHistorico: StatusHistoricoSerializado[];
+      }
+
+      pedidosCache = (JSON.parse(stored) as PedidoSerializado[]).map(
+        (p) => ({
+          ...p,
+          createdAt: new Date(p.createdAt),
+          updatedAt: new Date(p.updatedAt),
+          statusHistorico: p.statusHistorico.map((h) => ({
+            ...h,
+            timestamp: new Date(h.timestamp),
+          })),
+        }),
+      );
     } catch (error) {
       console.error("Erro ao carregar pedidos:", error);
       pedidosCache = [];
@@ -91,7 +106,9 @@ export async function criarPedido(dados: CriarPedidoDTO): Promise<Pedido> {
     return novoPedido;
   } catch (error) {
     console.error("Erro ao criar pedido:", error);
-    throw new Error("Não foi possível criar o pedido. Tente novamente.");
+    throw new Error("Não foi possível criar o pedido. Tente novamente.", {
+      cause: error,
+    });
   }
 }
 
@@ -144,7 +161,9 @@ export async function atualizarStatusPedido(
     return pedido;
   } catch (error) {
     console.error("Erro ao atualizar status:", error);
-    throw new Error("Não foi possível atualizar o status do pedido");
+    throw new Error("Não foi possível atualizar o status do pedido", {
+      cause: error,
+    });
   }
 }
 

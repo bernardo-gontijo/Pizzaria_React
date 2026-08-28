@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useCart } from "../../../context/CartContext";
 import { criarPedido } from "../api/pedidos.service";
+import type { Pedido, CriarPedidoDTO } from "../types/pedido";
 
 interface DadosPedido {
   nome: string;
@@ -15,9 +16,24 @@ interface DadosPedido {
     | string;
 }
 
+const FORMAS_PAGAMENTO_VALIDAS: readonly CriarPedidoDTO["formaPagamento"][] =
+  ["dinheiro", "cartao_credito", "cartao_debito", "pix", "vale_refeicao"];
+
+function validarFormaPagamento(
+  valor: string,
+): CriarPedidoDTO["formaPagamento"] {
+  if (
+    (FORMAS_PAGAMENTO_VALIDAS as readonly string[]).includes(valor)
+  ) {
+    return valor as CriarPedidoDTO["formaPagamento"];
+  }
+
+  throw new Error(`Forma de pagamento inválida: ${valor}`);
+}
+
 export function usePedido() {
   const { items, limparCarrinho } = useCart();
-  const [pedido, setPedido] = useState<any>(null);
+  const [pedido, setPedido] = useState<Pedido | null>(null);
   const [loading, setLoading] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
 
@@ -43,21 +59,23 @@ export function usePedido() {
           estado: "",
           cep: "",
         },
-        itens: items.map((item: any) => ({
+        itens: items.map((item) => ({
           pizzaId: item.id,
           pizzaName: item.nome,
           quantity: item.quantidade,
           price: item.precoUnitario,
-          size: item.tamanho || "M",
+          size: (item.tamanho as "P" | "M" | "G" | "GG") || "M",
         })),
-        formaPagamento: dados.formaPagamento as any,
+        formaPagamento: validarFormaPagamento(dados.formaPagamento),
       });
 
       limparCarrinho();
       setPedido(novoPedido);
       return novoPedido;
-    } catch (error: any) {
-      setErro(error.message || "Erro ao finalizar pedido");
+    } catch (error) {
+      setErro(
+        error instanceof Error ? error.message : "Erro ao finalizar pedido",
+      );
       return null;
     } finally {
       setLoading(false);
