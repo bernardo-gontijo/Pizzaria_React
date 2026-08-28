@@ -1,18 +1,10 @@
 import type { Pedido, StatusPedidoType } from "../../loja/types/pedido";
+import { NOMES_STATUS_PEDIDO } from "../utils/admin.utils";
 
 interface PedidoTableProps {
   pedidos: Pedido[];
   onAtualizarStatus: (id: string, status: StatusPedidoType) => void;
 }
-
-const nomesStatus: Record<StatusPedidoType, string> = {
-  pendente: "Pendente",
-  confirmado: "Confirmado",
-  preparando: "Em preparo",
-  pronto: "Pronto para entrega",
-  entregue: "Entregue",
-  cancelado: "Cancelado",
-};
 
 export function PedidoTable({ pedidos, onAtualizarStatus }: PedidoTableProps) {
   if (pedidos.length === 0) {
@@ -61,13 +53,13 @@ export function PedidoTable({ pedidos, onAtualizarStatus }: PedidoTableProps) {
                 }
                 aria-label={`Status do pedido ${pedido.id}`}
               >
-                {Object.entries(nomesStatus).map(([status, nome]) => (
+                {Object.entries(NOMES_STATUS_PEDIDO).map(([status, nome]) => (
                   <option key={status} value={status}>
                     {nome}
                   </option>
                 ))}
               </select>
-              <small>{nomesStatus[pedido.status]}</small>
+              <small>{NOMES_STATUS_PEDIDO[pedido.status]}</small>
             </td>
             <td>{new Date(pedido.createdAt).toLocaleString("pt-BR")}</td>
           </tr>

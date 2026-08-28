@@ -1,0 +1,16 @@
+# Normaliza a quebra de linha para LF em todos os arquivos de texto,
+# independente do sistema operacional de quem commita. Isso evita que
+# o Windows (que usa CRLF por padrão) entre em conflito com o Prettier
+# (configurado para LF), o que causava "reformatação em massa" fantasma
+# sempre que alguém rodava `npm run format` ou `git add .`.
+* text=auto eol=lf
+ 
+# Arquivos binários não devem ser convertidos de forma alguma.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+ 

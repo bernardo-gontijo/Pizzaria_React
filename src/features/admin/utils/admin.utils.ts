@@ -1,4 +1,4 @@
-import type { OrderStatus } from "../../../store/order.store";
+import type { StatusPedidoType } from "../../loja/types/pedido";
 
 export function formatarMoeda(valor: number): string {
   return valor.toLocaleString("pt-BR", {
@@ -17,13 +17,15 @@ export function formatarData(data: string): string {
   return dataConvertida.toLocaleString("pt-BR");
 }
 
-export function formatarStatusPedido(status: OrderStatus): string {
-  const statusFormatados: Record<OrderStatus, string> = {
-    recebido: "Recebido",
-    preparo: "Em preparo",
-    saiu_para_entrega: "Saiu para entrega",
-    entregue: "Entregue",
-  };
+export const NOMES_STATUS_PEDIDO: Record<StatusPedidoType, string> = {
+  pendente: "Pendente",
+  confirmado: "Confirmado",
+  preparando: "Em preparo",
+  pronto: "Pronto para entrega",
+  entregue: "Entregue",
+  cancelado: "Cancelado",
+};
 
-  return statusFormatados[status];
+export function formatarStatusPedido(status: StatusPedidoType): string {
+  return NOMES_STATUS_PEDIDO[status];
 }
