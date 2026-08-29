@@ -68,53 +68,68 @@ export function ConfiguracaoPage() {
             />
           </label>
         </div>
+        
+        <label className="flex-1">
+          Endereço:
+          <input
+            value={form.endereco}
+            onChange={(e) => setForm({ ...form, endereco: e.target.value })}
+            placeholder="Endereço"
+            className="w-full rounded border px-3 py-2"
+          />
+        </label>
+        
+        <label className="flex-1">
+          Horário de Funcionamento:
+          <input
+            value={form.horarioFuncionamento}
+            onChange={(e) =>
+              setForm({ ...form, horarioFuncionamento: e.target.value })
+            }
+            placeholder="Horário de funcionamento"
+            className="w-full rounded border px-3 py-2"
+          />
+        </label>
 
-        <input
-          value={form.endereco}
-          onChange={(e) => setForm({ ...form, endereco: e.target.value })}
-          placeholder="Endereço"
-          className="w-full rounded border px-3 py-2"
-        />
+        <label className="flex-1">
+          Taxa de Entrega:          
+          <input
+            type="number"
+            step="0.01"
+            value={form.taxaEntrega}
+            onChange={(e) =>
+              setForm({ ...form, taxaEntrega: Number(e.target.value) })
+            }
+            placeholder="Taxa de entrega"
+            className="w-full rounded border px-3 py-2"
+          />
+        </label>
 
-        <input
-          value={form.horarioFuncionamento}
-          onChange={(e) =>
-            setForm({ ...form, horarioFuncionamento: e.target.value })
-          }
-          placeholder="Horário de funcionamento"
-          className="w-full rounded border px-3 py-2"
-        />
+        <label className="flex-1">
+          Raio de Entrega:  
+          <input
+            type="number"
+            value={form.raioEntregaKm}
+            onChange={(e) =>
+              setForm({ ...form, raioEntregaKm: Number(e.target.value) })
+            }
+            placeholder="Raio de entrega (km)"
+            className="w-full rounded border px-3 py-2"
+          />
+        </label>
 
-        <input
-          type="number"
-          step="0.01"
-          value={form.taxaEntrega}
-          onChange={(e) =>
-            setForm({ ...form, taxaEntrega: Number(e.target.value) })
-          }
-          placeholder="Taxa de entrega"
-          className="w-full rounded border px-3 py-2"
-        />
-
-        <input
-          type="number"
-          value={form.raioEntregaKm}
-          onChange={(e) =>
-            setForm({ ...form, raioEntregaKm: Number(e.target.value) })
-          }
-          placeholder="Raio de entrega (km)"
-          className="w-full rounded border px-3 py-2"
-        />
-
-        <input
-          type="number"
-          value={form.tempoMedioPreparoMin}
-          onChange={(e) =>
-            setForm({ ...form, tempoMedioPreparoMin: Number(e.target.value) })
-          }
-          placeholder="Tempo médio de preparo (min)"
-          className="w-full rounded border px-3 py-2"
-        />
+        <label className="flex-1">
+          Tempo Médio de Preparo: 
+          <input
+            type="number"
+            value={form.tempoMedioPreparoMin}
+            onChange={(e) =>
+              setForm({ ...form, tempoMedioPreparoMin: Number(e.target.value) })
+            }
+            placeholder="Tempo médio de preparo (min)"
+            className="w-full rounded border px-3 py-2"
+          />
+        </label>
 
         <div>
           <p className="mb-1 font-medium">Formas de pagamento habilitadas</p>
