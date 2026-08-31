@@ -1,6 +1,6 @@
 # REACT ATÉ MORRER!!!
 
-# 🍕 Pizzaria React
+# 🍕 Pizzaria do Berna!
 
 Plataforma completa de pedidos de pizzaria, com loja para o cliente final e painel administrativo para gestão do negócio. Construída como um Progressive Web App (PWA) com React, TypeScript e Vite.
 
