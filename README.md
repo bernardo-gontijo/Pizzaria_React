@@ -136,9 +136,14 @@ Funcionalidades em planejamento (acompanhe nas [Issues](https://github.com/berna
 
 ## Acesso administrativo (ambiente de desenvolvimento)
 
+**E-mail:**
 ```
-E-mail: admin@pizzashop.com
-Senha: 123456
+admin@pizzashop.com
+```
+
+**Senha:**
+```
+123456
 ```
 
 > Credenciais fixas (mock) para fins de demonstração — não há backend de autenticação real.
