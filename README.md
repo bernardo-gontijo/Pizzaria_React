@@ -70,3 +70,6 @@ npm run build     # build de produção
 ## Stack
 
 React 19 · TypeScript · Vite · Zustand · React Router · Vitest · React Testing Library · ESLint · Prettier · Vite PWA Plugin
+
+E-mail: admin@pizzashop.com
+Senha: 123456
