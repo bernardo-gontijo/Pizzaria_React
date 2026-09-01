@@ -55,9 +55,8 @@ describe("PizzaCard", () => {
   it("linka para a página de detalhes da pizza", () => {
     renderComRouter(pizzaTeste);
 
-    expect(screen.getByRole("link", { name: "Ver detalhes" })).toHaveAttribute(
-      "href",
-      "/pizza/pizza-1",
-    );
+    expect(
+      screen.getByRole("link", { name: "Ver detalhes da pizza Calabresa" }),
+    ).toHaveAttribute("href", "/pizza/pizza-1");
   });
 });

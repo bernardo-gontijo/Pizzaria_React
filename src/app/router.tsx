@@ -4,6 +4,8 @@ import { createBrowserRouter, Navigate } from "react-router-dom";
 import { Layout } from "../components/Layout";
 import { Layout as AdminLayout } from "../features/admin/components/Layout";
 import { ProtectedRoute } from "../features/admin/components/ProtectedRoute";
+import { Layout as GarcomLayout } from "../features/garcom/components/Layout";
+import { ProtectedRoute as GarcomProtectedRoute } from "../features/garcom/components/ProtectedRoute";
 import { Loading } from "../components/Loading";
 
 const ConfiguracaoPage = lazy(() =>
@@ -29,6 +31,11 @@ const PedidoAdminPage = lazy(() =>
 const PizzasPage = lazy(() =>
   import("../features/admin/pages/PizzasPage").then((m) => ({
     default: m.PizzasPage,
+  })),
+);
+const MesasAdminPage = lazy(() =>
+  import("../features/admin/pages/MesasAdminPage").then((m) => ({
+    default: m.MesasAdminPage,
   })),
 );
 const AcompanharPedidoPage = lazy(() =>
@@ -72,6 +79,21 @@ const HomePage = lazy(() =>
 const NotFoundPage = lazy(() =>
   import("../pages/NotFoundPage").then((m) => ({
     default: m.NotFoundPage,
+  })),
+);
+const GarcomLoginPage = lazy(() =>
+  import("../features/garcom/pages/LoginPage").then((m) => ({
+    default: m.LoginPage,
+  })),
+);
+const MesasPage = lazy(() =>
+  import("../features/garcom/pages/MesasPage").then((m) => ({
+    default: m.MesasPage,
+  })),
+);
+const PedidoMesaPage = lazy(() =>
+  import("../features/garcom/pages/PedidoMesaPage").then((m) => ({
+    default: m.PedidoMesaPage,
   })),
 );
 
@@ -119,12 +141,47 @@ export const router = createBrowserRouter([
             Component: PizzasPage,
           },
           {
+            path: "mesas",
+            Component: MesasAdminPage,
+          },
+          {
             path: "pedidos",
             Component: PedidoAdminPage,
           },
           {
             path: "configuracao",
             Component: ConfiguracaoPage,
+          },
+        ],
+      },
+    ],
+  },
+  {
+    path: "/garcom/login",
+    element: (
+      <Suspense fallback={<Loading />}>
+        <GarcomLoginPage />
+      </Suspense>
+    ),
+  },
+  {
+    path: "/garcom",
+    Component: GarcomProtectedRoute,
+    children: [
+      {
+        Component: GarcomLayout,
+        children: [
+          {
+            index: true,
+            element: <Navigate to="mesas" replace />,
+          },
+          {
+            path: "mesas",
+            Component: MesasPage,
+          },
+          {
+            path: "mesa/:id",
+            Component: PedidoMesaPage,
           },
         ],
       },

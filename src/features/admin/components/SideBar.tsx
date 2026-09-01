@@ -11,6 +11,10 @@ export function SideBar() {
       caminho: "/admin/pizzas",
     },
     {
+      nome: "Mesas",
+      caminho: "/admin/mesas",
+    },
+    {
       nome: "Pedidos",
       caminho: "/admin/pedidos",
     },

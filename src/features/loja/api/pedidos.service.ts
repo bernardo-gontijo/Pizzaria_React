@@ -2,6 +2,7 @@ import type {
   Pedido,
   CriarPedidoDTO,
   AtualizarStatusPedidoDTO,
+  ItemPedido,
 } from "../types/pedido";
 
 export const PEDIDOS_ATUALIZADOS_EVENT = "pizzashop:pedidos-atualizados";
@@ -99,6 +100,7 @@ export async function criarPedido(dados: CriarPedidoDTO): Promise<Pedido> {
       observacoes: dados.observacoes,
       createdAt: new Date(),
       updatedAt: new Date(),
+      mesaId: dados.mesaId,
     };
 
     pedidosCache.unshift(novoPedido);
@@ -163,6 +165,43 @@ export async function atualizarStatusPedido(
   } catch (error) {
     console.error("Erro ao atualizar status:", error);
     throw new Error("Não foi possível atualizar o status do pedido", {
+      cause: error,
+    });
+  }
+}
+
+export async function atualizarItensPedido(
+  id: string,
+  itens: Omit<ItemPedido, "id">[],
+): Promise<Pedido | null> {
+  try {
+    const index = pedidosCache.findIndex((p) => p.id === id);
+    if (index === -1) return null;
+
+    const pedido = pedidosCache[index];
+
+    const itensComId = itens.map((item, i) => ({
+      id: `item-${Date.now()}-${i}`,
+      ...item,
+    }));
+
+    const subtotal = itensComId.reduce(
+      (sum, item) => sum + item.price * item.quantity,
+      0,
+    );
+
+    pedido.itens = itensComId;
+    pedido.subtotal = subtotal;
+    pedido.total = subtotal + pedido.taxaEntrega - pedido.desconto;
+    pedido.updatedAt = new Date();
+
+    pedidosCache[index] = pedido;
+    salvarPedidos();
+
+    return pedido;
+  } catch (error) {
+    console.error("Erro ao atualizar itens do pedido:", error);
+    throw new Error("Não foi possível atualizar os itens do pedido", {
       cause: error,
     });
   }

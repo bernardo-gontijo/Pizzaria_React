@@ -35,26 +35,26 @@ Os dados (pizzas, pedidos) são persistidos no `localStorage` do navegador, simu
 
 ## Módulo: Loja
 
-| Tela | Funcionalidade |
-|---|---|
-| Cardápio | Lista de pizzas disponíveis com filtro por categoria |
-| Detalhe da pizza | Informações completas e ingredientes |
-| Carrinho | Adicionar/remover itens, alterar quantidade, cálculo automático de subtotal e taxa de entrega |
-| Checkout | Formulário de dados do cliente e endereço |
-| Pagamento | Seleção da forma de pagamento |
-| Acompanhamento | Status do pedido em tempo real (pendente → confirmado → preparando → pronto → entregue) |
+| Tela             | Funcionalidade                                                                                |
+| ---------------- | --------------------------------------------------------------------------------------------- |
+| Cardápio         | Lista de pizzas disponíveis com filtro por categoria                                          |
+| Detalhe da pizza | Informações completas e ingredientes                                                          |
+| Carrinho         | Adicionar/remover itens, alterar quantidade, cálculo automático de subtotal e taxa de entrega |
+| Checkout         | Formulário de dados do cliente e endereço                                                     |
+| Pagamento        | Seleção da forma de pagamento                                                                 |
+| Acompanhamento   | Status do pedido em tempo real (pendente → confirmado → preparando → pronto → entregue)       |
 
 O carrinho persiste no `localStorage`: se o cliente fechar a aba no meio da compra, os itens continuam salvos.
 
 ## Módulo: Administração
 
-| Tela | Funcionalidade |
-|---|---|
-| Login | Autenticação do administrador |
-| Dashboard | Total de pedidos, pedidos do dia, faturamento, pedidos entregues |
-| Gestão de Pizzas | CRUD completo do cardápio |
-| Gestão de Pedidos | Visualização de pedidos e alteração de status |
-| Configuração | Personalização da marca: nome, cores, logo (white-label) |
+| Tela              | Funcionalidade                                                   |
+| ----------------- | ---------------------------------------------------------------- |
+| Login             | Autenticação do administrador                                    |
+| Dashboard         | Total de pedidos, pedidos do dia, faturamento, pedidos entregues |
+| Gestão de Pizzas  | CRUD completo do cardápio                                        |
+| Gestão de Pedidos | Visualização de pedidos e alteração de status                    |
+| Configuração      | Personalização da marca: nome, cores, logo (white-label)         |
 
 A alteração de status feita pelo admin reflete automaticamente na tela de acompanhamento do cliente, via sistema de eventos — sem necessidade de recarregar a página.
 
@@ -70,7 +70,7 @@ Senha: 123456
 ## PWA e Performance
 
 - **Progressive Web App**: manifest configurado, ícones customizados, funcionamento offline, instalável em celular/desktop
-- **Cache do cardápio**: estratégia *stale-while-revalidate* — serve dados rapidamente do cache e busca atualização em segundo plano
+- **Cache do cardápio**: estratégia _stale-while-revalidate_ — serve dados rapidamente do cache e busca atualização em segundo plano
 - **Lazy loading de rotas**: cada página é carregada sob demanda, reduzindo o tamanho do carregamento inicial
 - **Responsividade**: interface adaptada para celular, tablet e desktop
 
@@ -121,6 +121,7 @@ npm run format:check          # verifica formatação sem alterar arquivos
 ## Próximos passos
 
 Funcionalidades em planejamento (acompanhe nas [Issues](https://github.com/bernardo-gontijo/Pizzaria_React/issues)):
+
 - Área exclusiva para garçom (vínculo de pedidos a mesas, cálculo de gorjeta)
 - Papéis de cozinheiro e entregador, avançando o status do pedido
 - Geração de QR Code para pagamento via PIX
@@ -137,11 +138,13 @@ Funcionalidades em planejamento (acompanhe nas [Issues](https://github.com/berna
 ## Acesso administrativo (ambiente de desenvolvimento)
 
 **E-mail:**
+
 ```
 admin@pizzashop.com
 ```
 
 **Senha:**
+
 ```
 123456
 ```
