@@ -68,7 +68,7 @@ export function ConfiguracaoPage() {
             />
           </label>
         </div>
-        
+
         <label className="flex-1">
           Endereço:
           <input
@@ -78,7 +78,7 @@ export function ConfiguracaoPage() {
             className="w-full rounded border px-3 py-2"
           />
         </label>
-        
+
         <label className="flex-1">
           Horário de Funcionamento:
           <input
@@ -92,7 +92,7 @@ export function ConfiguracaoPage() {
         </label>
 
         <label className="flex-1">
-          Taxa de Entrega:          
+          Taxa de Entrega:
           <input
             type="number"
             step="0.01"
@@ -106,7 +106,7 @@ export function ConfiguracaoPage() {
         </label>
 
         <label className="flex-1">
-          Raio de Entrega:  
+          Raio de Entrega:
           <input
             type="number"
             value={form.raioEntregaKm}
@@ -119,7 +119,7 @@ export function ConfiguracaoPage() {
         </label>
 
         <label className="flex-1">
-          Tempo Médio de Preparo: 
+          Tempo Médio de Preparo:
           <input
             type="number"
             value={form.tempoMedioPreparoMin}

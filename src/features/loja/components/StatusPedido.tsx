@@ -3,7 +3,7 @@ interface StatusPedidoProps {
     id: string;
     status: string;
     cliente: { nome: string };
-    endereco: { rua: string };
+    endereco?: { rua: string };
     total: number;
   };
 }
@@ -41,9 +41,11 @@ export function StatusPedido({ pedido }: StatusPedidoProps) {
         <p>
           <strong>Cliente:</strong> {pedido.cliente.nome}
         </p>
-        <p>
-          <strong>Endereço:</strong> {pedido.endereco.rua}
-        </p>
+        {pedido.endereco && (
+          <p>
+            <strong>Endereço:</strong> {pedido.endereco.rua}
+          </p>
+        )}
         <p>
           <strong>Total:</strong> R$ {pedido.total.toFixed(2)}
         </p>
