@@ -91,7 +91,12 @@ export function PedidoCozinhaCard({
       <ul>
         {pedido.itens.map((item) => (
           <li key={item.id}>
-            {item.quantity}x {item.pizzaName} — Tamanho {item.size}
+            {item.quantity}x {item.pizzaName}
+            {item.tipo === "bebida" ? (
+              <> — Bebida</>
+            ) : (
+              item.size && <> — Tamanho {item.size}</>
+            )}
             {item.observations && <p>⚠️ Observação: {item.observations}</p>}
           </li>
         ))}

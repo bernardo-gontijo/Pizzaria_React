@@ -176,13 +176,20 @@ svg {
   outline-offset: 5px;
 }
 
+.bebida-card__imagem {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: contain;
+  background: #f5f1ec;
+}
+
 .pagina-loja,
 .pizza-detalhe-page,
 .pagamento-page,
 .acompanhar-page,
 .cardapio-page,
 .categoria-page {
-  width: min(100%, 820px);
+  width: min(100%, 1100px);
 }
 
 .pagina-loja h1,
@@ -852,14 +859,14 @@ body {
 }
 
 .pizza-card strong,
-.pizza-card__link,
 .categoria {
   color: #b57b28;
 }
 
 .pizza-card__link {
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  color: inherit;
+  letter-spacing: normal;
+  text-transform: none;
 }
 
 .footer {
@@ -1320,6 +1327,124 @@ body {
   color: #3d3935;
 }
 
+.produto-medida {
+  margin: -8px 0 18px;
+  color: #8a7d72;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.produto-detalhe__medida {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding-block: 18px;
+  border-block: 1px solid #e6d9cc;
+  color: #675e57;
+}
+
+.produto-detalhe__medida strong {
+  color: #3d3935;
+}
+
+.meus-pedidos-lista {
+  display: grid;
+  gap: 20px;
+}
+
+.meu-pedido-card,
+.meus-pedidos-vazio {
+  padding: 28px;
+  border: 1px solid #e2d5c9;
+  background: #fffdf9;
+  box-shadow: 0 10px 28px rgba(29, 24, 20, 0.08);
+}
+
+.meus-pedidos-vazio .botao {
+  background: #2b2927;
+  color: #fff;
+}
+
+.meu-pedido-card__cabecalho,
+.meu-pedido-card__resumo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.meu-pedido-card__cabecalho > div {
+  display: grid;
+  gap: 5px;
+}
+
+.meu-pedido-card__cabecalho span {
+  color: #2d2b28;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.35rem;
+}
+
+.meu-pedido-card__cabecalho time {
+  color: #81766d;
+  font-size: 0.85rem;
+}
+
+.meu-pedido-card__status {
+  color: #9b641b;
+  font-size: 0.78rem;
+  letter-spacing: 0.07em;
+  text-align: right;
+  text-transform: uppercase;
+}
+
+.meu-pedido-card__status.status--entregue {
+  color: #3e7450;
+}
+
+.meu-pedido-card__status.status--cancelado {
+  color: #a34732;
+}
+
+.meu-pedido-card__resumo {
+  margin-block: 22px;
+  padding-block: 18px;
+  border-block: 1px solid #e6d9cc;
+  color: #675e57;
+}
+
+.meu-pedido-card__resumo strong {
+  color: #b57b28;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.3rem;
+}
+
+.meu-pedido-card__link {
+  display: inline-block;
+  color: #7f5318;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.meu-pedido-card__link:hover {
+  color: #b57b28;
+}
+
+.meus-pedidos-vazio {
+  display: grid;
+  justify-items: start;
+  gap: 20px;
+  color: #675e57;
+}
+
+.meus-pedidos-vazio p {
+  margin: 0;
+}
+
 @media (max-width: 700px) {
   .pagina-loja,
   .pizza-detalhe-page {
@@ -1376,5 +1501,15 @@ body {
 
   .status-detalhes {
     grid-template-columns: 1fr;
+  }
+
+  .meu-pedido-card__cabecalho,
+  .meu-pedido-card__resumo {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .meu-pedido-card__status {
+    text-align: left;
   }
 }

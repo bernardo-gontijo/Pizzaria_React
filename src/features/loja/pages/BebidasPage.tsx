@@ -1,20 +1,21 @@
 import { Link } from "react-router-dom";
 
-import { ListaPizzas } from "../components/ListaPizzas";
-import { usePizzas } from "../hooks/usePizzas";
+import { ListaBebidas } from "../components/ListaBebidas";
+import { useBebidas } from "../hooks/useBebidas";
 
 const categorias = ["tradicional", "especial", "vegetariana", "doce"];
 
-export function CardapioPage() {
-  const { pizzas, loading, erro } = usePizzas();
+export function BebidasPage() {
+  const { bebidas, loading, erro } = useBebidas();
 
-  if (loading) return <p>Carregando cardápio...</p>;
-  if (erro) return <p>Erro: {erro.message}</p>;
+  if (loading) return <p className="feedback">Carregando bebidas...</p>;
+  if (erro)
+    return <p className="feedback feedback--erro">Erro: {erro.message}</p>;
 
   return (
     <div className="cardapio-page">
       <section className="cardapio-banner">
-        <h1>Cardápio</h1>
+        <h1>Bebidas</h1>
       </section>
       <section className="cardapio-catalogo">
         <nav aria-label="Categorias do cardápio" className="categorias-menu">
@@ -26,7 +27,7 @@ export function CardapioPage() {
           ))}
           <Link to="/bebidas">Bebidas</Link>
         </nav>
-        <ListaPizzas pizzas={pizzas.filter((pizza) => pizza.disponivel)} />
+        <ListaBebidas bebidas={bebidas.filter((bebida) => bebida.disponivel)} />
       </section>
     </div>
   );

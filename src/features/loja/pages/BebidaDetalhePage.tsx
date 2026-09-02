@@ -1,71 +1,74 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { useCart } from "../../../context/CartContext";
-import { buscarPizzaPorId } from "../api/loja.service";
-import type { Pizza } from "../types/pizza";
+import { useNavigate, useParams } from "react-router-dom";
 
-export function PizzaDetalhePage() {
+import { useCart } from "../../../context/CartContext";
+import { buscarBebidaPorId } from "../api/bebidas.service";
+import type { Bebida } from "../types/bebidas";
+
+export function BebidaDetalhePage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { adicionarItem } = useCart();
-  const [pizza, setPizza] = useState<Pizza | null>(null);
+  const [bebida, setBebida] = useState<Bebida | null>(null);
   const [loading, setLoading] = useState(true);
+  const [erro, setErro] = useState<string | null>(null);
   const [quantidade, setQuantidade] = useState(1);
 
   useEffect(() => {
     async function carregar() {
       try {
         setLoading(true);
-        const resultado = await buscarPizzaPorId(id!);
-        setPizza(resultado);
+        setErro(null);
+        setBebida(await buscarBebidaPorId(id!));
       } catch (error) {
-        console.error(error);
+        setErro(
+          error instanceof Error
+            ? error.message
+            : "Não foi possível carregar a bebida.",
+        );
       } finally {
         setLoading(false);
       }
     }
 
-    if (id) carregar();
+    if (id) void carregar();
   }, [id]);
 
   function handleAdicionar() {
-    if (!pizza) return;
+    if (!bebida) return;
 
     adicionarItem({
-      id: pizza.id,
-      tipo: "pizza",
-      nome: pizza.nome,
-      precoUnitario: pizza.preco,
-      quantidade: quantidade,
-      observacoes: "",
+      id: bebida.id,
+      tipo: "bebida",
+      nome: bebida.nome,
+      precoUnitario: bebida.preco,
+      quantidade,
     });
 
     navigate("/carrinho");
   }
 
-  if (loading) return <p>Carregando pizza...</p>;
-  if (!pizza) return <p>Pizza não encontrada</p>;
+  if (loading) return <p className="feedback">Carregando bebida...</p>;
+  if (erro) return <p className="feedback feedback--erro">Erro: {erro}</p>;
+  if (!bebida)
+    return <p className="feedback feedback--erro">Bebida não encontrada.</p>;
 
   return (
     <section className="pizza-detalhe-page">
       <img
         className="pizza-detalhe-page__imagem"
-        src={pizza.imagem}
-        alt={pizza.nome}
+        src={bebida.imagem}
+        alt={bebida.nome}
       />
 
       <div className="pizza-detalhe-page__conteudo">
-        <span className="categoria">{pizza.categoria}</span>
-        <h1>{pizza.nome}</h1>
-        <p className="pizza-detalhe-page__descricao">{pizza.descricao}</p>
+        <span className="categoria">{bebida.categoria}</span>
+        <h1>{bebida.nome}</h1>
+        <p className="pizza-detalhe-page__descricao">{bebida.descricao}</p>
 
-        <div className="pizza-detalhe-page__ingredientes">
-          <strong>Ingredientes</strong>
-          <ul>
-            {pizza.ingredientes.map((ing, index) => (
-              <li key={index}>{ing}</li>
-            ))}
-          </ul>
+        <div className="produto-detalhe__medida">
+          <strong>Conteúdo</strong>
+          <span>{bebida.quantidade}</span>
         </div>
 
         <div className="seletor-quantidade">
@@ -87,13 +90,15 @@ export function PizzaDetalhePage() {
           </div>
         </div>
 
-        <p className="pizza-detalhe-page__preco">R$ {pizza.preco.toFixed(2)}</p>
+        <p className="pizza-detalhe-page__preco">
+          R$ {bebida.preco.toFixed(2)}
+        </p>
         <button
           className="pizza-detalhe-page__adicionar"
           onClick={handleAdicionar}
-          disabled={!pizza.disponivel}
+          disabled={!bebida.disponivel}
         >
-          {pizza.disponivel
+          {bebida.disponivel
             ? "Adicionar ao carrinho"
             : "Indisponível no momento"}
         </button>

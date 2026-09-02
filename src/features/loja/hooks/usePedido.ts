@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useCart } from "../../../context/CartContext";
+import { registrarPedidoOnline } from "../api/meusPedidos.service";
 import { criarPedido } from "../api/pedidos.service";
 import type { Pedido, CriarPedidoDTO } from "../types/pedido";
 
@@ -63,15 +64,20 @@ export function usePedido() {
           cep: "",
         },
         itens: items.map((item) => ({
+          tipo: item.tipo ?? "pizza",
           pizzaId: item.id,
           pizzaName: item.nome,
           quantity: item.quantidade,
           price: item.precoUnitario,
-          size: (item.tamanho as "P" | "M" | "G" | "GG") || "M",
+          size:
+            item.tipo === "bebida"
+              ? undefined
+              : (item.tamanho as "P" | "M" | "G" | "GG") || "M",
         })),
         formaPagamento: validarFormaPagamento(dados.formaPagamento),
       });
 
+      registrarPedidoOnline(novoPedido.id);
       limparCarrinho();
       setPedido(novoPedido);
       return novoPedido;

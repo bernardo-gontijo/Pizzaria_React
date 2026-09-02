@@ -1,6 +1,6 @@
 [
   {
-    "id": "1",
+    "id": "bebida-coca-cola",
     "nome": "Coca-Cola Lata",
     "quantidade": "350ml",
     "descricao": "Refrigerante de cola, ideal para acompanhar qualquer refeição.",
@@ -10,7 +10,7 @@
     "disponivel": true
   },
   {
-    "id": "2",
+    "id": "bebida-pepsi",
     "nome": "Pepsi Lata",
     "quantidade": "350ml",
     "descricao": "Refrigerante de cola, ideal para acompanhar qualquer refeição.",
