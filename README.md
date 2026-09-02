@@ -6,7 +6,7 @@ Plataforma completa de pedidos de pizzaria, com loja para o cliente final e pain
 
 ## Visão geral
 
-O projeto cobre o fluxo completo de uma pizzaria digital: o cliente navega pelo cardápio, monta o carrinho, finaliza o pedido e acompanha a entrega em tempo real. Do outro lado, o administrador gerencia o cardápio, acompanha pedidos e personaliza a identidade visual da loja (white-label).
+O projeto cobre o fluxo completo de uma pizzaria digital: o cliente navega pelo cardápio, monta o carrinho, finaliza o pedido e acompanha a entrega em tempo real. Do outro lado, o administrador gerencia o cardápio, acompanha pedidos e personaliza a identidade visual da loja (white-label). O garçom, por sua vez, tem uma área própria para gerenciar mesas e pedidos feitos presencialmente.
 
 ## Arquitetura
 
@@ -24,6 +24,8 @@ src/
 │   │   ├── hooks/       # Lógica reutilizável
 │   │   ├── pages/       # Telas
 │   │   └── utils/       # Formatação (moeda, data, status)
+│   ├── garcom/       # Área do garçom (mesas e pedidos presenciais)
+│   │   ├── api/, components/, hooks/, pages/, types/
 │   └── loja/         # Loja pública
 │       ├── api/, components/, hooks/, pages/, types/
 ├── pwa/              # Registro do Service Worker
@@ -35,42 +37,46 @@ Os dados (pizzas, pedidos) são persistidos no `localStorage` do navegador, simu
 
 ## Módulo: Loja
 
-| Tela | Funcionalidade |
-|---|---|
-| Cardápio | Lista de pizzas disponíveis com filtro por categoria |
-| Detalhe da pizza | Informações completas e ingredientes |
-| Carrinho | Adicionar/remover itens, alterar quantidade, cálculo automático de subtotal e taxa de entrega |
-| Checkout | Formulário de dados do cliente e endereço |
-| Pagamento | Seleção da forma de pagamento |
-| Acompanhamento | Status do pedido em tempo real (pendente → confirmado → preparando → pronto → entregue) |
+| Tela             | Funcionalidade                                                                                 |
+| ---------------- | ----------------------------------------------------------------------------------------------- |
+| Cardápio         | Lista de pizzas disponíveis com filtro por categoria                                            |
+| Detalhe da pizza | Informações completas e ingredientes                                                            |
+| Carrinho         | Adicionar/remover itens, alterar quantidade, cálculo automático de subtotal e taxa de entrega   |
+| Checkout         | Formulário de dados do cliente e endereço                                                       |
+| Pagamento        | Seleção da forma de pagamento                                                                   |
+| Acompanhamento   | Status do pedido em tempo real (pendente → confirmado → preparando → pronto → entregue)         |
 
 O carrinho persiste no `localStorage`: se o cliente fechar a aba no meio da compra, os itens continuam salvos.
 
 ## Módulo: Administração
 
-| Tela | Funcionalidade |
-|---|---|
-| Login | Autenticação do administrador |
-| Dashboard | Total de pedidos, pedidos do dia, faturamento, pedidos entregues |
-| Gestão de Pizzas | CRUD completo do cardápio |
-| Gestão de Pedidos | Visualização de pedidos e alteração de status |
-| Configuração | Personalização da marca: nome, cores, logo (white-label) |
+| Tela              | Funcionalidade                                                    |
+| ----------------- | ------------------------------------------------------------------ |
+| Login             | Autenticação do administrador                                     |
+| Dashboard         | Total de pedidos, pedidos do dia, faturamento, pedidos entregues  |
+| Gestão de Pizzas  | CRUD completo do cardápio                                         |
+| Gestão de Mesas   | Cadastro e remoção de mesas do salão                              |
+| Gestão de Pedidos | Visualização de pedidos e alteração de status                    |
+| Configuração      | Personalização da marca: nome, cores, logo (white-label)          |
 
 A alteração de status feita pelo admin reflete automaticamente na tela de acompanhamento do cliente, via sistema de eventos — sem necessidade de recarregar a página.
 
-## Acesso administrativo (ambiente de desenvolvimento)
+## Módulo: Garçom
 
-```
-E-mail: admin@pizzashop.com
-Senha: 123456
-```
+Área própria e independente (login e rotas protegidas separadas do admin), para atendimento presencial das mesas do salão.
 
-> Credenciais fixas (mock) para fins de demonstração — não há backend de autenticação real.
+| Tela                | Funcionalidade                                                          |
+| ------------------- | ------------------------------------------------------------------------ |
+| Login               | Autenticação do garçom                                                  |
+| Mesas               | Grade de mesas (livre/ocupada), com opção de abrir uma nova mesa        |
+| Pedido da mesa      | Adiciona itens ao pedido conforme o atendimento avança, e encerra a conta |
+
+Um pedido por mesa, editável durante o atendimento. Ao encerrar a conta, a mesa fica livre novamente, o registro é preservado para prestação de contas, e o garçom pode registrar uma gorjeta opcional (10%, 15% ou 20%, a critério do cliente).
 
 ## PWA e Performance
 
 - **Progressive Web App**: manifest configurado, ícones customizados, funcionamento offline, instalável em celular/desktop
-- **Cache do cardápio**: estratégia *stale-while-revalidate* — serve dados rapidamente do cache e busca atualização em segundo plano
+- **Cache do cardápio**: estratégia _stale-while-revalidate_ — serve dados rapidamente do cache e busca atualização em segundo plano
 - **Lazy loading de rotas**: cada página é carregada sob demanda, reduzindo o tamanho do carregamento inicial
 - **Responsividade**: interface adaptada para celular, tablet e desktop
 
@@ -121,10 +127,11 @@ npm run format:check          # verifica formatação sem alterar arquivos
 ## Próximos passos
 
 Funcionalidades em planejamento (acompanhe nas [Issues](https://github.com/bernardo-gontijo/Pizzaria_React/issues)):
-- Área exclusiva para garçom (vínculo de pedidos a mesas, cálculo de gorjeta)
+
 - Papéis de cozinheiro e entregador, avançando o status do pedido
 - Geração de QR Code para pagamento via PIX
 - Preenchimento automático de endereço via API de CEP
+- Tela de consulta ao histórico de mesas (relatório de prestação de contas)
 
 ## Stack
 
@@ -137,11 +144,27 @@ Funcionalidades em planejamento (acompanhe nas [Issues](https://github.com/berna
 ## Acesso administrativo (ambiente de desenvolvimento)
 
 **E-mail:**
+
 ```
 admin@pizzashop.com
 ```
 
 **Senha:**
+
+```
+123456
+```
+
+## Acesso do garçom (ambiente de desenvolvimento)
+
+**E-mail:**
+
+```
+garcom@pizzashop.com
+```
+
+**Senha:**
+
 ```
 123456
 ```

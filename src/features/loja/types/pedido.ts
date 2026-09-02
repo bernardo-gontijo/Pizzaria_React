@@ -44,7 +44,7 @@ export interface Pedido {
     email?: string;
     telefone: string;
   };
-  endereco: EnderecoEntrega;
+  endereco?: EnderecoEntrega;
   itens: ItemPedido[];
   subtotal: number;
   taxaEntrega: number;
@@ -58,6 +58,11 @@ export interface Pedido {
   observacoes?: string;
   createdAt: Date;
   updatedAt: Date;
+  // Presentes apenas em pedidos feitos por um garçom, vinculados a uma
+  // mesa do salão (ver src/features/garcom). Ausentes em pedidos de
+  // delivery feitos pelo cliente na loja.
+  mesaId?: string;
+  gorjeta?: number;
 }
 
 export interface CriarPedidoDTO {
@@ -66,12 +71,13 @@ export interface CriarPedidoDTO {
     email?: string;
     telefone: string;
   };
-  endereco: EnderecoEntrega;
+  endereco?: EnderecoEntrega;
   itens: Omit<ItemPedido, "id">[];
   formaPagamento:
     "dinheiro" | "cartao_credito" | "cartao_debito" | "pix" | "vale_refeicao";
   trocoPara?: number;
   observacoes?: string;
+  mesaId?: string;
 }
 
 export interface AtualizarStatusPedidoDTO {

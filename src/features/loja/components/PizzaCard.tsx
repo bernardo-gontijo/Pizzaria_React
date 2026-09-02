@@ -16,7 +16,7 @@ export function PizzaCard({ pizza }: PizzaCardProps) {
     <Link
       className="pizza-card__link"
       to={`/pizza/${pizza.id}`}
-      arial-label={`Ver detalhes da pizza ${pizza.nome}`}
+      aria-label={`Ver detalhes da pizza ${pizza.nome}`}
     >
       <article className="pizza-card">
         <img alt={pizza.nome} src={pizza.imagem} onError={usarImagemReserva} />
