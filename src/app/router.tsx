@@ -7,6 +7,8 @@ import { ProtectedRoute } from "../features/admin/components/ProtectedRoute";
 import { Layout as GarcomLayout } from "../features/garcom/components/Layout";
 import { ProtectedRoute as GarcomProtectedRoute } from "../features/garcom/components/ProtectedRoute";
 import { Loading } from "../components/Loading";
+import { EntregadorLayout , EntregadorDashboard }  from "../features/entregador";
+import {EntregadorPedidos, EntregadorEntregas } from "../features/entregador";
 
 const ConfiguracaoPage = lazy(() =>
   import("../features/admin/pages/ConfiguracaoPage").then((m) => ({
@@ -94,6 +96,11 @@ const MesasPage = lazy(() =>
 const PedidoMesaPage = lazy(() =>
   import("../features/garcom/pages/PedidoMesaPage").then((m) => ({
     default: m.PedidoMesaPage,
+  })),
+);
+const EntregadorPage = lazy(() =>
+  import("../features/entregador/pages/entregadorPage").then((m) => ({
+    default: m.EntregadorPage,
   })),
 );
 
@@ -187,4 +194,15 @@ export const router = createBrowserRouter([
       },
     ],
   },
+
+   {
+  path: '/entregador',
+  element: <EntregadorLayout />,
+  children: [
+    { index: true, element: <EntregadorDashboard /> },
+    { path: 'dashboard', element: <EntregadorDashboard /> },
+    { path: 'pedidos', element: <EntregadorPedidos/> },
+    { path: 'entregas', element: <EntregadorEntregas /> },
+  ]
+}
 ]);
