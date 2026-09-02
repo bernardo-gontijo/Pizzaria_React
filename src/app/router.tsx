@@ -50,6 +50,16 @@ const CardapioPage = lazy(() =>
     default: m.CardapioPage,
   })),
 );
+const BebidasPage = lazy(() =>
+  import("../features/loja/pages/BebidasPage").then((m) => ({
+    default: m.BebidasPage,
+  })),
+);
+const BebidaDetalhePage = lazy(() =>
+  import("../features/loja/pages/BebidaDetalhePage").then((m) => ({
+    default: m.BebidaDetalhePage,
+  })),
+);
 const CarrinhoPage = lazy(() =>
   import("../features/loja/pages/CarrinhoPage").then((m) => ({
     default: m.CarrinhoPage,
@@ -75,6 +85,11 @@ const PizzaDetalhePage = lazy(() =>
     default: m.PizzaDetalhePage,
   })),
 );
+const MeusPedidosPage = lazy(() =>
+  import("../features/loja/pages/MeusPedidosPage").then((m) => ({
+    default: m.MeusPedidosPage,
+  })),
+);
 const HomePage = lazy(() =>
   import("../pages/HomePage").then((m) => ({ default: m.HomePage })),
 );
@@ -88,11 +103,13 @@ const GarcomLoginPage = lazy(() =>
     default: m.LoginPage,
   })),
 );
+
 const MesasPage = lazy(() =>
   import("../features/garcom/pages/MesasPage").then((m) => ({
     default: m.MesasPage,
   })),
 );
+
 const PedidoMesaPage = lazy(() =>
   import("../features/garcom/pages/PedidoMesaPage").then((m) => ({
     default: m.PedidoMesaPage,
@@ -104,6 +121,11 @@ const EntregadorPage = lazy(() =>
   })),
 );
 
+const CozinheiroPage = lazy(() =>
+  import("../features/cozinheiro/pages/CozinheiroPage").then((m) => ({
+    default: m.CozinheiroPage,
+  })),
+);
 export const router = createBrowserRouter([
   {
     path: "/",
@@ -111,14 +133,25 @@ export const router = createBrowserRouter([
     children: [
       { index: true, Component: HomePage },
       { path: "cardapio", Component: CardapioPage },
+      { path: "bebidas", Component: BebidasPage },
+      { path: "bebida/:id", Component: BebidaDetalhePage },
       { path: "categoria/:categoria", Component: CategoriaPage },
       { path: "pizza/:id", Component: PizzaDetalhePage },
       { path: "carrinho", Component: CarrinhoPage },
       { path: "checkout", Component: CheckoutPage },
       { path: "pagamento", Component: PagamentoPage },
+      { path: "meus-pedidos", Component: MeusPedidosPage },
       { path: "acompanhar/:id", Component: AcompanharPedidoPage },
       { path: "*", Component: NotFoundPage },
     ],
+  },
+  {
+    path: "/cozinha",
+    element: (
+      <Suspense fallback={<Loading />}>
+        <CozinheiroPage />
+      </Suspense>
+    ),
   },
   {
     path: "/admin/login",
