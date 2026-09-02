@@ -86,17 +86,24 @@ const GarcomLoginPage = lazy(() =>
     default: m.LoginPage,
   })),
 );
+
 const MesasPage = lazy(() =>
   import("../features/garcom/pages/MesasPage").then((m) => ({
     default: m.MesasPage,
   })),
 );
+
 const PedidoMesaPage = lazy(() =>
   import("../features/garcom/pages/PedidoMesaPage").then((m) => ({
     default: m.PedidoMesaPage,
   })),
 );
 
+const CozinheiroPage = lazy(() =>
+  import("../features/cozinheiro/pages/CozinheiroPage").then((m) => ({
+    default: m.CozinheiroPage,
+  })),
+);
 export const router = createBrowserRouter([
   {
     path: "/",
@@ -112,6 +119,14 @@ export const router = createBrowserRouter([
       { path: "acompanhar/:id", Component: AcompanharPedidoPage },
       { path: "*", Component: NotFoundPage },
     ],
+  },
+  {
+    path: "/cozinheiro-teste",
+    element: (
+      <Suspense fallback={<Loading />}>
+        <CozinheiroPage />
+      </Suspense>
+    ),
   },
   {
     path: "/admin/login",
