@@ -494,6 +494,7 @@ svg {
   color: #756661;
 }
 
+
 /* Equivalentes locais das classes utilitárias usadas no login e configuração. */
 .mx-auto {
   margin-inline: auto;
@@ -1556,6 +1557,228 @@ body {
   color: #1f8a4c;
 }
 
+/* ===== Entregador ===== */
+/* ===== Entregador ===== */
+.entregador-layout {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr);
+  background: #f8f4f1;
+}
+
+.entregador-sidebar {
+  padding: 28px 18px;
+  background: var(--cor-secundaria);
+  color: white;
+}
+
+.entregador-sidebar__titulo {
+  padding: 0 12px 24px;
+  border-bottom: 1px solid rgba(247, 235, 235, 0.18);
+}
+
+.entregador-sidebar__titulo h2 {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.entregador-sidebar__menu {
+  display: grid;
+  gap: 6px;
+  margin: 24px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.entregador-sidebar__link {
+  display: block;
+  padding: 12px;
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.82);
+  transition: background 0.2s;
+}
+
+.entregador-sidebar__link:hover,
+.entregador-sidebar__link--ativo {
+  background: rgba(255, 255, 255, 0.14);
+  color: white;
+}
+
+.entregador-layout__conteudo {
+  padding: 40px;
+  background: #f8f4f1;
+  min-height: 100vh;
+}
+
+.entregador-layout__conteudo > main,
+.entregador-layout__conteudo > section {
+  width: min(100%, 1050px);
+}
+
+.entregador-layout__conteudo h1 {
+  margin: 0 0 8px;
+  color: var(--cor-secundaria);
+  font-size: 2rem;
+}
+
+.entregador-layout__conteudo h2 {
+  margin: 0 0 12px;
+  color: var(--cor-secundaria);
+}
+
+.entregador-layout__conteudo h3 {
+  margin: 0 0 8px;
+  color: var(--cor-secundaria);
+  font-size: 1rem;
+}
+
+.entregador-layout__conteudo p {
+  line-height: 1.5;
+  color: var(--texto);
+}
+
+/* Cards estilo admin */
+.entregador-layout__conteudo > main > section,
+.entregador-layout__conteudo > section {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+  margin-top: 28px;
+}
+
+.entregador-layout__conteudo > main > section > article,
+.entregador-layout__conteudo > section > article {
+  padding: 20px;
+  border: 1px solid var(--borda);
+  border-radius: 12px;
+  background: white;
+}
+
+.entregador-layout__conteudo > main > section > article strong,
+.entregador-layout__conteudo > section > article strong {
+  display: block;
+  margin: 12px 0 4px;
+  color: var(--cor-primaria);
+  font-size: 1.6rem;
+}
+
+/* Botões estilo admin */
+.entregador-layout__conteudo button,
+.entregador-layout__conteudo .botao {
+  padding: 10px 16px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--cor-primaria);
+  color: white;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.entregador-layout__conteudo button:hover,
+.entregador-layout__conteudo .botao:hover {
+  opacity: 0.9;
+}
+
+.entregador-layout__conteudo button + button {
+  margin-left: 8px;
+  background: #756661;
+}
+
+/* Formulários estilo admin */
+.entregador-layout__conteudo form {
+  display: grid;
+  gap: 16px;
+  max-width: 680px;
+  margin: 24px 0;
+  padding: 24px;
+  border: 1px solid var(--borda);
+  border-radius: 12px;
+  background: white;
+}
+
+.entregador-layout__conteudo form > div {
+  display: grid;
+  gap: 6px;
+}
+
+.entregador-layout__conteudo label {
+  font-weight: 600;
+}
+
+.entregador-layout__conteudo input,
+.entregador-layout__conteudo textarea,
+.entregador-layout__conteudo select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #cfc4bb;
+  border-radius: 8px;
+  font: inherit;
+  background: white;
+}
+
+.entregador-layout__conteudo textarea {
+  min-height: 96px;
+  resize: vertical;
+}
+
+/* Tabelas estilo admin */
+.entregador-layout__conteudo table {
+  display: block;
+  width: 100%;
+  overflow-x: auto;
+  margin-top: 24px;
+  border-collapse: collapse;
+  border: 1px solid var(--borda);
+  background: white;
+}
+
+.entregador-layout__conteudo th,
+.entregador-layout__conteudo td {
+  padding: 14px;
+  border-bottom: 1px solid var(--borda);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.entregador-layout__conteudo th {
+  color: var(--cor-secundaria);
+  background: #fff6ee;
+}
+
+/* Responsivo entregador */
+@media (max-width: 700px) {
+  .entregador-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .entregador-sidebar {
+    padding: 18px;
+  }
+
+  .entregador-sidebar__titulo {
+    padding-bottom: 12px;
+  }
+
+  .entregador-sidebar__menu {
+    grid-template-columns: repeat(2, 1fr);
+    margin-top: 12px;
+  }
+
+  .entregador-layout__conteudo {
+    padding: 24px 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .entregador-sidebar__menu {
+    grid-template-columns: 1fr;
+  }
+
+  .entregador-layout__conteudo {
+    padding: 16px 12px;
+  }
+}
 .mesas-badge--disponivel::before {
   content: "";
   width: 8px;
