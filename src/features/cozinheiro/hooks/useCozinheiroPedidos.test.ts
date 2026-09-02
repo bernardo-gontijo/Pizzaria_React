@@ -38,8 +38,8 @@ const pedidoBase: Pedido = {
   formaPagamento: "dinheiro",
   status: "pendente",
   statusHistorico: [],
-  createdAt: new Date(),
-  updatedAt: new Date(),
+  createdAt: new Date("2026-09-01T20:00:00"),
+  updatedAt: new Date("2026-09-01T20:00:00"),
 };
 
 describe("useCozinheiroPedidos", () => {
@@ -117,6 +117,111 @@ describe("useCozinheiroPedidos", () => {
 
     expect(result.current.pedidosDelivery).toHaveLength(1);
     expect(result.current.pedidosDelivery[0].status).toBe("preparando");
+  });
+
+  it("ordena pedidos por prioridade de status", async () => {
+    const preparando: Pedido = {
+      ...pedidoBase,
+      id: "pedido-preparando",
+      status: "preparando",
+    };
+
+    const confirmado: Pedido = {
+      ...pedidoBase,
+      id: "pedido-confirmado",
+      status: "confirmado",
+    };
+
+    const pendente: Pedido = {
+      ...pedidoBase,
+      id: "pedido-pendente",
+      status: "pendente",
+    };
+
+    vi.mocked(buscarPedidos).mockResolvedValue([
+      preparando,
+      confirmado,
+      pendente,
+    ]);
+
+    const { result } = renderHook(() => useCozinheiroPedidos());
+
+    await act(async () => {
+      await result.current.carregarPedidos();
+    });
+
+    expect(result.current.pedidosDelivery.map((pedido) => pedido.id)).toEqual([
+      "pedido-pendente",
+      "pedido-confirmado",
+      "pedido-preparando",
+    ]);
+  });
+
+  it("ordena pedidos do mesmo status do mais antigo para o mais novo", async () => {
+    const pedidoNovo: Pedido = {
+      ...pedidoBase,
+      id: "pedido-novo",
+      status: "confirmado",
+      createdAt: new Date("2026-09-01T21:00:00"),
+    };
+
+    const pedidoAntigo: Pedido = {
+      ...pedidoBase,
+      id: "pedido-antigo",
+      status: "confirmado",
+      createdAt: new Date("2026-09-01T19:00:00"),
+    };
+
+    vi.mocked(buscarPedidos).mockResolvedValue([pedidoNovo, pedidoAntigo]);
+
+    const { result } = renderHook(() => useCozinheiroPedidos());
+
+    await act(async () => {
+      await result.current.carregarPedidos();
+    });
+
+    expect(result.current.pedidosDelivery.map((pedido) => pedido.id)).toEqual([
+      "pedido-antigo",
+      "pedido-novo",
+    ]);
+  });
+
+  it("calcula corretamente o resumo da cozinha", async () => {
+    vi.mocked(buscarPedidos).mockResolvedValue([
+      {
+        ...pedidoBase,
+        id: "pendente-1",
+        status: "pendente",
+      },
+      {
+        ...pedidoBase,
+        id: "pendente-2",
+        status: "pendente",
+      },
+      {
+        ...pedidoBase,
+        id: "confirmado-1",
+        status: "confirmado",
+      },
+      {
+        ...pedidoBase,
+        id: "preparando-1",
+        status: "preparando",
+      },
+    ]);
+
+    const { result } = renderHook(() => useCozinheiroPedidos());
+
+    await act(async () => {
+      await result.current.carregarPedidos();
+    });
+
+    expect(result.current.resumo).toEqual({
+      pendentes: 2,
+      confirmados: 1,
+      preparando: 1,
+      total: 4,
+    });
   });
 
   it("confirma um pedido pendente", async () => {

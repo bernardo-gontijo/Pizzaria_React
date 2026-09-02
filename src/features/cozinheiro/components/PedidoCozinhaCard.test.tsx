@@ -27,8 +27,8 @@ const pedidoBase: Pedido = {
   formaPagamento: "dinheiro",
   status: "pendente",
   statusHistorico: [],
-  createdAt: new Date(),
-  updatedAt: new Date(),
+  createdAt: new Date(2026, 8, 1, 20, 30),
+  updatedAt: new Date(2026, 8, 1, 20, 30),
 };
 
 describe("PedidoCozinhaCard", () => {
@@ -36,6 +36,7 @@ describe("PedidoCozinhaCard", () => {
     render(
       <PedidoCozinhaCard
         pedido={pedidoBase}
+        atualizando={false}
         onConfirmar={vi.fn()}
         onIniciarPreparo={vi.fn()}
         onFinalizarPreparo={vi.fn()}
@@ -48,12 +49,46 @@ describe("PedidoCozinhaCard", () => {
     expect(screen.getByText("Pedido delivery")).toBeInTheDocument();
   });
 
+  it("exibe o horário em que o pedido foi recebido", () => {
+    render(
+      <PedidoCozinhaCard
+        pedido={pedidoBase}
+        atualizando={false}
+        onConfirmar={vi.fn()}
+        onIniciarPreparo={vi.fn()}
+        onFinalizarPreparo={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByText("20:30")).toBeInTheDocument();
+  });
+
+  it("exibe o nome amigável do status", () => {
+    const pedidoPreparando: Pedido = {
+      ...pedidoBase,
+      status: "preparando",
+    };
+
+    render(
+      <PedidoCozinhaCard
+        pedido={pedidoPreparando}
+        atualizando={false}
+        onConfirmar={vi.fn()}
+        onIniciarPreparo={vi.fn()}
+        onFinalizarPreparo={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByText("Em preparo")).toBeInTheDocument();
+  });
+
   it("permite confirmar um pedido pendente", () => {
     const onConfirmar = vi.fn();
 
     render(
       <PedidoCozinhaCard
         pedido={pedidoBase}
+        atualizando={false}
         onConfirmar={onConfirmar}
         onIniciarPreparo={vi.fn()}
         onFinalizarPreparo={vi.fn()}
@@ -80,6 +115,7 @@ describe("PedidoCozinhaCard", () => {
     render(
       <PedidoCozinhaCard
         pedido={pedidoConfirmado}
+        atualizando={false}
         onConfirmar={vi.fn()}
         onIniciarPreparo={onIniciarPreparo}
         onFinalizarPreparo={vi.fn()}
@@ -111,6 +147,7 @@ describe("PedidoCozinhaCard", () => {
     render(
       <PedidoCozinhaCard
         pedido={pedidoLocal}
+        atualizando={false}
         onConfirmar={vi.fn()}
         onIniciarPreparo={vi.fn()}
         onFinalizarPreparo={onFinalizarPreparo}
@@ -139,6 +176,7 @@ describe("PedidoCozinhaCard", () => {
     render(
       <PedidoCozinhaCard
         pedido={pedidoDelivery}
+        atualizando={false}
         onConfirmar={vi.fn()}
         onIniciarPreparo={vi.fn()}
         onFinalizarPreparo={onFinalizarPreparo}
@@ -154,5 +192,23 @@ describe("PedidoCozinhaCard", () => {
     );
 
     expect(onFinalizarPreparo).toHaveBeenCalledWith("pedido-1");
+  });
+
+  it("desabilita o botão enquanto o pedido está sendo atualizado", () => {
+    render(
+      <PedidoCozinhaCard
+        pedido={pedidoBase}
+        atualizando={true}
+        onConfirmar={vi.fn()}
+        onIniciarPreparo={vi.fn()}
+        onFinalizarPreparo={vi.fn()}
+      />,
+    );
+
+    const botao = screen.getByRole("button", {
+      name: "Processando...",
+    });
+
+    expect(botao).toBeDisabled();
   });
 });
