@@ -1513,3 +1513,218 @@ body {
     text-align: left;
   }
 }
+
+/* ===================================================================
+   Tela "Mesas" do garçom (área bege/conteúdo).
+   Estas regras NÃO alteram .admin-sidebar nem .admin-layout já
+   existentes — são classes novas, usadas só dentro de <MesasPage />.
+   =================================================================== */
+
+.mesas-page__cabecalho {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.mesas-page__subtitulo {
+  margin: 4px 0 0;
+  color: #9a8c80;
+  font-size: 0.95rem;
+}
+
+.mesas-page__badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.mesas-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 16px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.mesas-badge--disponivel {
+  background: #e2f5e6;
+  color: #1f8a4c;
+}
+
+.mesas-badge--disponivel::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #2fae5f;
+}
+
+.mesas-badge--livres {
+  background: #fbead9;
+  color: #c06a1d;
+}
+
+/* Grade fluida: o número de mesas por fileira nasce da largura
+   disponível e da quantidade total de mesas cadastradas por essa
+   pizzaria (cada tenant pode ter um número diferente de mesas), em vez
+   de um valor fixo tipo "4 por linha". A ordem segue a ordem de
+   cadastro (array "mesas"). */
+.mesas-grade {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 44px 24px;
+  margin-top: 36px;
+}
+
+.mesa-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.mesa-item__mesa {
+  position: relative;
+  width: 112px;
+  height: 112px;
+  margin-bottom: 14px;
+}
+
+.mesa-item__tampo {
+  position: absolute;
+  inset: 13px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  border-radius: 18px;
+  background: #ffffff;
+  box-shadow: 0 8px 20px rgba(43, 32, 20, 0.09);
+}
+
+.mesa-item__tampo strong {
+  color: var(--cor-secundaria);
+  font-size: 1.55rem;
+  line-height: 1;
+}
+
+.mesa-item__status {
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+}
+
+.mesa-item__status--livre {
+  color: #2fae5f;
+}
+
+.mesa-item__status--ocupada {
+  color: #d9483a;
+}
+
+.mesa-item__cadeira {
+  position: absolute;
+  background: #e4dccf;
+  border-radius: 6px;
+}
+
+.mesa-item__cadeira--topo {
+  top: -6px;
+  left: 50%;
+  width: 34px;
+  height: 12px;
+  border-radius: 6px 6px 0 0;
+  transform: translateX(-50%);
+}
+
+.mesa-item__cadeira--base {
+  bottom: -6px;
+  left: 50%;
+  width: 34px;
+  height: 12px;
+  border-radius: 0 0 6px 6px;
+  transform: translateX(-50%);
+}
+
+.mesa-item__cadeira--esquerda-cima {
+  top: 24px;
+  left: -8px;
+  width: 12px;
+  height: 26px;
+  border-radius: 6px 0 0 6px;
+}
+
+.mesa-item__cadeira--esquerda-baixo {
+  bottom: 24px;
+  left: -8px;
+  width: 12px;
+  height: 26px;
+  border-radius: 6px 0 0 6px;
+}
+
+.mesa-item__cadeira--direita-cima {
+  top: 24px;
+  right: -8px;
+  width: 12px;
+  height: 26px;
+  border-radius: 0 6px 6px 0;
+}
+
+.mesa-item__cadeira--direita-baixo {
+  bottom: 24px;
+  right: -8px;
+  width: 12px;
+  height: 26px;
+  border-radius: 0 6px 6px 0;
+}
+
+.mesa-item__nome {
+  margin: 0 0 12px;
+  color: var(--cor-secundaria);
+  font-weight: 700;
+}
+
+.mesa-item__botao {
+  width: 100%;
+  max-width: 148px;
+}
+
+.mesas-page__area-preparo {
+  margin-top: 48px;
+  padding: 26px;
+  border: 1.5px dashed var(--borda);
+  border-radius: 12px;
+  color: #b7a99b;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+@media (max-width: 700px) {
+  .mesas-grade {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 36px 16px;
+  }
+}
+
+/* Na página de admin, "mesas-page" é um <section> filho direto de
+   <main>, e a regra genérica ".admin-layout__conteudo > main > section"
+   (usada pelas grades simples de cards de outras telas do admin, como
+   Pizzas/Categorias) estava aplicando um grid de 2 colunas nela,
+   jogando o cabeçalho numa coluna e a grade de mesas inteira em outra,
+   afastada da borda esquerda. Aqui devolvemos o comportamento em bloco
+   (empilhado), que é o que .mesas-page já define internamente. */
+.admin-layout__conteudo > main > section.mesas-page {
+  display: block;
+  grid-template-columns: none;
+  gap: 0;
+  margin-top: 0;
+}
