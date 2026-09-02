@@ -7,8 +7,12 @@ import { ProtectedRoute } from "../features/admin/components/ProtectedRoute";
 import { Layout as GarcomLayout } from "../features/garcom/components/Layout";
 import { ProtectedRoute as GarcomProtectedRoute } from "../features/garcom/components/ProtectedRoute";
 import { Loading } from "../components/Loading";
-import { EntregadorLayout , EntregadorDashboard }  from "../features/entregador";
-import {EntregadorPedidos, EntregadorEntregas } from "../features/entregador";
+import {
+  EntregadorDashboard,
+  EntregadorEntregas,
+  EntregadorLayout,
+  EntregadorPedidos,
+} from "../features/entregador";
 
 const ConfiguracaoPage = lazy(() =>
   import("../features/admin/pages/ConfiguracaoPage").then((m) => ({
@@ -115,12 +119,6 @@ const PedidoMesaPage = lazy(() =>
     default: m.PedidoMesaPage,
   })),
 );
-const EntregadorPage = lazy(() =>
-  import("../features/entregador/pages/entregadorPage").then((m) => ({
-    default: m.EntregadorPage,
-  })),
-);
-
 const CozinheiroPage = lazy(() =>
   import("../features/cozinheiro/pages/CozinheiroPage").then((m) => ({
     default: m.CozinheiroPage,
@@ -228,14 +226,14 @@ export const router = createBrowserRouter([
     ],
   },
 
-   {
-  path: '/entregador',
-  element: <EntregadorLayout />,
-  children: [
-    { index: true, element: <EntregadorDashboard /> },
-    { path: 'dashboard', element: <EntregadorDashboard /> },
-    { path: 'pedidos', element: <EntregadorPedidos/> },
-    { path: 'entregas', element: <EntregadorEntregas /> },
-  ]
-}
+  {
+    path: "/entregador",
+    element: <EntregadorLayout />,
+    children: [
+      { index: true, element: <EntregadorDashboard /> },
+      { path: "dashboard", element: <EntregadorDashboard /> },
+      { path: "pedidos", element: <EntregadorPedidos /> },
+      { path: "entregas", element: <EntregadorEntregas /> },
+    ],
+  },
 ]);

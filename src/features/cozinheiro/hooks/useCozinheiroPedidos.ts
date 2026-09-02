@@ -13,8 +13,9 @@ const prioridadeStatus: Record<StatusPedidoType, number> = {
   confirmado: 2,
   preparando: 3,
   pronto: 4,
-  entregue: 5,
-  cancelado: 6,
+  saiu_para_entrega: 5,
+  entregue: 6,
+  cancelado: 7,
 };
 
 export function useCozinheiroPedidos() {

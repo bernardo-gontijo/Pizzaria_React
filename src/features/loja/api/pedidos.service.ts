@@ -65,6 +65,7 @@ export async function criarPedido(dados: CriarPedidoDTO): Promise<Pedido> {
   try {
     // Simular delay de rede
     await new Promise((resolve) => setTimeout(resolve, 1000));
+    initPedidos();
 
     // Calcular totais
     const subtotal = dados.itens.reduce(
@@ -118,6 +119,7 @@ export async function criarPedido(dados: CriarPedidoDTO): Promise<Pedido> {
 export async function buscarPedidos(): Promise<Pedido[]> {
   try {
     await new Promise((resolve) => setTimeout(resolve, 300));
+    initPedidos();
     return [...pedidosCache];
   } catch (error) {
     console.error("Erro ao buscar pedidos:", error);
@@ -128,6 +130,7 @@ export async function buscarPedidos(): Promise<Pedido[]> {
 export async function buscarPedidoPorId(id: string): Promise<Pedido | null> {
   try {
     await new Promise((resolve) => setTimeout(resolve, 200));
+    initPedidos();
     return pedidosCache.find((p) => p.id === id) || null;
   } catch (error) {
     console.error("Erro ao buscar pedido:", error);
@@ -141,6 +144,7 @@ export async function atualizarStatusPedido(
 ): Promise<Pedido | null> {
   try {
     await new Promise((resolve) => setTimeout(resolve, 500));
+    initPedidos();
 
     const index = pedidosCache.findIndex((p) => p.id === id);
     if (index === -1) return null;
@@ -175,6 +179,7 @@ export async function atualizarItensPedido(
   itens: Omit<ItemPedido, "id">[],
 ): Promise<Pedido | null> {
   try {
+    initPedidos();
     const index = pedidosCache.findIndex((p) => p.id === id);
     if (index === -1) return null;
 
@@ -213,6 +218,7 @@ function getStatusMessage(status: string): string {
     confirmado: "Pedido confirmado",
     preparando: "Pedido em preparação",
     pronto: "Pedido pronto para entrega",
+    saiu_para_entrega: "Pedido saiu para entrega",
     entregue: "Pedido entregue",
     cancelado: "Pedido cancelado",
   };

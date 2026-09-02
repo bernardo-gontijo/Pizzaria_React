@@ -17,6 +17,7 @@ export type StatusPedidoType =
   | "confirmado"
   | "preparando"
   | "pronto"
+  | "saiu_para_entrega"
   | "entregue"
   | "cancelado";
 

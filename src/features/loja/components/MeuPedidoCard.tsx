@@ -11,6 +11,7 @@ const nomesStatus: Record<StatusPedidoType, string> = {
   confirmado: "Confirmado",
   preparando: "Em preparo",
   pronto: "Pronto",
+  saiu_para_entrega: "Saiu para entrega",
   entregue: "Entregue",
   cancelado: "Cancelado",
 };
