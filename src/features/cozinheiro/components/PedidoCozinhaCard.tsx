@@ -4,26 +4,36 @@ interface PedidoCozinhaCardProps {
   pedido: Pedido;
   onConfirmar: (id: string) => void;
   onIniciarPreparo: (id: string) => void;
+  onFinalizarPreparo: (id: string) => void;
 }
 
 export function PedidoCozinhaCard({
   pedido,
   onConfirmar,
   onIniciarPreparo,
+  onFinalizarPreparo,
 }: PedidoCozinhaCardProps) {
+  const pedidoLocal = pedido.mesaId !== undefined;
+
   return (
     <article>
       <header>
-        <h2>Pedido {pedido.id}</h2>
+        <h2>{pedidoLocal ? pedido.cliente.nome : `Pedido ${pedido.id}`}</h2>
+
+        <p>
+          Tipo: <span>{pedidoLocal ? "Pedido local" : "Pedido delivery"}</span>
+        </p>
 
         <p>
           Status: <span>{pedido.status}</span>
         </p>
       </header>
 
-      <p>
-        Cliente: <span>{pedido.cliente.nome}</span>
-      </p>
+      {!pedidoLocal && (
+        <p>
+          Cliente: <span>{pedido.cliente.nome}</span>
+        </p>
+      )}
 
       <h3>Itens</h3>
 
@@ -55,6 +65,16 @@ export function PedidoCozinhaCard({
           onClick={() => onIniciarPreparo(pedido.id)}
         >
           Iniciar preparo
+        </button>
+      )}
+
+      {pedido.status === "preparando" && (
+        <button
+          type="button"
+          className="bg-primaria"
+          onClick={() => onFinalizarPreparo(pedido.id)}
+        >
+          {pedidoLocal ? "Marcar como pronto" : "Preparado para delivery"}
         </button>
       )}
     </article>

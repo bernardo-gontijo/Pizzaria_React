@@ -5,6 +5,7 @@ import {
   buscarPedidos,
   PEDIDOS_ATUALIZADOS_EVENT,
 } from "../../loja/api/pedidos.service";
+
 import type { Pedido, StatusPedidoType } from "../../loja/types/pedido";
 
 export function useCozinheiroPedidos() {
@@ -37,10 +38,12 @@ export function useCozinheiroPedidos() {
     }
 
     window.addEventListener(PEDIDOS_ATUALIZADOS_EVENT, atualizarLista);
+
     window.addEventListener("storage", atualizarLista);
 
     return () => {
       window.removeEventListener(PEDIDOS_ATUALIZADOS_EVENT, atualizarLista);
+
       window.removeEventListener("storage", atualizarLista);
     };
   }, [carregarPedidos]);
@@ -49,9 +52,22 @@ export function useCozinheiroPedidos() {
     () =>
       pedidos.filter(
         (pedido) =>
-          pedido.status === "pendente" || pedido.status === "confirmado",
+          pedido.itens.length > 0 &&
+          (pedido.status === "pendente" ||
+            pedido.status === "confirmado" ||
+            pedido.status === "preparando"),
       ),
     [pedidos],
+  );
+
+  const pedidosLocais = useMemo(
+    () => pedidosDaCozinha.filter((pedido) => pedido.mesaId !== undefined),
+    [pedidosDaCozinha],
+  );
+
+  const pedidosDelivery = useMemo(
+    () => pedidosDaCozinha.filter((pedido) => pedido.mesaId === undefined),
+    [pedidosDaCozinha],
   );
 
   async function alterarStatus(id: string, status: StatusPedidoType) {
@@ -80,12 +96,18 @@ export function useCozinheiroPedidos() {
     await alterarStatus(id, "preparando");
   }
 
+  async function finalizarPreparo(id: string) {
+    await alterarStatus(id, "pronto");
+  }
+
   return {
-    pedidos: pedidosDaCozinha,
+    pedidosLocais,
+    pedidosDelivery,
     carregando,
     erro,
     carregarPedidos,
     confirmarPedido,
     iniciarPreparo,
+    finalizarPreparo,
   };
 }
