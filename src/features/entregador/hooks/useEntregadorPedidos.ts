@@ -1,73 +1,114 @@
-// src/features/entregador/hooks/useEntregadorPedidos.ts
-import { useState, useEffect, useCallback } from 'react';
-import { pedidosService } from '../services/pedidos.service';
-import { type Pedido } from '../types/entregador.types';
+import { useCallback, useEffect, useMemo, useState } from "react";
 
-export const useEntregadorPedidos = () => {
-  const [pedidosProntos, setPedidosProntos] = useState<Pedido[]>([]);
-  const [pedidosEmRota, setPedidosEmRota] = useState<Pedido[]>([]);
+import {
+  pedidosService,
+  PEDIDOS_ATUALIZADOS_EVENT,
+} from "../services/pedidos.service";
+import type { Pedido } from "../../loja/types/pedido";
+
+export function useEntregadorPedidos() {
+  const [pedidos, setPedidos] = useState<Pedido[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [pedidoAtualizando, setPedidoAtualizando] = useState<string | null>(
+    null,
+  );
 
   const carregarPedidos = useCallback(async () => {
-    console.log('🔄 Carregando pedidos...');
-    setLoading(true);
-    setError(null);
     try {
+      setLoading(true);
+      setError(null);
+
       const todosPedidos = await pedidosService.listarPedidos();
-      console.log('📦 Todos os pedidos:', todosPedidos);
-      
-      // Filtra pedidos prontos para retirar
-      const prontos = todosPedidos.filter(p => p.status === 'pronto');
-      console.log('✅ Pedidos prontos:', prontos);
-      setPedidosProntos(prontos);
-      
-      // Filtra pedidos em rota de entrega
-      const emRota = todosPedidos.filter(p => p.status === 'saiu_para_entrega');
-      console.log('🚚 Pedidos em rota:', emRota);
-      setPedidosEmRota(emRota);
-    } catch (err) {
-      console.error('❌ Erro ao carregar pedidos:', err);
-      setError('Erro ao carregar pedidos');
+      setPedidos(todosPedidos.filter((pedido) => pedido.mesaId === undefined));
+    } catch (error) {
+      setError(
+        error instanceof Error
+          ? error.message
+          : "Não foi possível carregar os pedidos para entrega.",
+      );
     } finally {
       setLoading(false);
-      console.log('🏁 Carregamento finalizado');
     }
   }, []);
 
-  const saiuParaEntrega = useCallback(async (pedidoId: string) => {
-    console.log(`🚚 Pedido ${pedidoId} saiu para entrega`);
-    try {
-      await pedidosService.atualizarStatusPedido(pedidoId, 'saiu_para_entrega');
-      await carregarPedidos();
-    } catch (err) {
-      console.error('❌ Erro ao atualizar status:', err);
-      setError('Erro ao atualizar status');
-    }
-  }, [carregarPedidos]);
-
-  const marcarEntregue = useCallback(async (pedidoId: string) => {
-    console.log(`✅ Pedido ${pedidoId} entregue`);
-    try {
-      await pedidosService.atualizarStatusPedido(pedidoId, 'entregue');
-      await carregarPedidos();
-    } catch (err) {
-      console.error('❌ Erro ao marcar como entregue:', err);
-      setError('Erro ao marcar como entregue');
-    }
-  }, [carregarPedidos]);
-
   useEffect(() => {
-    carregarPedidos();
+    const carregamentoInicial = window.setTimeout(() => {
+      void carregarPedidos();
+    }, 0);
+
+    function atualizarLista() {
+      void carregarPedidos();
+    }
+
+    window.addEventListener(PEDIDOS_ATUALIZADOS_EVENT, atualizarLista);
+    window.addEventListener("storage", atualizarLista);
+
+    return () => {
+      window.clearTimeout(carregamentoInicial);
+      window.removeEventListener(PEDIDOS_ATUALIZADOS_EVENT, atualizarLista);
+      window.removeEventListener("storage", atualizarLista);
+    };
   }, [carregarPedidos]);
+
+  const pedidosProntos = useMemo(
+    () => pedidos.filter((pedido) => pedido.status === "pronto"),
+    [pedidos],
+  );
+
+  const pedidosEmRota = useMemo(
+    () => pedidos.filter((pedido) => pedido.status === "saiu_para_entrega"),
+    [pedidos],
+  );
+
+  const pedidosEntregues = useMemo(
+    () => pedidos.filter((pedido) => pedido.status === "entregue"),
+    [pedidos],
+  );
+
+  const atualizarStatus = useCallback(
+    async (pedidoId: string, status: "saiu_para_entrega" | "entregue") => {
+      try {
+        setPedidoAtualizando(pedidoId);
+        setError(null);
+        await pedidosService.atualizarStatusPedido(pedidoId, status);
+        await carregarPedidos();
+      } catch (error) {
+        setError(
+          error instanceof Error
+            ? error.message
+            : "Não foi possível atualizar o pedido.",
+        );
+      } finally {
+        setPedidoAtualizando(null);
+      }
+    },
+    [carregarPedidos],
+  );
+
+  const saiuParaEntrega = useCallback(
+    async (pedidoId: string) => {
+      await atualizarStatus(pedidoId, "saiu_para_entrega");
+    },
+    [atualizarStatus],
+  );
+
+  const marcarEntregue = useCallback(
+    async (pedidoId: string) => {
+      await atualizarStatus(pedidoId, "entregue");
+    },
+    [atualizarStatus],
+  );
 
   return {
     pedidosProntos,
     pedidosEmRota,
+    pedidosEntregues,
     loading,
     error,
+    pedidoAtualizando,
     saiuParaEntrega,
     marcarEntregue,
     carregarPedidos,
   };
-};
+}

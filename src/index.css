@@ -494,7 +494,6 @@ svg {
   color: #756661;
 }
 
-
 /* Equivalentes locais das classes utilitárias usadas no login e configuração. */
 .mx-auto {
   margin-inline: auto;
@@ -1270,7 +1269,7 @@ body {
 
 .status-timeline {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(6, 1fr);
   gap: 8px;
   margin: 32px 0;
   padding: 0;
@@ -1403,6 +1402,10 @@ body {
 
 .meu-pedido-card__status.status--entregue {
   color: #3e7450;
+}
+
+.meu-pedido-card__status.status--saiu_para_entrega {
+  color: #356a8a;
 }
 
 .meu-pedido-card__status.status--cancelado {
@@ -1744,6 +1747,72 @@ body {
 .entregador-layout__conteudo th {
   color: var(--cor-secundaria);
   background: #fff6ee;
+}
+
+.entregador-layout__conteudo .entregador-pedidos__lista {
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+.pedido-entregador-card {
+  display: grid;
+  gap: 20px;
+}
+
+.pedido-entregador-card__cabecalho {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.pedido-entregador-card__cabecalho > div {
+  display: grid;
+  gap: 6px;
+}
+
+.pedido-entregador-card__cabecalho span {
+  color: var(--cor-secundaria);
+  font-weight: 700;
+}
+
+.pedido-entregador-card__cabecalho strong,
+.entregador-layout__conteudo .pedido-entregador-card__cabecalho strong {
+  display: block;
+  margin: 0;
+  color: var(--cor-primaria);
+  font-size: 1rem;
+}
+
+.pedido-entregador-card__detalhes {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+}
+
+.pedido-entregador-card__detalhes div {
+  display: grid;
+  gap: 3px;
+}
+
+.pedido-entregador-card__detalhes dt {
+  color: #756661;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.pedido-entregador-card__detalhes dd {
+  margin: 0;
+  color: var(--cor-secundaria);
+}
+
+.pedido-entregador-card > button {
+  width: 100%;
+}
+
+.pedido-entregador-card > button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
 }
 
 /* Responsivo entregador */

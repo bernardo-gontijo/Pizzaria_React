@@ -22,6 +22,7 @@ export const NOMES_STATUS_PEDIDO: Record<StatusPedidoType, string> = {
   confirmado: "Confirmado",
   preparando: "Em preparo",
   pronto: "Pronto para entrega",
+  saiu_para_entrega: "Saiu para entrega",
   entregue: "Entregue",
   cancelado: "Cancelado",
 };

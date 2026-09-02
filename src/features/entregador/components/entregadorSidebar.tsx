@@ -1,5 +1,5 @@
 // src/features/entregador/components/EntregadorSidebar.tsx
-import { NavLink } from 'react-router-dom';
+import { NavLink } from "react-router-dom";
 
 export function EntregadorSidebar() {
   return (
@@ -8,29 +8,30 @@ export function EntregadorSidebar() {
         <h2> Entregador</h2>
       </div>
       <nav className="entregador-sidebar__menu">
-        <NavLink 
-          to="/entregador" 
-          className={({ isActive }) => 
-            `entregador-sidebar__link${isActive ? ' entregador-sidebar__link--ativo' : ''}`
+        <NavLink
+          to="/entregador"
+          end
+          className={({ isActive }) =>
+            `entregador-sidebar__link${isActive ? " entregador-sidebar__link--ativo" : ""}`
           }
         >
           Dashboard
         </NavLink>
-        <NavLink 
-          to="/entregador/pedidos" 
-          className={({ isActive }) => 
-            `entregador-sidebar__link${isActive ? ' entregador-sidebar__link--ativo' : ''}`
+        <NavLink
+          to="/entregador/pedidos"
+          className={({ isActive }) =>
+            `entregador-sidebar__link${isActive ? " entregador-sidebar__link--ativo" : ""}`
           }
         >
-           Pedidos
+          Pedidos
         </NavLink>
-        <NavLink 
-          to="/entregador/entregas" 
-          className={({ isActive }) => 
-            `entregador-sidebar__link${isActive ? ' entregador-sidebar__link--ativo' : ''}`
+        <NavLink
+          to="/entregador/entregas"
+          className={({ isActive }) =>
+            `entregador-sidebar__link${isActive ? " entregador-sidebar__link--ativo" : ""}`
           }
         >
-           Entregas
+          Entregas
         </NavLink>
       </nav>
     </aside>
