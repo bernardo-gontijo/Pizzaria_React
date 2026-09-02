@@ -47,10 +47,10 @@ export default defineConfig({
         ],
       },
       workbox: {
-        globPatterns: ["**/*.{js,css,html,ico,png,svg,webmanifest}"],
+        globPatterns: ["**/*.{js,css,html,ico,png,svg,json,webmanifest}"],
         runtimeCaching: [
           {
-            urlPattern: /\/api\/todasAsPizzas\.json$/,
+            urlPattern: /\/api\/todasAs(?:Pizzas|Bebidas)\.json$/,
             handler: "StaleWhileRevalidate",
             options: {
               cacheName: "cardapio-cache",

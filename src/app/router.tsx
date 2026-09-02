@@ -48,6 +48,16 @@ const CardapioPage = lazy(() =>
     default: m.CardapioPage,
   })),
 );
+const BebidasPage = lazy(() =>
+  import("../features/loja/pages/BebidasPage").then((m) => ({
+    default: m.BebidasPage,
+  })),
+);
+const BebidaDetalhePage = lazy(() =>
+  import("../features/loja/pages/BebidaDetalhePage").then((m) => ({
+    default: m.BebidaDetalhePage,
+  })),
+);
 const CarrinhoPage = lazy(() =>
   import("../features/loja/pages/CarrinhoPage").then((m) => ({
     default: m.CarrinhoPage,
@@ -71,6 +81,11 @@ const PagamentoPage = lazy(() =>
 const PizzaDetalhePage = lazy(() =>
   import("../features/loja/pages/PizzaDetalhePage").then((m) => ({
     default: m.PizzaDetalhePage,
+  })),
+);
+const MeusPedidosPage = lazy(() =>
+  import("../features/loja/pages/MeusPedidosPage").then((m) => ({
+    default: m.MeusPedidosPage,
   })),
 );
 const HomePage = lazy(() =>
@@ -111,11 +126,14 @@ export const router = createBrowserRouter([
     children: [
       { index: true, Component: HomePage },
       { path: "cardapio", Component: CardapioPage },
+      { path: "bebidas", Component: BebidasPage },
+      { path: "bebida/:id", Component: BebidaDetalhePage },
       { path: "categoria/:categoria", Component: CategoriaPage },
       { path: "pizza/:id", Component: PizzaDetalhePage },
       { path: "carrinho", Component: CarrinhoPage },
       { path: "checkout", Component: CheckoutPage },
       { path: "pagamento", Component: PagamentoPage },
+      { path: "meus-pedidos", Component: MeusPedidosPage },
       { path: "acompanhar/:id", Component: AcompanharPedidoPage },
       { path: "*", Component: NotFoundPage },
     ],

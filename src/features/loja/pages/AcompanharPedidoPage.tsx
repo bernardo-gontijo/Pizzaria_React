@@ -1,7 +1,10 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { StatusPedido } from "../components/StatusPedido";
-import { buscarPedidoPorId } from "../api/pedidos.service";
+import {
+  buscarPedidoPorId,
+  PEDIDOS_ATUALIZADOS_EVENT,
+} from "../api/pedidos.service";
 import type { Pedido } from "../types/pedido";
 
 export function AcompanharPedidoPage() {
@@ -14,6 +17,7 @@ export function AcompanharPedidoPage() {
     async function carregar() {
       try {
         setLoading(true);
+        setErro(null);
         const resultado = await buscarPedidoPorId(id!);
         if (resultado) {
           setPedido(resultado);
@@ -29,7 +33,20 @@ export function AcompanharPedidoPage() {
       }
     }
 
-    if (id) carregar();
+    function atualizarPedido() {
+      void carregar();
+    }
+
+    if (id) {
+      void carregar();
+      window.addEventListener(PEDIDOS_ATUALIZADOS_EVENT, atualizarPedido);
+      window.addEventListener("storage", atualizarPedido);
+    }
+
+    return () => {
+      window.removeEventListener(PEDIDOS_ATUALIZADOS_EVENT, atualizarPedido);
+      window.removeEventListener("storage", atualizarPedido);
+    };
   }, [id]);
 
   if (loading) return <p className="feedback">Carregando pedido...</p>;

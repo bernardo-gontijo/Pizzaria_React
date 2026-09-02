@@ -12,6 +12,7 @@ import type { Pizza } from "../features/loja/types/pizza";
 // ========== TIPOS ==========
 export interface CartItem {
   id: string;
+  tipo?: "pizza" | "bebida";
   pizza?: Pizza;
   nome: string;
   precoUnitario: number;
