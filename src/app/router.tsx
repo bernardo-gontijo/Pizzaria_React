@@ -139,7 +139,7 @@ export const router = createBrowserRouter([
     ],
   },
   {
-    path: "/cozinheiro-teste",
+    path: "/cozinha",
     element: (
       <Suspense fallback={<Loading />}>
         <CozinheiroPage />
