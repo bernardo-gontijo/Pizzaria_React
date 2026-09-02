@@ -7,8 +7,10 @@ export function CozinheiroPage() {
   const {
     pedidosLocais,
     pedidosDelivery,
+    resumo,
     carregando,
     erro,
+    pedidoAtualizando,
     carregarPedidos,
     confirmarPedido,
     iniciarPreparo,
@@ -40,6 +42,28 @@ export function CozinheiroPage() {
             prontos.
           </p>
 
+          <section>
+            <article>
+              <h2>Aguardando</h2>
+              <strong>{resumo.pendentes}</strong>
+            </article>
+
+            <article>
+              <h2>Confirmados</h2>
+              <strong>{resumo.confirmados}</strong>
+            </article>
+
+            <article>
+              <h2>Em preparo</h2>
+              <strong>{resumo.preparando}</strong>
+            </article>
+
+            <article>
+              <h2>Total na cozinha</h2>
+              <strong>{resumo.total}</strong>
+            </article>
+          </section>
+
           {carregando && <p>Carregando pedidos da cozinha...</p>}
 
           {erro && (
@@ -61,6 +85,7 @@ export function CozinheiroPage() {
                   <PedidoCozinhaCard
                     key={pedido.id}
                     pedido={pedido}
+                    atualizando={pedidoAtualizando === pedido.id}
                     onConfirmar={confirmarPedido}
                     onIniciarPreparo={iniciarPreparo}
                     onFinalizarPreparo={finalizarPreparo}
@@ -79,6 +104,7 @@ export function CozinheiroPage() {
                   <PedidoCozinhaCard
                     key={pedido.id}
                     pedido={pedido}
+                    atualizando={pedidoAtualizando === pedido.id}
                     onConfirmar={confirmarPedido}
                     onIniciarPreparo={iniciarPreparo}
                     onFinalizarPreparo={finalizarPreparo}
