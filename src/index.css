@@ -1579,3 +1579,17 @@ body {
     gap: 36px 16px;
   }
 }
+
+/* Na página de admin, "mesas-page" é um <section> filho direto de
+   <main>, e a regra genérica ".admin-layout__conteudo > main > section"
+   (usada pelas grades simples de cards de outras telas do admin, como
+   Pizzas/Categorias) estava aplicando um grid de 2 colunas nela,
+   jogando o cabeçalho numa coluna e a grade de mesas inteira em outra,
+   afastada da borda esquerda. Aqui devolvemos o comportamento em bloco
+   (empilhado), que é o que .mesas-page já define internamente. */
+.admin-layout__conteudo > main > section.mesas-page {
+  display: block;
+  grid-template-columns: none;
+  gap: 0;
+  margin-top: 0;
+}
