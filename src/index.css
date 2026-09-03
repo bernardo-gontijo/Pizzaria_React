@@ -2020,3 +2020,142 @@ body {
   gap: 0;
   margin-top: 0;
 }
+
+/* Modal de seleção de item do cardápio (garçom) */
+.seletor-item-modal__overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(27, 20, 20, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  z-index: 1000;
+}
+
+.seletor-item-modal {
+  background: var(--fundo);
+  border-radius: 12px;
+  border: 1px solid var(--borda);
+  width: 100%;
+  max-width: 480px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  box-shadow: 0 12px 32px rgba(27, 20, 20, 0.25);
+}
+
+.seletor-item-modal__cabecalho {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.seletor-item-modal__cabecalho h2 {
+  margin: 0;
+  color: var(--cor-secundaria);
+}
+
+.seletor-item-modal__fechar {
+  background: transparent;
+  border: none;
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+  color: var(--cor-secundaria);
+  padding: 4px 8px;
+}
+
+.seletor-item-modal__abas {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.seletor-item-modal__aba {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid var(--borda);
+  background: var(--cor-secundaria) !important;
+  color: #fff;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: 0.2s;
+}
+
+/* Só fica vermelha quando passar o mouse */
+.seletor-item-modal__aba:hover {
+  background: var(--cor-primaria) !important;
+  border-color: var(--cor-primaria);
+}
+
+/* A aba atualmente selecionada fica vermelha */
+.seletor-item-modal__aba--ativa {
+  background: var(--cor-primaria) !important;
+  color: #fff;
+  border-color: var(--cor-primaria);
+}
+
+.seletor-item-modal__busca {
+  width: 100%;
+  padding: 8px 10px;
+  margin-bottom: 12px;
+  border: 1px solid var(--borda);
+  border-radius: 8px;
+  font-size: 15px;
+}
+
+.seletor-item-modal__lista {
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-right: 4px;
+  margin-bottom: 12px;
+}
+
+.seletor-item-modal__item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--fundo);
+  border-radius: 8px;
+  background: var(--cor-secundaria) !important;
+  color: #fff;
+  cursor: pointer;
+  text-align: left;
+  transition: 0.2s;
+}
+
+.seletor-item-modal__item:hover:not(:disabled) {
+  background: var(--cor-primaria) !important;
+  border-color: var(--cor-primaria);
+}
+
+.seletor-item-modal__item:focus {
+  background: var(--fundo) !important;
+  outline: none;
+}
+
+.seletor-item-modal__item:focus:hover:not(:disabled) {
+  background: var(--cor-primaria) !important;
+}
+
+.seletor-item-modal__item-nome {
+  color: #fff;
+}
+
+.seletor-item-modal__item-preco {
+  color: #fff;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+.seletor-item-modal__concluir {
+  align-self: flex-end;
+}
