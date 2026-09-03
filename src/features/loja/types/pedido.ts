@@ -2,7 +2,7 @@ import { type Pizza } from "./pizza";
 
 export interface ItemPedido {
   id: string;
-  tipo?: "pizza" | "bebida";
+  tipo?: "pizza" | "bebida" | "combo";
   pizzaId: string;
   pizzaName: string;
   quantity: number;
