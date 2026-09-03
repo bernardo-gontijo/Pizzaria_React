@@ -1561,7 +1561,6 @@ body {
 }
 
 /* ===== Entregador ===== */
-/* ===== Entregador ===== */
 .entregador-layout {
   min-height: 100vh;
   display: grid;
@@ -2158,4 +2157,143 @@ body {
 
 .seletor-item-modal__concluir {
   align-self: flex-end;
+}
+
+/* Botão de suporte via WhatsApp no rodapé */
+.footer__suporte {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  background: #25d366;
+  color: white !important;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.footer__suporte:hover {
+  background: #1ebe5a;
+}
+
+/* =========================================================
+   Seção de combos e promoções no cardápio
+   ========================================================= */
+
+.combos-secao {
+  padding: 48px max(24px, calc((100% - 1120px) / 2)) 0;
+  background: #fbf8f4;
+}
+
+.combos-secao h2 {
+  margin: 0 0 24px;
+  color: #2d2b28;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  font-weight: 400;
+}
+
+.combos-grade {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+}
+
+.combo-card {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  background: white;
+  box-shadow: 0 10px 28px rgba(29, 24, 20, 0.1);
+}
+
+.combo-card__selo {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  z-index: 1;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: var(--cor-primaria, #e63946);
+  color: white;
+  font-size: 0.85rem;
+  font-weight: 800;
+}
+
+.combo-card__imagem {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+}
+
+.combo-card__conteudo {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  padding: 22px;
+}
+
+.combo-card__conteudo h2 {
+  margin: 0 0 8px;
+  color: #2d2b28;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.4rem;
+  font-weight: 400;
+}
+
+.combo-card__conteudo p {
+  margin: 0 0 12px;
+  color: #756a61;
+  line-height: 1.5;
+}
+
+.combo-card__itens {
+  margin: 0 0 16px;
+  padding-left: 18px;
+  color: #756a61;
+  font-size: 0.9rem;
+}
+
+.combo-card__precos {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-top: auto;
+  margin-bottom: 14px;
+}
+
+.combo-card__preco-original {
+  color: #a89b8f;
+  font-size: 0.95rem;
+  text-decoration: line-through;
+}
+
+.combo-card__preco-promocional {
+  color: #b57b28;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.5rem;
+}
+
+.combo-card__botao {
+  width: 100%;
+  padding: 12px 16px;
+  border: 0;
+  background: var(--cor-primaria, #e63946);
+  color: white;
+  font: inherit;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.combo-card__botao:hover {
+  opacity: 0.9;
+}
+
+@media (max-width: 700px) {
+  .combos-secao {
+    padding: 32px 20px 0;
+  }
 }
