@@ -2078,31 +2078,22 @@ body {
   margin-bottom: 12px;
 }
 
-.seletor-item-modal__aba {
+.admin-layout__conteudo .seletor-item-modal__aba {
   flex: 1;
   padding: 8px 12px;
-  border: 1px solid var(--borda);
-  background: var(--cor-secundaria) !important;
-  color: #fff;
+  border: 1px solid var(--cor-secundaria);
   border-radius: 8px;
+  background: var(--cor-secundaria);
+  color: #fff;
   cursor: pointer;
   font-weight: bold;
-  transition: 0.2s;
 }
 
-/* Só fica vermelha quando passar o mouse */
-.seletor-item-modal__aba:hover {
-  background: var(--cor-primaria) !important;
-  border-color: var(--cor-primaria);
-}
-
-/* A aba atualmente selecionada fica vermelha */
-.seletor-item-modal__aba--ativa {
-  background: var(--cor-primaria) !important;
+.admin-layout__conteudo .seletor-item-modal__aba--ativa {
+  background: var(--cor-primaria);
   color: #fff;
   border-color: var(--cor-primaria);
 }
-
 .seletor-item-modal__busca {
   width: 100%;
   padding: 8px 10px;
@@ -2127,31 +2118,23 @@ body {
   justify-content: space-between;
   gap: 12px;
   padding: 10px 12px;
-  border: 1px solid var(--fundo);
+  border: 1px solid var(--cor-secundaria);
   border-radius: 8px;
-  background: var(--cor-secundaria) !important;
-  color: #fff;
-  cursor: pointer;
-  text-align: left;
-  transition: 0.2s;
+  background: var(--cor-secundaria);
 }
 
-.seletor-item-modal__item:hover:not(:disabled) {
-  background: var(--cor-primaria) !important;
-  border-color: var(--cor-primaria);
-}
-
-.seletor-item-modal__item:focus {
-  background: var(--fundo) !important;
-  outline: none;
-}
-
-.seletor-item-modal__item:focus:hover:not(:disabled) {
-  background: var(--cor-primaria) !important;
+.seletor-item-modal__item-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
 }
 
 .seletor-item-modal__item-nome {
   color: #fff;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .seletor-item-modal__item-preco {
@@ -2160,10 +2143,340 @@ body {
   white-space: nowrap;
 }
 
+.seletor-item-modal__item-acoes {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  gap: 10px;
+}
+
+.seletor-item-modal__stepper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.seletor-item-modal__stepper button {
+  display: grid;
+  width: 24px;
+  height: 24px;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--cor-primaria);
+  cursor: pointer;
+}
+
+.seletor-item-modal__stepper button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.seletor-item-modal__stepper span {
+  min-width: 16px;
+  color: #fff;
+  font-weight: 700;
+  text-align: center;
+}
+
+.admin-layout__conteudo .seletor-item-modal__adicionar {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: #fff;
+  color: var(--cor-primaria);
+  cursor: pointer;
+}
+
+.admin-layout__conteudo .seletor-item-modal__adicionar:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.admin-layout__conteudo .seletor-item-modal__adicionar:disabled {
+  opacity: 0.5;
+  cursor: wait;
+}
+
 .seletor-item-modal__concluir {
   align-self: flex-end;
 }
 
+/* ===================================================================
+   Tela de pedido da mesa (garçom) — lista de itens com controle de
+   quantidade, remoção e encerramento de conta.
+   =================================================================== */
+
+.pedido-mesa-page {
+  width: min(100%, 1050px);
+}
+
+.pedido-mesa-page > hr {
+  margin: 20px 0 32px;
+  border: 0;
+  border-top: 1px solid var(--borda);
+}
+
+.pedido-mesa-page__cabecalho {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.pedido-mesa-page__cabecalho h2 {
+  margin: 0;
+}
+
+.pedido-mesa-page__badge {
+  padding: 7px 16px;
+  border-radius: 999px;
+  background: #f4efe9;
+  color: var(--cor-secundaria);
+  font-size: 0.8rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.pedido-mesa-page__grade {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.pedido-mesa-page__item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 20px;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 6px 18px rgba(43, 32, 20, 0.06);
+}
+
+.pedido-mesa-page__item-info {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.pedido-mesa-page__item-info strong {
+  color: var(--cor-secundaria);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pedido-mesa-page__item-info span {
+  color: var(--cor-primaria);
+  font-weight: 700;
+}
+
+.pedido-mesa-page__item-controles {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  gap: 12px;
+}
+
+.pedido-mesa-page__stepper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: #f4efe9;
+}
+
+.pedido-mesa-page__stepper button {
+  display: grid;
+  width: 24px;
+  height: 24px;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: #fff;
+  color: var(--cor-secundaria);
+  cursor: pointer;
+}
+
+.pedido-mesa-page__stepper button:hover:not(:disabled) {
+  background: var(--cor-secundaria);
+  color: #fff;
+}
+
+.pedido-mesa-page__stepper button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.pedido-mesa-page__stepper span {
+  min-width: 14px;
+  color: var(--cor-secundaria);
+  font-weight: 700;
+  text-align: center;
+}
+
+.admin-layout__conteudo .pedido-mesa-page__remover {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--cor-primaria);
+  color: #fff;
+  cursor: pointer;
+}
+
+.admin-layout__conteudo .pedido-mesa-page__remover:hover {
+  background: var(--cor-secundaria);
+  color: #fff;
+}
+
+.pedido-mesa-page__acoes {
+  display: flex;
+  justify-content: flex-end;
+  margin: 28px 0 40px;
+}
+
+.pedido-mesa-page__adicionar {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 22px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--cor-secundaria);
+  color: #fff;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 10px 24px rgba(230, 57, 70, 0.32);
+}
+
+.pedido-mesa-page__adicionar:hover {
+  filter: brightness(1.05);
+}
+
+.pedido-mesa-page__encerrar {
+  display: grid;
+  gap: 20px;
+  padding: 32px;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 6px 18px rgba(43, 32, 20, 0.06);
+}
+
+.pedido-mesa-page__encerrar h2 {
+  margin: 0;
+}
+
+.pedido-mesa-page__checkbox {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--texto);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.pedido-mesa-page__checkbox input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--cor-primaria);
+}
+
+.pedido-mesa-page__gorjeta-percentual {
+  display: grid;
+  gap: 6px;
+  max-width: 220px;
+}
+
+.pedido-mesa-page__gorjeta-percentual label {
+  color: #9a8c80;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.pedido-mesa-page__gorjeta-percentual select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--borda);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--texto);
+  font: inherit;
+}
+
+.pedido-mesa-page__total {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 20px;
+  border-radius: 10px;
+  background: #f7f2ec;
+}
+
+.pedido-mesa-page__total span {
+  color: #9a8c80;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.pedido-mesa-page__total strong {
+  color: var(--cor-secundaria);
+  font-size: 1.4rem;
+}
+
+.pedido-mesa-page__encerrar-botao {
+  width: 100%;
+  padding: 16px 20px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--cor-primaria);
+  color: #fff;
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.pedido-mesa-page__encerrar-botao:hover {
+  filter: brightness(1.05);
+}
+
+@media (max-width: 700px) {
+  .pedido-mesa-page__grade {
+    grid-template-columns: 1fr;
+  }
+
+  .pedido-mesa-page__acoes {
+    justify-content: stretch;
+  }
+
+  .pedido-mesa-page__adicionar {
+    width: 100%;
+    justify-content: center;
+  }
+}
 /* Botão de suporte via WhatsApp no rodapé */
 .footer__suporte {
   display: inline-flex;

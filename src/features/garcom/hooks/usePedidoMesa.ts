@@ -3,6 +3,8 @@ import {
   buscarMesas,
   abrirMesa,
   adicionarItemNaMesa,
+  atualizarQuantidadeItemNaMesa,
+  removerItemNaMesa,
   encerrarContaMesa,
 } from "../api/mesa.service";
 import { buscarPedidoPorId } from "../../loja/api/pedidos.service";
@@ -47,6 +49,16 @@ export function usePedidoMesa(mesaId: string) {
     await carregar();
   }
 
+  async function atualizarQuantidadeItem(itemId: string, quantidade: number) {
+    await atualizarQuantidadeItemNaMesa(mesaId, itemId, quantidade);
+    await carregar();
+  }
+
+  async function removerItem(itemId: string) {
+    await removerItemNaMesa(mesaId, itemId);
+    await carregar();
+  }
+
   async function encerrarConta(gorjeta?: number) {
     const registro = await encerrarContaMesa(mesaId, gorjeta);
     await carregar();
@@ -61,6 +73,8 @@ export function usePedidoMesa(mesaId: string) {
     carregar,
     abrir,
     adicionarItem,
+    atualizarQuantidadeItem,
+    removerItem,
     encerrarConta,
   };
 }

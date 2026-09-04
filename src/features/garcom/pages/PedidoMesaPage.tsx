@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { Minus, Plus, ShoppingCart, X } from "lucide-react";
 import { usePedidoMesa } from "../hooks/usePedidoMesa";
 import { Loading } from "../../../components/Loading";
 import { SeletorItemModal } from "../components/SeletorItemModal";
@@ -15,6 +16,8 @@ export function PedidoMesaPage() {
     erro,
     carregar,
     adicionarItem,
+    atualizarQuantidadeItem,
+    removerItem,
     encerrarConta,
   } = usePedidoMesa(id!);
 
@@ -40,48 +43,104 @@ export function PedidoMesaPage() {
     await adicionarItem(item);
   }
 
-  async function aoEncerrarConta() {
-    const subtotal = pedido?.subtotal ?? 0;
-    const gorjeta = quisPagarGorjeta
-      ? (subtotal * Number(percentualGorjeta)) / 100
-      : undefined;
+  async function aoAumentarQuantidade(item: ItemPedido) {
+    await atualizarQuantidadeItem(item.id, item.quantity + 1);
+  }
 
-    await encerrarConta(gorjeta);
+  async function aoDiminuirQuantidade(item: ItemPedido) {
+    if (item.quantity <= 1) return;
+    await atualizarQuantidadeItem(item.id, item.quantity - 1);
+  }
+
+  async function aoRemoverItem(itemId: string) {
+    await removerItem(itemId);
+  }
+
+  const totalItens =
+    pedido?.itens.reduce((soma, item) => soma + item.quantity, 0) ?? 0;
+
+  const subtotal = pedido?.subtotal ?? 0;
+  const gorjeta = quisPagarGorjeta
+    ? (subtotal * Number(percentualGorjeta)) / 100
+    : 0;
+  const totalFinal = subtotal + gorjeta;
+
+  async function aoEncerrarConta() {
+    await encerrarConta(quisPagarGorjeta ? gorjeta : undefined);
     navigate("/garcom/mesas");
   }
 
   return (
-    <section>
+    <section className="pedido-mesa-page">
       <h1>Mesa {mesa.numero}</h1>
+      <hr />
 
       {!pedido && <p>Mesa ainda não foi aberta.</p>}
 
       {pedido && (
         <>
-          <h2>Itens do pedido</h2>
+          <div className="pedido-mesa-page__cabecalho">
+            <h2>Itens do pedido</h2>
+            <span className="pedido-mesa-page__badge">
+              {totalItens} {totalItens === 1 ? "item selecionado" : "itens selecionados"}
+            </span>
+          </div>
+
           {pedido.itens.length === 0 ? (
             <p>Nenhum item adicionado ainda.</p>
           ) : (
-            <ul>
+            <div className="pedido-mesa-page__grade">
               {pedido.itens.map((item) => (
-                <li key={item.id}>
-                  {item.pizzaName} — R$ {item.price.toFixed(2)}
-                </li>
+                <div key={item.id} className="pedido-mesa-page__item">
+                  <div className="pedido-mesa-page__item-info">
+                    <strong>{item.pizzaName}</strong>
+                    <span>R$ {item.price.toFixed(2)}</span>
+                  </div>
+
+                  <div className="pedido-mesa-page__item-controles">
+                    <div className="pedido-mesa-page__stepper">
+                      <button
+                        type="button"
+                        aria-label={`Diminuir quantidade de ${item.pizzaName}`}
+                        disabled={item.quantity <= 1}
+                        onClick={() => void aoDiminuirQuantidade(item)}
+                      >
+                        <Minus size={14} />
+                      </button>
+                      <span>{item.quantity}</span>
+                      <button
+                        type="button"
+                        aria-label={`Aumentar quantidade de ${item.pizzaName}`}
+                        onClick={() => void aoAumentarQuantidade(item)}
+                      >
+                        <Plus size={14} />
+                      </button>
+                    </div>
+
+                    <button
+                      type="button"
+                      className="pedido-mesa-page__remover"
+                      aria-label={`Remover ${item.pizzaName} do pedido`}
+                      onClick={() => void aoRemoverItem(item.id)}
+                    >
+                      <X size={14} />
+                    </button>
+                  </div>
+                </div>
               ))}
-            </ul>
+            </div>
           )}
 
-          <p className="carrinho-total">
-            Subtotal: R$ {pedido.subtotal.toFixed(2)}
-          </p>
-
-          <button
-            type="button"
-            className="bg-primaria"
-            onClick={() => setModalAberto(true)}
-          >
-            Adicionar item
-          </button>
+          <div className="pedido-mesa-page__acoes">
+            <button
+              type="button"
+              className="pedido-mesa-page__adicionar"
+              onClick={() => setModalAberto(true)}
+            >
+              <ShoppingCart size={16} />
+              Adicionar item
+            </button>
+          </div>
 
           {modalAberto && (
             <SeletorItemModal
@@ -90,11 +149,10 @@ export function PedidoMesaPage() {
             />
           )}
 
-          <hr />
+          <div className="pedido-mesa-page__encerrar">
+            <h2>Encerrar conta</h2>
 
-          <h2>Encerrar conta</h2>
-          <div>
-            <label>
+            <label className="pedido-mesa-page__checkbox">
               <input
                 type="checkbox"
                 checked={quisPagarGorjeta}
@@ -102,26 +160,35 @@ export function PedidoMesaPage() {
               />
               Cliente deseja deixar gorjeta
             </label>
-          </div>
 
-          {quisPagarGorjeta && (
-            <div>
-              <label htmlFor="percentualGorjeta">Percentual da gorjeta</label>
-              <select
-                id="percentualGorjeta"
-                value={percentualGorjeta}
-                onChange={(e) => setPercentualGorjeta(e.target.value)}
-              >
-                <option value="10">10%</option>
-                <option value="15">15%</option>
-                <option value="20">20%</option>
-              </select>
+            {quisPagarGorjeta && (
+              <div className="pedido-mesa-page__gorjeta-percentual">
+                <label htmlFor="percentualGorjeta">Percentual da gorjeta</label>
+                <select
+                  id="percentualGorjeta"
+                  value={percentualGorjeta}
+                  onChange={(e) => setPercentualGorjeta(e.target.value)}
+                >
+                  <option value="10">10%</option>
+                  <option value="15">15%</option>
+                  <option value="20">20%</option>
+                </select>
+              </div>
+            )}
+
+            <div className="pedido-mesa-page__total">
+              <span>Total final</span>
+              <strong>R$ {totalFinal.toFixed(2)}</strong>
             </div>
-          )}
 
-          <button className="bg-primaria" onClick={aoEncerrarConta}>
-            Encerrar conta da mesa
-          </button>
+            <button
+              type="button"
+              className="pedido-mesa-page__encerrar-botao"
+              onClick={() => void aoEncerrarConta()}
+            >
+              Encerrar conta da mesa
+            </button>
+          </div>
         </>
       )}
     </section>
