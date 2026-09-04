@@ -1200,6 +1200,11 @@ body {
   gap: 8px;
 }
 
+.formulario-checkout__campo small {
+  color: #675e57;
+  line-height: 1.5;
+}
+
 .formulario-checkout label,
 .formulario-pagamento label {
   color: #4b4540;
@@ -2296,4 +2301,9 @@ body {
   .combos-secao {
     padding: 32px 20px 0;
   }
+}
+
+.checkout-page {
+  width: min(100% - 40px, 720px);
+  margin-inline: auto;
 }
