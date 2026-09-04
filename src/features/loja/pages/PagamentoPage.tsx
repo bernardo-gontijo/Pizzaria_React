@@ -41,11 +41,13 @@ export function PagamentoPage() {
   function calcularParcelas(total: number, numeroParcelas: number): number {
     const taxaJuros = 0.02;
     const valorParcela = total / numeroParcelas;
-    
+
     if (numeroParcelas > 1) {
-      return Number((valorParcela * (1 + taxaJuros * (numeroParcelas / 12))).toFixed(2));
+      return Number(
+        (valorParcela * (1 + taxaJuros * (numeroParcelas / 12))).toFixed(2),
+      );
     }
-    
+
     return Number(valorParcela.toFixed(2));
   }
 
@@ -53,21 +55,23 @@ export function PagamentoPage() {
   function gerarOpcoesParcelas(total: number) {
     const opcoes = [];
     const maxParcelas = 12;
-    
+
     for (let i = 1; i <= maxParcelas; i++) {
       const valorParcela = calcularParcelas(total, i);
-      const juros = i > 1 ? ` (+${(i * 0.5).toFixed(1)}% juros)` : " (sem juros)";
-      const label = i === 1 
-        ? `1x de R$ ${valorParcela.toFixed(2)}` 
-        : `${i}x de R$ ${valorParcela.toFixed(2)}${juros}`;
-      
+      const juros =
+        i > 1 ? ` (+${(i * 0.5).toFixed(1)}% juros)` : " (sem juros)";
+      const label =
+        i === 1
+          ? `1x de R$ ${valorParcela.toFixed(2)}`
+          : `${i}x de R$ ${valorParcela.toFixed(2)}${juros}`;
+
       opcoes.push(
         <option key={i} value={i}>
           {label}
-        </option>
+        </option>,
       );
     }
-    
+
     return opcoes;
   }
 
@@ -99,16 +103,17 @@ export function PagamentoPage() {
       await simularProgresso();
 
       if (pedidoId) {
-        const mensagemParcelas = metodo === "cartao_credito" && parcelas > 1
-          ? `Pagamento confirmado via ${metodo} em ${parcelas}x`
-          : `Pagamento confirmado via ${metodo}`;
+        const mensagemParcelas =
+          metodo === "cartao_credito" && parcelas > 1
+            ? `Pagamento confirmado via ${metodo} em ${parcelas}x`
+            : `Pagamento confirmado via ${metodo}`;
 
         await atualizarStatusPedido(pedidoId, {
           status: "confirmado",
           message: mensagemParcelas,
         });
       }
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise((resolve) => setTimeout(resolve, 500));
       navigate(`/acompanhar/${pedidoId}`);
     } catch {
       setErro("Não foi possível confirmar o pagamento. Tente novamente.");
@@ -118,12 +123,12 @@ export function PagamentoPage() {
   }
 
   const valorTotal = pedido?.total || 0;
-  const valorParcelaAtual = parcelas > 0 
-    ? calcularParcelas(valorTotal, parcelas) 
-    : 0;
-  const totalComJuros = parcelas > 1 
-    ? Number((valorParcelaAtual * parcelas).toFixed(2))
-    : valorTotal;
+  const valorParcelaAtual =
+    parcelas > 0 ? calcularParcelas(valorTotal, parcelas) : 0;
+  const totalComJuros =
+    parcelas > 1
+      ? Number((valorParcelaAtual * parcelas).toFixed(2))
+      : valorTotal;
 
   if (!pedidoId) {
     return <p className="feedback feedback--erro">Pedido não encontrado.</p>;
@@ -156,7 +161,8 @@ export function PagamentoPage() {
               setMetodo(valor);
               setMostrarQRCode(valor === "pix"); // ✅ ===
               setMostrarParcelas(valor === "cartao_credito"); // ✅ ===
-              if (valor !== "cartao_credito") { // ✅ !==
+              if (valor !== "cartao_credito") {
+                // ✅ !==
                 setParcelas(1);
               }
             }}
@@ -191,12 +197,12 @@ export function PagamentoPage() {
             >
               {gerarOpcoesParcelas(valorTotal)}
             </select>
-            
+
             <div className="parcelas-resumo">
               <div className="parcelas-info">
                 <span>
-                  {parcelas === 1 
-                    ? `À vista: R$ ${valorParcelaAtual.toFixed(2)}` 
+                  {parcelas === 1
+                    ? `À vista: R$ ${valorParcelaAtual.toFixed(2)}`
                     : `${parcelas}x de R$ ${valorParcelaAtual.toFixed(2)}`}
                 </span>
                 {parcelas > 1 && (
@@ -219,14 +225,14 @@ export function PagamentoPage() {
 
         {/* BOTÃO */}
         <button
-          className={`formulario-pagamento__botao ${loading ? 'loading' : ''}`}
+          className={`formulario-pagamento__botao ${loading ? "loading" : ""}`}
           type="submit"
           disabled={loading || !pedido}
         >
           {loading ? (
             <div className="progress-container">
               <div className="progress-bar">
-                <div 
+                <div
                   className="progress-fill"
                   data-complete={progresso === 100 ? "true" : "false"}
                   style={{ width: `${progresso}%` }}
@@ -234,12 +240,12 @@ export function PagamentoPage() {
               </div>
               <span className="progress-text">{progresso}%</span>
             </div>
+          ) : metodo === "cartao_credito" && parcelas > 1 ? (
+            `Pagar ${parcelas}x de R$ ${valorParcelaAtual.toFixed(2)}`
+          ) : metodo === "pix" ? (
+            "Confirmar PIX"
           ) : (
-            metodo === "cartao_credito" && parcelas > 1
-              ? `Pagar ${parcelas}x de R$ ${valorParcelaAtual.toFixed(2)}`
-              : metodo === "pix"
-              ? "Confirmar PIX"
-              : "Pagar agora"
+            "Pagar agora"
           )}
         </button>
       </form>

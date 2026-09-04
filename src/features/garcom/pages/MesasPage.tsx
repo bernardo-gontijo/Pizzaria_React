@@ -106,9 +106,7 @@ export function MesasPage() {
         })}
       </div>
 
-      <div className="mesas-page__area-preparo">
-        Cozinha / Área de preparo
-      </div>
+      <div className="mesas-page__area-preparo">Cozinha / Área de preparo</div>
     </section>
   );
 }
