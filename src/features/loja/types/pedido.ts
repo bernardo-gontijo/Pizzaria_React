@@ -67,6 +67,13 @@ export interface Pedido {
   gorjeta?: number;
 }
 
+export interface DadosCheckout {
+  nome: string;
+  telefone: string;
+  endereco: EnderecoEntrega;
+  formaPagamento: string;
+}
+
 export interface CriarPedidoDTO {
   cliente: {
     nome: string;

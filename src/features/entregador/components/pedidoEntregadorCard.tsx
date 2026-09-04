@@ -1,18 +1,11 @@
 import type { Pedido } from "../../loja/types/pedido";
+import { formatarEndereco } from "../../loja/utils/endereco";
 
 interface PedidoEntregadorCardProps {
   pedido: Pedido;
   onAction: (id: string) => Promise<void>;
   atualizando: boolean;
   tipo: "pronto" | "emRota";
-}
-
-function formatarEndereco(pedido: Pedido): string {
-  if (!pedido.endereco) return "Endereço não informado";
-
-  return [pedido.endereco.rua, pedido.endereco.numero, pedido.endereco.bairro]
-    .filter(Boolean)
-    .join(", ");
 }
 
 export function PedidoEntregadorCard({
@@ -52,7 +45,7 @@ export function PedidoEntregadorCard({
         </div>
         <div>
           <dt>Endereço</dt>
-          <dd>{formatarEndereco(pedido)}</dd>
+          <dd>{formatarEndereco(pedido.endereco)}</dd>
         </div>
         <div>
           <dt>Itens</dt>

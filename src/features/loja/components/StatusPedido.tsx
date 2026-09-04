@@ -1,9 +1,12 @@
+import type { EnderecoEntrega } from "../types/pedido";
+import { formatarEndereco } from "../utils/endereco";
+
 interface StatusPedidoProps {
   pedido: {
     id: string;
     status: string;
     cliente: { nome: string };
-    endereco?: { rua: string };
+    endereco?: Partial<EnderecoEntrega>;
     total: number;
   };
 }
@@ -51,7 +54,7 @@ export function StatusPedido({ pedido }: StatusPedidoProps) {
         </p>
         {pedido.endereco && (
           <p>
-            <strong>Endereço:</strong> {pedido.endereco.rua}
+            <strong>Endereço:</strong> {formatarEndereco(pedido.endereco)}
           </p>
         )}
         <p>

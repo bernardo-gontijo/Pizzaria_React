@@ -90,8 +90,11 @@ export function BebidaDetalhePage() {
           </div>
         </div>
 
-        <p className="pizza-detalhe-page__preco">
-          R$ {bebida.preco.toFixed(2)}
+        <p className="pizza-detalhe-page__preco" aria-live="polite">
+          {(bebida.preco * quantidade).toLocaleString("pt-BR", {
+            style: "currency",
+            currency: "BRL",
+          })}
         </p>
         <button
           className="pizza-detalhe-page__adicionar"

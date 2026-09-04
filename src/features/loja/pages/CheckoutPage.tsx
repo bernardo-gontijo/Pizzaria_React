@@ -2,17 +2,13 @@ import { useNavigate } from "react-router-dom";
 
 import { FormularioCheckout } from "../components/FormularioCheckout";
 import { usePedido } from "../hooks/usePedido";
+import type { DadosCheckout } from "../types/pedido";
 
 export function CheckoutPage() {
   const navigate = useNavigate();
   const { loading, erro, finalizar } = usePedido();
 
-  async function finalizarPedido(dados: {
-    nome: string;
-    telefone: string;
-    endereco: string;
-    formaPagamento: string;
-  }) {
+  async function finalizarPedido(dados: DadosCheckout) {
     const pedido = await finalizar(dados);
 
     if (pedido) {
