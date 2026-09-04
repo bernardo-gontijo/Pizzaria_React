@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { Minus, Plus } from "lucide-react";
 import { usePizzas } from "../../loja/hooks/usePizzas";
 import { useBebidas } from "../../loja/hooks/useBebidas";
 import { Loading } from "../../../components/Loading";
@@ -11,6 +12,8 @@ interface SeletorItemModalProps {
 
 type Aba = "pizza" | "bebida";
 
+const QUANTIDADE_MINIMA = 0;
+
 export function SeletorItemModal({
   onSelecionar,
   onFechar,
@@ -20,7 +23,8 @@ export function SeletorItemModal({
 
   const [aba, setAba] = useState<Aba>("pizza");
   const [busca, setBusca] = useState("");
-  const [adicionandoId, setAdicionandoId] = useState<string | null>(null);
+  const [adicionando, setAdicionando] = useState(false);
+  const [quantidades, setQuantidades] = useState<Record<string, number>>({});
 
   const carregando = aba === "pizza" ? carregandoPizzas : carregandoBebidas;
 
@@ -44,34 +48,76 @@ export function SeletorItemModal({
     [bebidas, busca],
   );
 
-  async function aoSelecionarPizza(pizza: (typeof pizzas)[number]) {
-    setAdicionandoId(pizza.id);
-    try {
-      await onSelecionar({
-        tipo: "pizza",
-        pizzaId: pizza.id,
-        pizzaName: pizza.nome,
-        quantity: 1,
-        price: pizza.preco,
-        size: "M",
-      });
-    } finally {
-      setAdicionandoId(null);
-    }
+  function obterQuantidade(id: string) {
+    return quantidades[id] ?? QUANTIDADE_MINIMA;
   }
 
-  async function aoSelecionarBebida(bebida: (typeof bebidas)[number]) {
-    setAdicionandoId(bebida.id);
+  function alterarQuantidade(id: string, delta: number) {
+    setQuantidades((atual) => ({
+      ...atual,
+      [id]: Math.max(
+        QUANTIDADE_MINIMA,
+        (atual[id] ?? QUANTIDADE_MINIMA) + delta,
+      ),
+    }));
+  }
+
+  async function concluirSelecao() {
+    if (adicionando) return;
+
+    const itensParaAdicionar: Omit<ItemPedido, "id">[] = [];
+
+    // Pega todas as pizzas que possuem quantidade maior que 0.
+    pizzasDisponiveis.forEach((pizza) => {
+      const quantidade = obterQuantidade(pizza.id);
+
+      if (quantidade > 0) {
+        itensParaAdicionar.push({
+          tipo: "pizza",
+          pizzaId: pizza.id,
+          pizzaName: pizza.nome,
+          quantity: quantidade,
+          price: pizza.preco,
+          size: "M",
+        });
+      }
+    });
+
+    // Pega todas as bebidas que possuem quantidade maior que 0.
+    bebidasDisponiveis.forEach((bebida) => {
+      const quantidade = obterQuantidade(bebida.id);
+
+      if (quantidade > 0) {
+        itensParaAdicionar.push({
+          tipo: "bebida",
+          pizzaId: bebida.id,
+          pizzaName: bebida.nome,
+          quantity: quantidade,
+          price: bebida.preco,
+        });
+      }
+    });
+
+    // Se nenhum item foi selecionado, não faz nada.
+    if (itensParaAdicionar.length === 0) {
+      return;
+    }
+
+    setAdicionando(true);
+
     try {
-      await onSelecionar({
-        tipo: "bebida",
-        pizzaId: bebida.id,
-        pizzaName: bebida.nome,
-        quantity: 1,
-        price: bebida.preco,
-      });
+      // Adiciona todos os produtos selecionados.
+      for (const item of itensParaAdicionar) {
+        await onSelecionar(item);
+      }
+
+      // Limpa as quantidades depois de adicionar.
+      setQuantidades({});
+
+      // Fecha o modal.
+      onFechar();
     } finally {
-      setAdicionandoId(null);
+      setAdicionando(false);
     }
   }
 
@@ -89,11 +135,13 @@ export function SeletorItemModal({
       >
         <div className="seletor-item-modal__cabecalho">
           <h2>Adicionar item</h2>
+
           <button
             type="button"
             className="seletor-item-modal__fechar"
             onClick={onFechar}
             aria-label="Fechar"
+            disabled={adicionando}
           >
             ×
           </button>
@@ -108,9 +156,11 @@ export function SeletorItemModal({
                 : "seletor-item-modal__aba"
             }
             onClick={() => setAba("pizza")}
+            disabled={adicionando}
           >
             Pizzas
           </button>
+
           <button
             type="button"
             className={
@@ -119,6 +169,7 @@ export function SeletorItemModal({
                 : "seletor-item-modal__aba"
             }
             onClick={() => setAba("bebida")}
+            disabled={adicionando}
           >
             Bebidas
           </button>
@@ -127,70 +178,154 @@ export function SeletorItemModal({
         <input
           type="text"
           className="seletor-item-modal__busca"
-          placeholder={aba === "pizza" ? "Buscar pizza..." : "Buscar bebida..."}
+          placeholder={
+            aba === "pizza"
+              ? "Buscar pizza..."
+              : "Buscar bebida..."
+          }
           value={busca}
           onChange={(evento) => setBusca(evento.target.value)}
+          disabled={adicionando}
         />
 
         <div className="seletor-item-modal__lista">
           {carregando && <Loading />}
 
-          {!carregando && aba === "pizza" && pizzasDisponiveis.length === 0 && (
-            <p className="feedback">Nenhuma pizza encontrada.</p>
-          )}
+          {!carregando &&
+            aba === "pizza" &&
+            pizzasDisponiveis.length === 0 && (
+              <p className="feedback">
+                Nenhuma pizza encontrada.
+              </p>
+            )}
 
           {!carregando &&
             aba === "bebida" &&
             bebidasDisponiveis.length === 0 && (
-              <p className="feedback">Nenhuma bebida encontrada.</p>
+              <p className="feedback">
+                Nenhuma bebida encontrada.
+              </p>
             )}
 
           {!carregando &&
             aba === "pizza" &&
-            pizzasDisponiveis.map((pizza) => (
-              <button
-                type="button"
-                key={pizza.id}
-                className="seletor-item-modal__item"
-                disabled={adicionandoId === pizza.id}
-                onClick={() => void aoSelecionarPizza(pizza)}
-              >
-                <span className="seletor-item-modal__item-nome">
-                  {pizza.nome}
-                </span>
-                <span className="seletor-item-modal__item-preco">
-                  R$ {pizza.preco.toFixed(2)}
-                </span>
-              </button>
-            ))}
+            pizzasDisponiveis.map((pizza) => {
+              const quantidade = obterQuantidade(pizza.id);
+
+              return (
+                <div
+                  key={pizza.id}
+                  className="seletor-item-modal__item"
+                >
+                  <div className="seletor-item-modal__item-info">
+                    <span className="seletor-item-modal__item-nome">
+                      {pizza.nome}
+                    </span>
+
+                    <span className="seletor-item-modal__item-preco">
+                      R$ {pizza.preco.toFixed(2)}
+                    </span>
+                  </div>
+
+                  <div className="seletor-item-modal__item-acoes">
+                    <div className="seletor-item-modal__stepper">
+                      <button
+                        type="button"
+                        aria-label={`Diminuir quantidade de ${pizza.nome}`}
+                        disabled={
+                          adicionando ||
+                          quantidade <= QUANTIDADE_MINIMA
+                        }
+                        onClick={() =>
+                          alterarQuantidade(pizza.id, -1)
+                        }
+                      >
+                        <Minus size={14} />
+                      </button>
+
+                      <span>{quantidade}</span>
+
+                      <button
+                        type="button"
+                        aria-label={`Aumentar quantidade de ${pizza.nome}`}
+                        disabled={adicionando}
+                        onClick={() =>
+                          alterarQuantidade(pizza.id, 1)
+                        }
+                      >
+                        <Plus size={14} />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
 
           {!carregando &&
             aba === "bebida" &&
-            bebidasDisponiveis.map((bebida) => (
-              <button
-                type="button"
-                key={bebida.id}
-                className="seletor-item-modal__item"
-                disabled={adicionandoId === bebida.id}
-                onClick={() => void aoSelecionarBebida(bebida)}
-              >
-                <span className="seletor-item-modal__item-nome">
-                  {bebida.nome}
-                  {bebida.quantidade ? ` (${bebida.quantidade})` : ""}
-                </span>
-                <span className="seletor-item-modal__item-preco">
-                  R$ {bebida.preco.toFixed(2)}
-                </span>
-              </button>
-            ))}
+            bebidasDisponiveis.map((bebida) => {
+              const quantidade = obterQuantidade(bebida.id);
+
+              return (
+                <div
+                  key={bebida.id}
+                  className="seletor-item-modal__item"
+                >
+                  <div className="seletor-item-modal__item-info">
+                    <span className="seletor-item-modal__item-nome">
+                      {bebida.nome}
+                      {bebida.quantidade
+                        ? ` (${bebida.quantidade})`
+                        : ""}
+                    </span>
+
+                    <span className="seletor-item-modal__item-preco">
+                      R$ {bebida.preco.toFixed(2)}
+                    </span>
+                  </div>
+
+                  <div className="seletor-item-modal__item-acoes">
+                    <div className="seletor-item-modal__stepper">
+                      <button
+                        type="button"
+                        aria-label={`Diminuir quantidade de ${bebida.nome}`}
+                        disabled={
+                          adicionando ||
+                          quantidade <= QUANTIDADE_MINIMA
+                        }
+                        onClick={() =>
+                          alterarQuantidade(bebida.id, -1)
+                        }
+                      >
+                        <Minus size={14} />
+                      </button>
+
+                      <span>{quantidade}</span>
+
+                      <button
+                        type="button"
+                        aria-label={`Aumentar quantidade de ${bebida.nome}`}
+                        disabled={adicionando}
+                        onClick={() =>
+                          alterarQuantidade(bebida.id, 1)
+                        }
+                      >
+                        <Plus size={14} />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
         </div>
 
         <button
           type="button"
           className="bg-primaria seletor-item-modal__concluir"
-          onClick={onFechar}
+          onClick={() => void concluirSelecao()}
+          disabled={adicionando}
         >
-          Concluir
+          {adicionando ? "Adicionando..." : "Concluir"}
         </button>
       </div>
     </div>
