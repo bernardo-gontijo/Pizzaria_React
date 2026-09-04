@@ -1,0 +1,186 @@
+.qr-code-wrapper {
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.qr-code-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  padding: 1.5rem;
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #e8e8e8;
+  margin: 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.qr-code-box {
+  background: white;
+  padding: 0.5rem;
+  border-radius: 8px;
+  flex-shrink: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.qr-code-box svg {
+  display: block;
+  width: 160px;
+  height: 160px;
+}
+.qr-code-info {
+  flex: 1;
+  min-width: 180px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  justify-content: center;
+  align-items: center; /* ✅ CENTRALIZA TUDO */
+  text-align: center; /* ✅ TEXTO CENTRALIZADO */
+}
+
+.qr-code-titulo {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #2d3436;
+  margin: 0;
+}
+
+.qr-code-valor {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #e63946;
+  margin: 0;
+}
+
+.qr-code-descricao {
+  font-size: 0.8rem;
+  color: #888;
+  margin: 0;
+}
+.qr-code-copiar {
+  padding: 0.6rem 1.2rem;
+  background: #2d3436;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: fit-content;
+  min-width: 160px;
+  text-align: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  align-self: center;
+}
+
+.qr-code-copiar:hover {
+  background: #1a1a1a;
+  transform: translateY(-1px);
+}
+
+.qr-code-copiar:active {
+  transform: translateY(0);
+}
+
+.qr-code-copiar.copiado {
+  background: #27ae60;
+}
+
+.qr-code-chave {
+  font-size: 0.75rem;
+  color: #888;
+  padding: 0.2rem 0.4rem;
+  background: #f5f5f5;
+  border-radius: 4px;
+  word-break: break-all;
+  text-align: center; /* ✅ CENTRALIZA A CHAVE */
+  width: 100%; /* ✅ OCUPA A LARGURA TOTAL */
+  box-sizing: border-box;
+}
+
+.qr-code-chave strong {
+  color: #2d3436;
+  font-family: monospace;
+}
+
+/* ============================================
+   RESPONSIVIDADE
+   ============================================ */
+@media (max-width: 600px) {
+  .qr-code-container {
+    flex-direction: column;
+    padding: 1rem;
+    gap: 1rem;
+  }
+
+  .qr-code-box svg {
+    width: 140px;
+    height: 140px;
+  }
+
+  .qr-code-info {
+    text-align: center;
+    align-items: center;
+    min-width: unset;
+    width: 100%;
+  }
+
+  .qr-code-titulo {
+    font-size: 1rem;
+  }
+
+  .qr-code-valor {
+    font-size: 1.3rem;
+  }
+
+  .qr-code-copiar {
+    width: 100%;
+    justify-content: center;
+    padding: 0.7rem;
+    min-width: unset;
+    align-self: center;
+  }
+
+  .qr-code-chave {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+.formulario-pagamento .qr-code-wrapper {
+  width: 100% !important;
+  max-width: 100% !important;
+  display: block !important;
+  margin: 0.5rem 0 !important;
+}
+
+.formulario-pagamento .qr-code-container {
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+  justify-content: center !important;
+}
+.formulario-pagamento .qr-code-info {
+  align-items: center !important;
+  text-align: center !important;
+}
+
+.formulario-pagamento .qr-code-copiar {
+  align-self: center !important;
+}
+
+.formulario-pagamento .qr-code-chave {
+  text-align: center !important;
+  width: 100% !important;
+}

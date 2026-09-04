@@ -18,6 +18,7 @@ export function Header() {
       <nav aria-label="Navegação principal" className="navegacao">
         <NavLink to="/">Início</NavLink>
         <NavLink to="/cardapio">Cardápio</NavLink>
+        <NavLink to="/meus-pedidos">Meus pedidos</NavLink>
         <NavLink to="/carrinho">Carrinho ({items.length})</NavLink>
       </nav>
     </header>

@@ -176,13 +176,20 @@ svg {
   outline-offset: 5px;
 }
 
+.bebida-card__imagem {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: contain;
+  background: #f5f1ec;
+}
+
 .pagina-loja,
 .pizza-detalhe-page,
 .pagamento-page,
 .acompanhar-page,
 .cardapio-page,
 .categoria-page {
-  width: min(100%, 820px);
+  width: min(100%, 1100px);
 }
 
 .pagina-loja h1,
@@ -852,14 +859,14 @@ body {
 }
 
 .pizza-card strong,
-.pizza-card__link,
 .categoria {
   color: #b57b28;
 }
 
 .pizza-card__link {
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  color: inherit;
+  letter-spacing: normal;
+  text-transform: none;
 }
 
 .footer {
@@ -1193,6 +1200,11 @@ body {
   gap: 8px;
 }
 
+.formulario-checkout__campo small {
+  color: #675e57;
+  line-height: 1.5;
+}
+
 .formulario-checkout label,
 .formulario-pagamento label {
   color: #4b4540;
@@ -1262,7 +1274,7 @@ body {
 
 .status-timeline {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(6, 1fr);
   gap: 8px;
   margin: 32px 0;
   padding: 0;
@@ -1318,6 +1330,128 @@ body {
 .status-detalhes strong {
   display: block;
   color: #3d3935;
+}
+
+.produto-medida {
+  margin: -8px 0 18px;
+  color: #8a7d72;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.produto-detalhe__medida {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding-block: 18px;
+  border-block: 1px solid #e6d9cc;
+  color: #675e57;
+}
+
+.produto-detalhe__medida strong {
+  color: #3d3935;
+}
+
+.meus-pedidos-lista {
+  display: grid;
+  gap: 20px;
+}
+
+.meu-pedido-card,
+.meus-pedidos-vazio {
+  padding: 28px;
+  border: 1px solid #e2d5c9;
+  background: #fffdf9;
+  box-shadow: 0 10px 28px rgba(29, 24, 20, 0.08);
+}
+
+.meus-pedidos-vazio .botao {
+  background: #2b2927;
+  color: #fff;
+}
+
+.meu-pedido-card__cabecalho,
+.meu-pedido-card__resumo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.meu-pedido-card__cabecalho > div {
+  display: grid;
+  gap: 5px;
+}
+
+.meu-pedido-card__cabecalho span {
+  color: #2d2b28;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.35rem;
+}
+
+.meu-pedido-card__cabecalho time {
+  color: #81766d;
+  font-size: 0.85rem;
+}
+
+.meu-pedido-card__status {
+  color: #9b641b;
+  font-size: 0.78rem;
+  letter-spacing: 0.07em;
+  text-align: right;
+  text-transform: uppercase;
+}
+
+.meu-pedido-card__status.status--entregue {
+  color: #3e7450;
+}
+
+.meu-pedido-card__status.status--saiu_para_entrega {
+  color: #356a8a;
+}
+
+.meu-pedido-card__status.status--cancelado {
+  color: #a34732;
+}
+
+.meu-pedido-card__resumo {
+  margin-block: 22px;
+  padding-block: 18px;
+  border-block: 1px solid #e6d9cc;
+  color: #675e57;
+}
+
+.meu-pedido-card__resumo strong {
+  color: #b57b28;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.3rem;
+}
+
+.meu-pedido-card__link {
+  display: inline-block;
+  color: #7f5318;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.meu-pedido-card__link:hover {
+  color: #b57b28;
+}
+
+.meus-pedidos-vazio {
+  display: grid;
+  justify-items: start;
+  gap: 20px;
+  color: #675e57;
+}
+
+.meus-pedidos-vazio p {
+  margin: 0;
 }
 
 @media (max-width: 700px) {
@@ -1377,4 +1511,799 @@ body {
   .status-detalhes {
     grid-template-columns: 1fr;
   }
+
+  .meu-pedido-card__cabecalho,
+  .meu-pedido-card__resumo {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .meu-pedido-card__status {
+    text-align: left;
+  }
+}
+
+/* ===================================================================
+   Tela "Mesas" do garçom (área bege/conteúdo).
+   Estas regras NÃO alteram .admin-sidebar nem .admin-layout já
+   existentes — são classes novas, usadas só dentro de <MesasPage />.
+   =================================================================== */
+
+.mesas-page__cabecalho {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.mesas-page__subtitulo {
+  margin: 4px 0 0;
+  color: #9a8c80;
+  font-size: 0.95rem;
+}
+
+.mesas-page__badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.mesas-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 16px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.mesas-badge--disponivel {
+  background: #e2f5e6;
+  color: #1f8a4c;
+}
+
+/* ===== Entregador ===== */
+.entregador-layout {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr);
+  background: #f8f4f1;
+}
+
+.entregador-sidebar {
+  padding: 28px 18px;
+  background: var(--cor-secundaria);
+  color: white;
+}
+
+.entregador-sidebar__titulo {
+  padding: 0 12px 24px;
+  border-bottom: 1px solid rgba(247, 235, 235, 0.18);
+}
+
+.entregador-sidebar__titulo h2 {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.entregador-sidebar__menu {
+  display: grid;
+  gap: 6px;
+  margin: 24px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.entregador-sidebar__link {
+  display: block;
+  padding: 12px;
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.82);
+  transition: background 0.2s;
+}
+
+.entregador-sidebar__link:hover,
+.entregador-sidebar__link--ativo {
+  background: rgba(255, 255, 255, 0.14);
+  color: white;
+}
+
+.entregador-layout__conteudo {
+  padding: 40px;
+  background: #f8f4f1;
+  min-height: 100vh;
+}
+
+.entregador-layout__conteudo > main,
+.entregador-layout__conteudo > section {
+  width: min(100%, 1050px);
+}
+
+.entregador-layout__conteudo h1 {
+  margin: 0 0 8px;
+  color: var(--cor-secundaria);
+  font-size: 2rem;
+}
+
+.entregador-layout__conteudo h2 {
+  margin: 0 0 12px;
+  color: var(--cor-secundaria);
+}
+
+.entregador-layout__conteudo h3 {
+  margin: 0 0 8px;
+  color: var(--cor-secundaria);
+  font-size: 1rem;
+}
+
+.entregador-layout__conteudo p {
+  line-height: 1.5;
+  color: var(--texto);
+}
+
+/* Cards estilo admin */
+.entregador-layout__conteudo > main > section,
+.entregador-layout__conteudo > section {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+  margin-top: 28px;
+}
+
+.entregador-layout__conteudo > main > section > article,
+.entregador-layout__conteudo > section > article {
+  padding: 20px;
+  border: 1px solid var(--borda);
+  border-radius: 12px;
+  background: white;
+}
+
+.entregador-layout__conteudo > main > section > article strong,
+.entregador-layout__conteudo > section > article strong {
+  display: block;
+  margin: 12px 0 4px;
+  color: var(--cor-primaria);
+  font-size: 1.6rem;
+}
+
+/* Botões estilo admin */
+.entregador-layout__conteudo button,
+.entregador-layout__conteudo .botao {
+  padding: 10px 16px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--cor-primaria);
+  color: white;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.entregador-layout__conteudo button:hover,
+.entregador-layout__conteudo .botao:hover {
+  opacity: 0.9;
+}
+
+.entregador-layout__conteudo button + button {
+  margin-left: 8px;
+  background: #756661;
+}
+
+/* Formulários estilo admin */
+.entregador-layout__conteudo form {
+  display: grid;
+  gap: 16px;
+  max-width: 680px;
+  margin: 24px 0;
+  padding: 24px;
+  border: 1px solid var(--borda);
+  border-radius: 12px;
+  background: white;
+}
+
+.entregador-layout__conteudo form > div {
+  display: grid;
+  gap: 6px;
+}
+
+.entregador-layout__conteudo label {
+  font-weight: 600;
+}
+
+.entregador-layout__conteudo input,
+.entregador-layout__conteudo textarea,
+.entregador-layout__conteudo select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #cfc4bb;
+  border-radius: 8px;
+  font: inherit;
+  background: white;
+}
+
+.entregador-layout__conteudo textarea {
+  min-height: 96px;
+  resize: vertical;
+}
+
+/* Tabelas estilo admin */
+.entregador-layout__conteudo table {
+  display: block;
+  width: 100%;
+  overflow-x: auto;
+  margin-top: 24px;
+  border-collapse: collapse;
+  border: 1px solid var(--borda);
+  background: white;
+}
+
+.entregador-layout__conteudo th,
+.entregador-layout__conteudo td {
+  padding: 14px;
+  border-bottom: 1px solid var(--borda);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.entregador-layout__conteudo th {
+  color: var(--cor-secundaria);
+  background: #fff6ee;
+}
+
+.entregador-layout__conteudo .entregador-pedidos__lista {
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+.pedido-entregador-card {
+  display: grid;
+  gap: 20px;
+}
+
+.pedido-entregador-card__cabecalho {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.pedido-entregador-card__cabecalho > div {
+  display: grid;
+  gap: 6px;
+}
+
+.pedido-entregador-card__cabecalho span {
+  color: var(--cor-secundaria);
+  font-weight: 700;
+}
+
+.pedido-entregador-card__cabecalho strong,
+.entregador-layout__conteudo .pedido-entregador-card__cabecalho strong {
+  display: block;
+  margin: 0;
+  color: var(--cor-primaria);
+  font-size: 1rem;
+}
+
+.pedido-entregador-card__detalhes {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+}
+
+.pedido-entregador-card__detalhes div {
+  display: grid;
+  gap: 3px;
+}
+
+.pedido-entregador-card__detalhes dt {
+  color: #756661;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.pedido-entregador-card__detalhes dd {
+  margin: 0;
+  color: var(--cor-secundaria);
+}
+
+.pedido-entregador-card > button {
+  width: 100%;
+}
+
+.pedido-entregador-card > button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+/* Responsivo entregador */
+@media (max-width: 700px) {
+  .entregador-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .entregador-sidebar {
+    padding: 18px;
+  }
+
+  .entregador-sidebar__titulo {
+    padding-bottom: 12px;
+  }
+
+  .entregador-sidebar__menu {
+    grid-template-columns: repeat(2, 1fr);
+    margin-top: 12px;
+  }
+
+  .entregador-layout__conteudo {
+    padding: 24px 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .entregador-sidebar__menu {
+    grid-template-columns: 1fr;
+  }
+
+  .entregador-layout__conteudo {
+    padding: 16px 12px;
+  }
+}
+.mesas-badge--disponivel::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #2fae5f;
+}
+
+.mesas-badge--livres {
+  background: #fbead9;
+  color: #c06a1d;
+}
+
+/* Grade fluida: o número de mesas por fileira nasce da largura
+   disponível e da quantidade total de mesas cadastradas por essa
+   pizzaria (cada tenant pode ter um número diferente de mesas), em vez
+   de um valor fixo tipo "4 por linha". A ordem segue a ordem de
+   cadastro (array "mesas"). */
+.mesas-grade {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 44px 24px;
+  margin-top: 36px;
+}
+
+.mesa-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.mesa-item__mesa {
+  position: relative;
+  width: 112px;
+  height: 112px;
+  margin-bottom: 14px;
+}
+
+.mesa-item__tampo {
+  position: absolute;
+  inset: 13px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  border-radius: 18px;
+  background: #ffffff;
+  box-shadow: 0 8px 20px rgba(43, 32, 20, 0.09);
+}
+
+.mesa-item__tampo strong {
+  color: var(--cor-secundaria);
+  font-size: 1.55rem;
+  line-height: 1;
+}
+
+.mesa-item__status {
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+}
+
+.mesa-item__status--livre {
+  color: #2fae5f;
+}
+
+.mesa-item__status--ocupada {
+  color: #d9483a;
+}
+
+.mesa-item__cadeira {
+  position: absolute;
+  background: #e4dccf;
+  border-radius: 6px;
+}
+
+.mesa-item__cadeira--topo {
+  top: -6px;
+  left: 50%;
+  width: 34px;
+  height: 12px;
+  border-radius: 6px 6px 0 0;
+  transform: translateX(-50%);
+}
+
+.mesa-item__cadeira--base {
+  bottom: -6px;
+  left: 50%;
+  width: 34px;
+  height: 12px;
+  border-radius: 0 0 6px 6px;
+  transform: translateX(-50%);
+}
+
+.mesa-item__cadeira--esquerda-cima {
+  top: 24px;
+  left: -8px;
+  width: 12px;
+  height: 26px;
+  border-radius: 6px 0 0 6px;
+}
+
+.mesa-item__cadeira--esquerda-baixo {
+  bottom: 24px;
+  left: -8px;
+  width: 12px;
+  height: 26px;
+  border-radius: 6px 0 0 6px;
+}
+
+.mesa-item__cadeira--direita-cima {
+  top: 24px;
+  right: -8px;
+  width: 12px;
+  height: 26px;
+  border-radius: 0 6px 6px 0;
+}
+
+.mesa-item__cadeira--direita-baixo {
+  bottom: 24px;
+  right: -8px;
+  width: 12px;
+  height: 26px;
+  border-radius: 0 6px 6px 0;
+}
+
+.mesa-item__nome {
+  margin: 0 0 12px;
+  color: var(--cor-secundaria);
+  font-weight: 700;
+}
+
+.mesa-item__botao {
+  width: 100%;
+  max-width: 148px;
+}
+
+.mesas-page__area-preparo {
+  margin-top: 48px;
+  padding: 26px;
+  border: 1.5px dashed var(--borda);
+  border-radius: 12px;
+  color: #b7a99b;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+@media (max-width: 700px) {
+  .mesas-grade {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 36px 16px;
+  }
+}
+
+/* Na página de admin, "mesas-page" é um <section> filho direto de
+   <main>, e a regra genérica ".admin-layout__conteudo > main > section"
+   (usada pelas grades simples de cards de outras telas do admin, como
+   Pizzas/Categorias) estava aplicando um grid de 2 colunas nela,
+   jogando o cabeçalho numa coluna e a grade de mesas inteira em outra,
+   afastada da borda esquerda. Aqui devolvemos o comportamento em bloco
+   (empilhado), que é o que .mesas-page já define internamente. */
+.admin-layout__conteudo > main > section.mesas-page {
+  display: block;
+  grid-template-columns: none;
+  gap: 0;
+  margin-top: 0;
+}
+
+/* Modal de seleção de item do cardápio (garçom) */
+.seletor-item-modal__overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(27, 20, 20, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  z-index: 1000;
+}
+
+.seletor-item-modal {
+  background: var(--fundo);
+  border-radius: 12px;
+  border: 1px solid var(--borda);
+  width: 100%;
+  max-width: 480px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  box-shadow: 0 12px 32px rgba(27, 20, 20, 0.25);
+}
+
+.seletor-item-modal__cabecalho {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.seletor-item-modal__cabecalho h2 {
+  margin: 0;
+  color: var(--cor-secundaria);
+}
+
+.seletor-item-modal__fechar {
+  background: transparent;
+  border: none;
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+  color: var(--cor-secundaria);
+  padding: 4px 8px;
+}
+
+.seletor-item-modal__abas {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.seletor-item-modal__aba {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid var(--borda);
+  background: var(--cor-secundaria) !important;
+  color: #fff;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: 0.2s;
+}
+
+/* Só fica vermelha quando passar o mouse */
+.seletor-item-modal__aba:hover {
+  background: var(--cor-primaria) !important;
+  border-color: var(--cor-primaria);
+}
+
+/* A aba atualmente selecionada fica vermelha */
+.seletor-item-modal__aba--ativa {
+  background: var(--cor-primaria) !important;
+  color: #fff;
+  border-color: var(--cor-primaria);
+}
+
+.seletor-item-modal__busca {
+  width: 100%;
+  padding: 8px 10px;
+  margin-bottom: 12px;
+  border: 1px solid var(--borda);
+  border-radius: 8px;
+  font-size: 15px;
+}
+
+.seletor-item-modal__lista {
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-right: 4px;
+  margin-bottom: 12px;
+}
+
+.seletor-item-modal__item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--fundo);
+  border-radius: 8px;
+  background: var(--cor-secundaria) !important;
+  color: #fff;
+  cursor: pointer;
+  text-align: left;
+  transition: 0.2s;
+}
+
+.seletor-item-modal__item:hover:not(:disabled) {
+  background: var(--cor-primaria) !important;
+  border-color: var(--cor-primaria);
+}
+
+.seletor-item-modal__item:focus {
+  background: var(--fundo) !important;
+  outline: none;
+}
+
+.seletor-item-modal__item:focus:hover:not(:disabled) {
+  background: var(--cor-primaria) !important;
+}
+
+.seletor-item-modal__item-nome {
+  color: #fff;
+}
+
+.seletor-item-modal__item-preco {
+  color: #fff;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+.seletor-item-modal__concluir {
+  align-self: flex-end;
+}
+
+/* Botão de suporte via WhatsApp no rodapé */
+.footer__suporte {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  background: #25d366;
+  color: white !important;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.footer__suporte:hover {
+  background: #1ebe5a;
+}
+
+/* =========================================================
+   Seção de combos e promoções no cardápio
+   ========================================================= */
+
+.combos-secao {
+  padding: 48px max(24px, calc((100% - 1120px) / 2)) 0;
+  background: #fbf8f4;
+}
+
+.combos-secao h2 {
+  margin: 0 0 24px;
+  color: #2d2b28;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  font-weight: 400;
+}
+
+.combos-grade {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+}
+
+.combo-card {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  background: white;
+  box-shadow: 0 10px 28px rgba(29, 24, 20, 0.1);
+}
+
+.combo-card__selo {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  z-index: 1;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: var(--cor-primaria, #e63946);
+  color: white;
+  font-size: 0.85rem;
+  font-weight: 800;
+}
+
+.combo-card__imagem {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+}
+
+.combo-card__conteudo {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  padding: 22px;
+}
+
+.combo-card__conteudo h2 {
+  margin: 0 0 8px;
+  color: #2d2b28;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.4rem;
+  font-weight: 400;
+}
+
+.combo-card__conteudo p {
+  margin: 0 0 12px;
+  color: #756a61;
+  line-height: 1.5;
+}
+
+.combo-card__itens {
+  margin: 0 0 16px;
+  padding-left: 18px;
+  color: #756a61;
+  font-size: 0.9rem;
+}
+
+.combo-card__precos {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-top: auto;
+  margin-bottom: 14px;
+}
+
+.combo-card__preco-original {
+  color: #a89b8f;
+  font-size: 0.95rem;
+  text-decoration: line-through;
+}
+
+.combo-card__preco-promocional {
+  color: #b57b28;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.5rem;
+}
+
+.combo-card__botao {
+  width: 100%;
+  padding: 12px 16px;
+  border: 0;
+  background: var(--cor-primaria, #e63946);
+  color: white;
+  font: inherit;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.combo-card__botao:hover {
+  opacity: 0.9;
+}
+
+@media (max-width: 700px) {
+  .combos-secao {
+    padding: 32px 20px 0;
+  }
+}
+
+.checkout-page {
+  width: min(100% - 40px, 720px);
+  margin-inline: auto;
 }

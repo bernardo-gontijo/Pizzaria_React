@@ -7,6 +7,12 @@ import { ProtectedRoute } from "../features/admin/components/ProtectedRoute";
 import { Layout as GarcomLayout } from "../features/garcom/components/Layout";
 import { ProtectedRoute as GarcomProtectedRoute } from "../features/garcom/components/ProtectedRoute";
 import { Loading } from "../components/Loading";
+import {
+  EntregadorDashboard,
+  EntregadorEntregas,
+  EntregadorLayout,
+  EntregadorPedidos,
+} from "../features/entregador";
 
 const ConfiguracaoPage = lazy(() =>
   import("../features/admin/pages/ConfiguracaoPage").then((m) => ({
@@ -33,6 +39,11 @@ const PizzasPage = lazy(() =>
     default: m.PizzasPage,
   })),
 );
+const CombosAdminPage = lazy(() =>
+  import("../features/admin/pages/CombosAdminPage").then((m) => ({
+    default: m.CombosAdminPage,
+  })),
+);
 const MesasAdminPage = lazy(() =>
   import("../features/admin/pages/MesasAdminPage").then((m) => ({
     default: m.MesasAdminPage,
@@ -46,6 +57,16 @@ const AcompanharPedidoPage = lazy(() =>
 const CardapioPage = lazy(() =>
   import("../features/loja/pages/CardapioPage").then((m) => ({
     default: m.CardapioPage,
+  })),
+);
+const BebidasPage = lazy(() =>
+  import("../features/loja/pages/BebidasPage").then((m) => ({
+    default: m.BebidasPage,
+  })),
+);
+const BebidaDetalhePage = lazy(() =>
+  import("../features/loja/pages/BebidaDetalhePage").then((m) => ({
+    default: m.BebidaDetalhePage,
   })),
 );
 const CarrinhoPage = lazy(() =>
@@ -73,6 +94,11 @@ const PizzaDetalhePage = lazy(() =>
     default: m.PizzaDetalhePage,
   })),
 );
+const MeusPedidosPage = lazy(() =>
+  import("../features/loja/pages/MeusPedidosPage").then((m) => ({
+    default: m.MeusPedidosPage,
+  })),
+);
 const HomePage = lazy(() =>
   import("../pages/HomePage").then((m) => ({ default: m.HomePage })),
 );
@@ -86,17 +112,23 @@ const GarcomLoginPage = lazy(() =>
     default: m.LoginPage,
   })),
 );
+
 const MesasPage = lazy(() =>
   import("../features/garcom/pages/MesasPage").then((m) => ({
     default: m.MesasPage,
   })),
 );
+
 const PedidoMesaPage = lazy(() =>
   import("../features/garcom/pages/PedidoMesaPage").then((m) => ({
     default: m.PedidoMesaPage,
   })),
 );
-
+const CozinheiroPage = lazy(() =>
+  import("../features/cozinheiro/pages/CozinheiroPage").then((m) => ({
+    default: m.CozinheiroPage,
+  })),
+);
 export const router = createBrowserRouter([
   {
     path: "/",
@@ -104,14 +136,25 @@ export const router = createBrowserRouter([
     children: [
       { index: true, Component: HomePage },
       { path: "cardapio", Component: CardapioPage },
+      { path: "bebidas", Component: BebidasPage },
+      { path: "bebida/:id", Component: BebidaDetalhePage },
       { path: "categoria/:categoria", Component: CategoriaPage },
       { path: "pizza/:id", Component: PizzaDetalhePage },
       { path: "carrinho", Component: CarrinhoPage },
       { path: "checkout", Component: CheckoutPage },
       { path: "pagamento", Component: PagamentoPage },
+      { path: "meus-pedidos", Component: MeusPedidosPage },
       { path: "acompanhar/:id", Component: AcompanharPedidoPage },
       { path: "*", Component: NotFoundPage },
     ],
+  },
+  {
+    path: "/cozinha",
+    element: (
+      <Suspense fallback={<Loading />}>
+        <CozinheiroPage />
+      </Suspense>
+    ),
   },
   {
     path: "/admin/login",
@@ -139,6 +182,10 @@ export const router = createBrowserRouter([
           {
             path: "pizzas",
             Component: PizzasPage,
+          },
+          {
+            path: "combos",
+            Component: CombosAdminPage,
           },
           {
             path: "mesas",
@@ -185,6 +232,17 @@ export const router = createBrowserRouter([
           },
         ],
       },
+    ],
+  },
+
+  {
+    path: "/entregador",
+    element: <EntregadorLayout />,
+    children: [
+      { index: true, element: <EntregadorDashboard /> },
+      { path: "dashboard", element: <EntregadorDashboard /> },
+      { path: "pedidos", element: <EntregadorPedidos /> },
+      { path: "entregas", element: <EntregadorEntregas /> },
     ],
   },
 ]);

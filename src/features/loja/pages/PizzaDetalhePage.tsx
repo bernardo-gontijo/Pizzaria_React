@@ -33,6 +33,7 @@ export function PizzaDetalhePage() {
 
     adicionarItem({
       id: pizza.id,
+      tipo: "pizza",
       nome: pizza.nome,
       precoUnitario: pizza.preco,
       quantidade: quantidade,
@@ -86,7 +87,12 @@ export function PizzaDetalhePage() {
           </div>
         </div>
 
-        <p className="pizza-detalhe-page__preco">R$ {pizza.preco.toFixed(2)}</p>
+        <p className="pizza-detalhe-page__preco" aria-live="polite">
+          {(pizza.preco * quantidade).toLocaleString("pt-BR", {
+            style: "currency",
+            currency: "BRL",
+          })}
+        </p>
         <button
           className="pizza-detalhe-page__adicionar"
           onClick={handleAdicionar}

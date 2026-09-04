@@ -1,20 +1,8 @@
 import { useState } from "react";
 import { useCart } from "../../../context/CartContext";
+import { registrarPedidoOnline } from "../api/meusPedidos.service";
 import { criarPedido } from "../api/pedidos.service";
-import type { Pedido, CriarPedidoDTO } from "../types/pedido";
-
-interface DadosPedido {
-  nome: string;
-  telefone: string;
-  endereco: string;
-  formaPagamento:
-    | "dinheiro"
-    | "cartao_credito"
-    | "cartao_debito"
-    | "pix"
-    | "vale_refeicao"
-    | string;
-}
+import type { Pedido, CriarPedidoDTO, DadosCheckout } from "../types/pedido";
 
 const FORMAS_PAGAMENTO_VALIDAS: readonly CriarPedidoDTO["formaPagamento"][] = [
   "dinheiro",
@@ -40,7 +28,7 @@ export function usePedido() {
   const [loading, setLoading] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
 
-  async function finalizar(dados: DadosPedido) {
+  async function finalizar(dados: DadosCheckout) {
     try {
       setLoading(true);
       setErro(null);
@@ -54,24 +42,22 @@ export function usePedido() {
           nome: dados.nome,
           telefone: dados.telefone,
         },
-        endereco: {
-          rua: dados.endereco,
-          numero: "0",
-          bairro: "",
-          cidade: "",
-          estado: "",
-          cep: "",
-        },
+        endereco: dados.endereco,
         itens: items.map((item) => ({
+          tipo: item.tipo ?? "pizza",
           pizzaId: item.id,
           pizzaName: item.nome,
           quantity: item.quantidade,
           price: item.precoUnitario,
-          size: (item.tamanho as "P" | "M" | "G" | "GG") || "M",
+          size:
+            item.tipo === "bebida"
+              ? undefined
+              : (item.tamanho as "P" | "M" | "G" | "GG") || "M",
         })),
         formaPagamento: validarFormaPagamento(dados.formaPagamento),
       });
 
+      registrarPedidoOnline(novoPedido.id);
       limparCarrinho();
       setPedido(novoPedido);
       return novoPedido;

@@ -1,9 +1,12 @@
+import type { EnderecoEntrega } from "../types/pedido";
+import { formatarEndereco } from "../utils/endereco";
+
 interface StatusPedidoProps {
   pedido: {
     id: string;
     status: string;
     cliente: { nome: string };
-    endereco?: { rua: string };
+    endereco?: Partial<EnderecoEntrega>;
     total: number;
   };
 }
@@ -13,12 +16,20 @@ const STATUS_MAP: Record<string, string> = {
   confirmado: " Confirmado",
   preparando: " Preparando",
   pronto: " Pronto",
+  saiu_para_entrega: " Saiu para entrega",
   entregue: " Entregue",
   cancelado: " Cancelado",
 };
 
 export function StatusPedido({ pedido }: StatusPedidoProps) {
-  const steps = ["pendente", "confirmado", "preparando", "pronto", "entregue"];
+  const steps = [
+    "pendente",
+    "confirmado",
+    "preparando",
+    "pronto",
+    "saiu_para_entrega",
+    "entregue",
+  ];
   const currentIndex = steps.indexOf(pedido.status);
 
   return (
@@ -43,7 +54,7 @@ export function StatusPedido({ pedido }: StatusPedidoProps) {
         </p>
         {pedido.endereco && (
           <p>
-            <strong>Endereço:</strong> {pedido.endereco.rua}
+            <strong>Endereço:</strong> {formatarEndereco(pedido.endereco)}
           </p>
         )}
         <p>

@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { usePedidoMesa } from "../hooks/usePedidoMesa";
 import { Loading } from "../../../components/Loading";
+import { SeletorItemModal } from "../components/SeletorItemModal";
+import type { ItemPedido } from "../../loja/types/pedido";
 
 export function PedidoMesaPage() {
   const { id } = useParams<{ id: string }>();
@@ -20,8 +22,7 @@ export function PedidoMesaPage() {
     void carregar();
   }, [carregar]);
 
-  const [nomeItem, setNomeItem] = useState("");
-  const [precoItem, setPrecoItem] = useState("");
+  const [modalAberto, setModalAberto] = useState(false);
   const [quisPagarGorjeta, setQuisPagarGorjeta] = useState(false);
   const [percentualGorjeta, setPercentualGorjeta] = useState("10");
 
@@ -35,23 +36,8 @@ export function PedidoMesaPage() {
     return <p className="feedback feedback--erro">Mesa não encontrada.</p>;
   }
 
-  async function aoAdicionarItem(evento: React.FormEvent) {
-    evento.preventDefault();
-
-    const preco = Number(precoItem);
-
-    if (!nomeItem || Number.isNaN(preco) || preco <= 0) return;
-
-    await adicionarItem({
-      pizzaId: `mesa-item-${Date.now()}`,
-      pizzaName: nomeItem,
-      quantity: 1,
-      price: preco,
-      size: "M",
-    });
-
-    setNomeItem("");
-    setPrecoItem("");
+  async function aoSelecionarItemDoCardapio(item: Omit<ItemPedido, "id">) {
+    await adicionarItem(item);
   }
 
   async function aoEncerrarConta() {
@@ -89,32 +75,20 @@ export function PedidoMesaPage() {
             Subtotal: R$ {pedido.subtotal.toFixed(2)}
           </p>
 
-          <form onSubmit={aoAdicionarItem}>
-            <div>
-              <label htmlFor="nomeItem">Item</label>
-              <input
-                id="nomeItem"
-                type="text"
-                value={nomeItem}
-                onChange={(e) => setNomeItem(e.target.value)}
-                placeholder="Ex: Pizza Calabresa"
-                required
-              />
-            </div>
-            <div>
-              <label htmlFor="precoItem">Preço</label>
-              <input
-                id="precoItem"
-                type="number"
-                min="0"
-                step="0.01"
-                value={precoItem}
-                onChange={(e) => setPrecoItem(e.target.value)}
-                required
-              />
-            </div>
-            <button type="submit">Adicionar item</button>
-          </form>
+          <button
+            type="button"
+            className="bg-primaria"
+            onClick={() => setModalAberto(true)}
+          >
+            Adicionar item
+          </button>
+
+          {modalAberto && (
+            <SeletorItemModal
+              onSelecionar={aoSelecionarItemDoCardapio}
+              onFechar={() => setModalAberto(false)}
+            />
+          )}
 
           <hr />
 
