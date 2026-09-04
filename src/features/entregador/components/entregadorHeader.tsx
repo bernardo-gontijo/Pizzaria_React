@@ -1,24 +1,21 @@
 // src/features/entregador/components/EntregadorHeader.tsx
-import { User, Bell } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { User, Bell } from "lucide-react";
 
 interface EntregadorHeaderProps {
   nome: string;
 }
 
-export const EntregadorHeader: React.FC<EntregadorHeaderProps> = ({ nome }) => {
-  const [dataAtual, setDataAtual] = useState('');
+function formatarDataAtual(): string {
+  return new Date().toLocaleDateString("pt-BR", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+}
 
-  useEffect(() => {
-    const now = new Date();
-    const formatted = now.toLocaleDateString('pt-BR', { 
-      weekday: 'long', 
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric'
-    });
-    setDataAtual(formatted);
-  }, []);
+export const EntregadorHeader: React.FC<EntregadorHeaderProps> = ({ nome }) => {
+  const dataAtual = formatarDataAtual();
 
   return (
     <header className="bg-white border-b px-6 py-4 flex justify-between items-center">
@@ -28,7 +25,7 @@ export const EntregadorHeader: React.FC<EntregadorHeaderProps> = ({ nome }) => {
         </h2>
         <p className="text-sm text-gray-500">{dataAtual}</p>
       </div>
-      
+
       <div className="flex items-center gap-4">
         <button className="p-2 hover:bg-gray-100 rounded-full relative">
           <Bell size={20} />

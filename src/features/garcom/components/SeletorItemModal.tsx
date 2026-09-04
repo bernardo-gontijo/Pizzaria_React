@@ -127,9 +127,7 @@ export function SeletorItemModal({
         <input
           type="text"
           className="seletor-item-modal__busca"
-          placeholder={
-            aba === "pizza" ? "Buscar pizza..." : "Buscar bebida..."
-          }
+          placeholder={aba === "pizza" ? "Buscar pizza..." : "Buscar bebida..."}
           value={busca}
           onChange={(evento) => setBusca(evento.target.value)}
         />
@@ -141,9 +139,11 @@ export function SeletorItemModal({
             <p className="feedback">Nenhuma pizza encontrada.</p>
           )}
 
-          {!carregando && aba === "bebida" && bebidasDisponiveis.length === 0 && (
-            <p className="feedback">Nenhuma bebida encontrada.</p>
-          )}
+          {!carregando &&
+            aba === "bebida" &&
+            bebidasDisponiveis.length === 0 && (
+              <p className="feedback">Nenhuma bebida encontrada.</p>
+            )}
 
           {!carregando &&
             aba === "pizza" &&

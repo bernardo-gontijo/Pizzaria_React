@@ -56,7 +56,9 @@ export async function criarMesa(dados: MesaInput): Promise<Mesa> {
   const jaExiste = mesas.some((mesa) => mesa.numero === dados.numero);
 
   if (jaExiste) {
-    throw new Error(`Já existe uma mesa cadastrada com o número ${dados.numero}.`);
+    throw new Error(
+      `Já existe uma mesa cadastrada com o número ${dados.numero}.`,
+    );
   }
 
   const novaMesa: Mesa = {
