@@ -21,10 +21,10 @@ export function BebidaCard({ bebida }: BebidaCardProps) {
     >
       <article className="pizza-card">
         <img
-            className="bebida-card__imagem"
-            alt={bebida.nome}
-            src={bebida.imagem}
-            onError={usarImagemReserva}
+          className="bebida-card__imagem"
+          alt={bebida.nome}
+          src={bebida.imagem}
+          onError={usarImagemReserva}
         />
         <div className="pizza-card__conteudo">
           <span className="categoria">{bebida.categoria}</span>

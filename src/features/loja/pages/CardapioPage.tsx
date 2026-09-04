@@ -5,7 +5,7 @@ import { ComboCard } from "../components/ComboCard";
 import { usePizzas } from "../hooks/usePizzas";
 import { useCombos } from "../hooks/useCombos";
 import { useCart } from "../../../context/CartContext";
-import type { Combo } from "../types/combos";
+import type { ComboResolvido } from "../types/combos";
 
 const categorias = ["tradicional", "especial", "vegetariana", "doce"];
 
@@ -15,7 +15,7 @@ export function CardapioPage() {
   const { adicionarItem } = useCart();
   const navigate = useNavigate();
 
-  function handleAdicionarCombo(combo: Combo) {
+  function handleAdicionarCombo(combo: ComboResolvido) {
     adicionarItem({
       id: combo.id,
       tipo: "combo",

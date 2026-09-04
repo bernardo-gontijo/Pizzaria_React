@@ -15,9 +15,11 @@ export function Footer() {
       <strong>{config.nome}</strong>
       <span>{config.endereco}</span>
       <span>Atendimento: {config.horarioFuncionamento}</span>
-      <a className="footer__suporte" href=
-      {SUPORTE_WHATSAPP_URL} target="_blank" 
-      rel="noopener noreferrer"
+      <a
+        className="footer__suporte"
+        href={SUPORTE_WHATSAPP_URL}
+        target="_blank"
+        rel="noopener noreferrer"
       >
         <Headset size={18} />
         Suporte da Pizzaria

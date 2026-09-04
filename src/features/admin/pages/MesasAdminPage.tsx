@@ -27,7 +27,9 @@ export function MesasAdminPage() {
     const jaCadastrada = mesas.some((mesa) => mesa.numero === numeroConvertido);
 
     if (jaCadastrada) {
-      setErroCadastro(`Já existe uma mesa cadastrada com o número ${numeroConvertido}.`);
+      setErroCadastro(
+        `Já existe uma mesa cadastrada com o número ${numeroConvertido}.`,
+      );
       return;
     }
 

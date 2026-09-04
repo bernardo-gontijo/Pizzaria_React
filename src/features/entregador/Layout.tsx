@@ -1,5 +1,5 @@
-import { Outlet } from 'react-router-dom';
-import { EntregadorSidebar } from './components/entregadorSidebar';
+import { Outlet } from "react-router-dom";
+import { EntregadorSidebar } from "./components/entregadorSidebar";
 
 export function EntregadorLayout() {
   return (

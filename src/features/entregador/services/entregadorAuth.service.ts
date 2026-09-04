@@ -1,25 +1,24 @@
-
-const STORAGE_KEY = '@entregador:user';
+const STORAGE_KEY = "@entregador:user";
 
 export interface EntregadorUser {
   id: string;
   nome: string;
   email: string;
-  role: 'entregador';
+  role: "entregador";
 }
 
 // Credenciais mock para demonstração (igual ao padrão do garçom)
 const MOCK_ENTREGADOR: EntregadorUser = {
-  id: '1',
-  nome: 'Carlos Silva',
-  email: 'entregador@pizzashop.com',
-  role: 'entregador',
+  id: "1",
+  nome: "Carlos Silva",
+  email: "entregador@pizzashop.com",
+  role: "entregador",
 };
 
 // Credenciais válidas
 const VALID_CREDENTIALS = {
-  email: 'entregador@pizzashop.com',
-  senha: '123456',
+  email: "entregador@pizzashop.com",
+  senha: "123456",
 };
 
 export const entregadorAuthService = {
@@ -31,11 +30,16 @@ export const entregadorAuthService = {
    * @throws Error se as credenciais forem inválidas
    */
   login(email: string, senha: string): EntregadorUser {
-    if (email === VALID_CREDENTIALS.email && senha === VALID_CREDENTIALS.senha) {
+    if (
+      email === VALID_CREDENTIALS.email &&
+      senha === VALID_CREDENTIALS.senha
+    ) {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(MOCK_ENTREGADOR));
       return MOCK_ENTREGADOR;
     }
-    throw new Error('Credenciais inválidas. Use: entregador@pizzashop.com / 123456');
+    throw new Error(
+      "Credenciais inválidas. Use: entregador@pizzashop.com / 123456",
+    );
   },
 
   /**
@@ -72,7 +76,7 @@ export const entregadorAuthService = {
    */
   getNome(): string {
     const user = this.getUser();
-    return user?.nome || 'Entregador';
+    return user?.nome || "Entregador";
   },
 
   /**

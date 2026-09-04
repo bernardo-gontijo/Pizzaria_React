@@ -1,10 +1,10 @@
 import type { SyntheticEvent } from "react";
 
-import type { Combo } from "../types/combos";
+import type { ComboResolvido } from "../types/combos";
 
 interface ComboCardProps {
-  combo: Combo;
-  onAdicionar: (combo: Combo) => void;
+  combo: ComboResolvido;
+  onAdicionar: (combo: ComboResolvido) => void;
 }
 
 export function ComboCard({ combo, onAdicionar }: ComboCardProps) {
@@ -13,14 +13,9 @@ export function ComboCard({ combo, onAdicionar }: ComboCardProps) {
     event.currentTarget.src = "/images/banner-pizzaria.jpg";
   }
 
-  const percentualDesconto = Math.round(
-    ((combo.precoOriginal - combo.precoPromocional) / combo.precoOriginal) *
-      100,
-  );
-
   return (
     <article className="combo-card">
-      <span className="combo-card__selo">-{percentualDesconto}%</span>
+      <span className="combo-card__selo">-{combo.descontoPercentual}%</span>
 
       <img
         className="combo-card__imagem"
@@ -31,11 +26,13 @@ export function ComboCard({ combo, onAdicionar }: ComboCardProps) {
 
       <div className="combo-card__conteudo">
         <h2>{combo.nome}</h2>
-        <p>{combo.descricao}</p>
+        {combo.descricao && <p>{combo.descricao}</p>}
 
         <ul className="combo-card__itens">
-          {combo.itensIncluidos.map((item) => (
-            <li key={item}>{item}</li>
+          {combo.itens.map((item) => (
+            <li key={`${item.tipo}-${item.id}`}>
+              {item.quantidade}x {item.nome}
+            </li>
           ))}
         </ul>
 

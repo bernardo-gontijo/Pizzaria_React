@@ -1,10 +1,14 @@
 import { useEffect, useState } from "react";
 
-import { buscarCombos } from "../api/combos.service";
-import type { Combo } from "../types/combos";
+import {
+  buscarCombosResolvidos,
+  COMBOS_ATUALIZADOS_EVENT,
+} from "../api/combos.service";
+import { PIZZAS_ATUALIZADAS_EVENT } from "../api/loja.service";
+import type { ComboResolvido } from "../types/combos";
 
 export function useCombos() {
-  const [combos, setCombos] = useState<readonly Combo[]>([]);
+  const [combos, setCombos] = useState<readonly ComboResolvido[]>([]);
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState<Error | null>(null);
 
@@ -13,7 +17,7 @@ export function useCombos() {
       try {
         setLoading(true);
         setErro(null);
-        setCombos(await buscarCombos());
+        setCombos(await buscarCombosResolvidos());
       } catch (error) {
         setErro(
           error instanceof Error
@@ -26,6 +30,20 @@ export function useCombos() {
     }
 
     void carregarCombos();
+
+    function atualizarCombos() {
+      void carregarCombos();
+    }
+
+    window.addEventListener(COMBOS_ATUALIZADOS_EVENT, atualizarCombos);
+    window.addEventListener(PIZZAS_ATUALIZADAS_EVENT, atualizarCombos);
+    window.addEventListener("storage", atualizarCombos);
+
+    return () => {
+      window.removeEventListener(COMBOS_ATUALIZADOS_EVENT, atualizarCombos);
+      window.removeEventListener(PIZZAS_ATUALIZADAS_EVENT, atualizarCombos);
+      window.removeEventListener("storage", atualizarCombos);
+    };
   }, []);
 
   return { combos, loading, erro };
