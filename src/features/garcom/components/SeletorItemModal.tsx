@@ -178,11 +178,7 @@ export function SeletorItemModal({
         <input
           type="text"
           className="seletor-item-modal__busca"
-          placeholder={
-            aba === "pizza"
-              ? "Buscar pizza..."
-              : "Buscar bebida..."
-          }
+          placeholder={aba === "pizza" ? "Buscar pizza..." : "Buscar bebida..."}
           value={busca}
           onChange={(evento) => setBusca(evento.target.value)}
           disabled={adicionando}
@@ -191,20 +187,14 @@ export function SeletorItemModal({
         <div className="seletor-item-modal__lista">
           {carregando && <Loading />}
 
-          {!carregando &&
-            aba === "pizza" &&
-            pizzasDisponiveis.length === 0 && (
-              <p className="feedback">
-                Nenhuma pizza encontrada.
-              </p>
-            )}
+          {!carregando && aba === "pizza" && pizzasDisponiveis.length === 0 && (
+            <p className="feedback">Nenhuma pizza encontrada.</p>
+          )}
 
           {!carregando &&
             aba === "bebida" &&
             bebidasDisponiveis.length === 0 && (
-              <p className="feedback">
-                Nenhuma bebida encontrada.
-              </p>
+              <p className="feedback">Nenhuma bebida encontrada.</p>
             )}
 
           {!carregando &&
@@ -213,10 +203,7 @@ export function SeletorItemModal({
               const quantidade = obterQuantidade(pizza.id);
 
               return (
-                <div
-                  key={pizza.id}
-                  className="seletor-item-modal__item"
-                >
+                <div key={pizza.id} className="seletor-item-modal__item">
                   <div className="seletor-item-modal__item-info">
                     <span className="seletor-item-modal__item-nome">
                       {pizza.nome}
@@ -233,12 +220,9 @@ export function SeletorItemModal({
                         type="button"
                         aria-label={`Diminuir quantidade de ${pizza.nome}`}
                         disabled={
-                          adicionando ||
-                          quantidade <= QUANTIDADE_MINIMA
+                          adicionando || quantidade <= QUANTIDADE_MINIMA
                         }
-                        onClick={() =>
-                          alterarQuantidade(pizza.id, -1)
-                        }
+                        onClick={() => alterarQuantidade(pizza.id, -1)}
                       >
                         <Minus size={14} />
                       </button>
@@ -249,9 +233,7 @@ export function SeletorItemModal({
                         type="button"
                         aria-label={`Aumentar quantidade de ${pizza.nome}`}
                         disabled={adicionando}
-                        onClick={() =>
-                          alterarQuantidade(pizza.id, 1)
-                        }
+                        onClick={() => alterarQuantidade(pizza.id, 1)}
                       >
                         <Plus size={14} />
                       </button>
@@ -267,16 +249,11 @@ export function SeletorItemModal({
               const quantidade = obterQuantidade(bebida.id);
 
               return (
-                <div
-                  key={bebida.id}
-                  className="seletor-item-modal__item"
-                >
+                <div key={bebida.id} className="seletor-item-modal__item">
                   <div className="seletor-item-modal__item-info">
                     <span className="seletor-item-modal__item-nome">
                       {bebida.nome}
-                      {bebida.quantidade
-                        ? ` (${bebida.quantidade})`
-                        : ""}
+                      {bebida.quantidade ? ` (${bebida.quantidade})` : ""}
                     </span>
 
                     <span className="seletor-item-modal__item-preco">
@@ -290,12 +267,9 @@ export function SeletorItemModal({
                         type="button"
                         aria-label={`Diminuir quantidade de ${bebida.nome}`}
                         disabled={
-                          adicionando ||
-                          quantidade <= QUANTIDADE_MINIMA
+                          adicionando || quantidade <= QUANTIDADE_MINIMA
                         }
-                        onClick={() =>
-                          alterarQuantidade(bebida.id, -1)
-                        }
+                        onClick={() => alterarQuantidade(bebida.id, -1)}
                       >
                         <Minus size={14} />
                       </button>
@@ -306,9 +280,7 @@ export function SeletorItemModal({
                         type="button"
                         aria-label={`Aumentar quantidade de ${bebida.nome}`}
                         disabled={adicionando}
-                        onClick={() =>
-                          alterarQuantidade(bebida.id, 1)
-                        }
+                        onClick={() => alterarQuantidade(bebida.id, 1)}
                       >
                         <Plus size={14} />
                       </button>
