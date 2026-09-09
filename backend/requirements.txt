@@ -1,0 +1,8 @@
+flask
+flask-sqlalchemy
+flask-cors
+flask-jwt-extended
+python-dotenv
+black
+flake8
+pytest
