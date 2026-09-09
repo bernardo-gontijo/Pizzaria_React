@@ -1,5 +1,8 @@
-def registrar_e_logar(client, email="teste@teste.com"):
-    client.post("/register", json={"nome": "Teste", "email": email, "senha": "123456"})
+def registrar_e_logar(client, email="teste@teste.com", role="cliente"):
+    client.post(
+        "/register",
+        json={"nome": "Teste", "email": email, "senha": "123456", "role": role},
+    )
     resposta = client.post("/login", json={"email": email, "senha": "123456"})
     return resposta.get_json()["token"]
 
@@ -31,6 +34,7 @@ def test_register(client):
     )
     assert resposta.status_code == 201
     assert resposta.get_json()["email"] == "gabriel@teste.com"
+    assert resposta.get_json()["role"] == "cliente"
 
 
 def test_register_email_duplicado(client):
@@ -115,6 +119,20 @@ def test_atualizar_status(client):
     assert dados["statusHistorico"][-1]["message"] == "Pedido em preparação"
 
 
+def test_status_invalido_e_rejeitado(client):
+    token = registrar_e_logar(client, email="statusinvalido@teste.com")
+    headers = {"Authorization": f"Bearer {token}"}
+
+    pedido = client.post("/pedidos", json=payload_pedido(), headers=headers).get_json()
+
+    resposta = client.patch(
+        f"/pedidos/{pedido['id']}/status",
+        json={"status": "qualquercoisa"},
+        headers=headers,
+    )
+    assert resposta.status_code == 400
+
+
 def test_usuario_nao_ve_pedido_de_outro(client):
     token_a = registrar_e_logar(client, email="usuarioa@teste.com")
     token_b = registrar_e_logar(client, email="usuariob@teste.com")
@@ -133,17 +151,28 @@ def test_usuario_nao_ve_pedido_de_outro(client):
 
 
 def test_relatorio_mais_vendida(client):
-    token = registrar_e_logar(client, email="relatorio@teste.com")
-    headers = {"Authorization": f"Bearer {token}"}
+    token_cliente = registrar_e_logar(client, email="relatorio@teste.com")
+    token_admin = registrar_e_logar(client, email="admin@teste.com", role="admin")
 
     client.post(
         "/pedidos",
         json=payload_pedido(nome_item="Calabresa", quantity=3, price=45.90),
-        headers=headers,
+        headers={"Authorization": f"Bearer {token_cliente}"},
     )
 
-    resposta = client.get("/relatorios/mais-vendida", headers=headers)
+    resposta = client.get(
+        "/relatorios/mais-vendida", headers={"Authorization": f"Bearer {token_admin}"}
+    )
     assert resposta.status_code == 200
     dados = resposta.get_json()
     assert dados["pizza"] == "Calabresa"
     assert dados["quantidade"] == 3
+
+
+def test_relatorio_bloqueado_para_cliente_comum(client):
+    token_cliente = registrar_e_logar(client, email="clientecomum@teste.com")
+
+    resposta = client.get(
+        "/relatorios/faturamento", headers={"Authorization": f"Bearer {token_cliente}"}
+    )
+    assert resposta.status_code == 403

@@ -11,6 +11,9 @@ class Usuario(db.Model):
     nome = db.Column(db.String(120), nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     senha_hash = db.Column(db.String(255), nullable=False)
+    role = db.Column(
+        db.String(20), nullable=False, default="cliente"
+    )  # "cliente" ou "admin"
 
     pedidos = db.relationship("Pedido", backref="usuario", lazy=True)
 
@@ -21,7 +24,12 @@ class Usuario(db.Model):
         return check_password_hash(self.senha_hash, senha)
 
     def to_dict(self):
-        return {"id": self.id, "nome": self.nome, "email": self.email}
+        return {
+            "id": self.id,
+            "nome": self.nome,
+            "email": self.email,
+            "role": self.role,
+        }
 
 
 class Pedido(db.Model):
