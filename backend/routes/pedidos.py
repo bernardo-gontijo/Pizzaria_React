@@ -6,6 +6,16 @@ from models import Pedido, ItemPedido, HistoricoStatus
 
 pedidos_bp = Blueprint("pedidos", __name__)
 
+STATUS_VALIDOS = (
+    "pendente",
+    "confirmado",
+    "preparando",
+    "pronto",
+    "saiu_para_entrega",
+    "entregue",
+    "cancelado",
+)
+
 MENSAGENS_STATUS = {
     "pendente": "Pedido recebido",
     "confirmado": "Pedido confirmado",
@@ -20,7 +30,7 @@ MENSAGENS_STATUS = {
 @pedidos_bp.route("/pedidos", methods=["POST"])
 @jwt_required()
 def criar_pedido():
-    usuario_id = get_jwt_identity()
+    usuario_id = int(get_jwt_identity())
     dados = request.get_json()
 
     tipo = dados.get("tipo")
@@ -32,7 +42,11 @@ def criar_pedido():
     cliente = dados.get("cliente", {}) or {}
     endereco = dados.get("endereco")
 
-    subtotal = sum(item["price"] * item["quantity"] for item in itens)
+    try:
+        subtotal = sum(item["price"] * item["quantity"] for item in itens)
+    except KeyError as erro:
+        return jsonify({"erro": f"item sem o campo obrigatório: {erro}"}), 400
+
     taxa_entrega = dados.get("taxaEntrega", 0) or 0
     desconto = dados.get("desconto", 0) or 0
     total = subtotal + taxa_entrega - desconto
@@ -55,21 +69,25 @@ def criar_pedido():
         mesa_id=dados.get("mesaId"),
     )
     db.session.add(pedido)
-    db.session.flush()  # gera o pedido.id antes de criar os itens
+    db.session.flush()
 
-    for item in itens:
-        db.session.add(
-            ItemPedido(
-                pedido_id=pedido.id,
-                pizza_id=item.get("pizzaId"),
-                nome_item=item["pizzaName"],
-                tipo_item=item.get("tipo", "pizza"),
-                quantidade=item["quantity"],
-                preco_unitario=item["price"],
-                tamanho=item.get("size"),
-                observacoes=item.get("observations"),
+    try:
+        for item in itens:
+            db.session.add(
+                ItemPedido(
+                    pedido_id=pedido.id,
+                    pizza_id=item.get("pizzaId"),
+                    nome_item=item["pizzaName"],
+                    tipo_item=item.get("tipo", "pizza"),
+                    quantidade=item["quantity"],
+                    preco_unitario=item["price"],
+                    tamanho=item.get("size"),
+                    observacoes=item.get("observations"),
+                )
             )
-        )
+    except KeyError as erro:
+        db.session.rollback()
+        return jsonify({"erro": f"item sem o campo obrigatório: {erro}"}), 400
 
     db.session.add(
         HistoricoStatus(
@@ -86,7 +104,7 @@ def criar_pedido():
 @pedidos_bp.route("/pedidos", methods=["GET"])
 @jwt_required()
 def listar_pedidos():
-    usuario_id = get_jwt_identity()
+    usuario_id = int(get_jwt_identity())
     pedidos = (
         Pedido.query.filter_by(usuario_id=usuario_id)
         .order_by(Pedido.criado_em.desc())
@@ -98,7 +116,7 @@ def listar_pedidos():
 @pedidos_bp.route("/pedidos/<int:pedido_id>", methods=["GET"])
 @jwt_required()
 def detalhar_pedido(pedido_id):
-    usuario_id = get_jwt_identity()
+    usuario_id = int(get_jwt_identity())
     pedido = Pedido.query.filter_by(id=pedido_id, usuario_id=usuario_id).first()
 
     if not pedido:
@@ -110,7 +128,7 @@ def detalhar_pedido(pedido_id):
 @pedidos_bp.route("/pedidos/<int:pedido_id>/status", methods=["PATCH"])
 @jwt_required()
 def atualizar_status(pedido_id):
-    usuario_id = get_jwt_identity()
+    usuario_id = int(get_jwt_identity())
     pedido = Pedido.query.filter_by(id=pedido_id, usuario_id=usuario_id).first()
 
     if not pedido:
@@ -120,6 +138,13 @@ def atualizar_status(pedido_id):
     novo_status = dados.get("status")
     if not novo_status:
         return jsonify({"erro": "status é obrigatório"}), 400
+    if novo_status not in STATUS_VALIDOS:
+        return (
+            jsonify(
+                {"erro": f"status inválido. Use um de: {', '.join(STATUS_VALIDOS)}"}
+            ),
+            400,
+        )
 
     mensagem = dados.get("message") or MENSAGENS_STATUS.get(
         novo_status, "Status atualizado"

@@ -1,11 +1,24 @@
 from datetime import datetime
+from functools import wraps
 from flask import Blueprint, request, jsonify
-from flask_jwt_extended import jwt_required
+from flask_jwt_extended import jwt_required, get_jwt
 from sqlalchemy import func
 from extensions import db
 from models import Pedido, ItemPedido
 
 relatorios_bp = Blueprint("relatorios", __name__)
+
+
+def admin_required(fn):
+    @wraps(fn)
+    @jwt_required()
+    def wrapper(*args, **kwargs):
+        claims = get_jwt()
+        if claims.get("role") != "admin":
+            return jsonify({"erro": "acesso restrito a administradores"}), 403
+        return fn(*args, **kwargs)
+
+    return wrapper
 
 
 def _parse_periodo():
@@ -17,7 +30,7 @@ def _parse_periodo():
 
 
 @relatorios_bp.route("/relatorios/mais-vendida", methods=["GET"])
-@jwt_required()
+@admin_required
 def mais_vendida():
     inicio_dt, fim_dt = _parse_periodo()
 
@@ -47,7 +60,7 @@ def mais_vendida():
 
 
 @relatorios_bp.route("/relatorios/faturamento", methods=["GET"])
-@jwt_required()
+@admin_required
 def faturamento():
     inicio_dt, fim_dt = _parse_periodo()
     agrupar = request.args.get("agrupar", "dia")  # dia, semana, mes
