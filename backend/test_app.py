@@ -78,7 +78,7 @@ def test_criar_e_listar_pedido(client):
     assert resposta_criar.status_code == 201
     pedido = resposta_criar.get_json()
     assert pedido["total"] == 91.8
-    assert pedido["status"] == "aguardando"
+    assert pedido["status"] == "pendente"
 
     resposta_listar = client.get("/pedidos", headers=headers)
     assert resposta_listar.status_code == 200
@@ -107,11 +107,11 @@ def test_atualizar_status(client):
 
     resposta = client.patch(
         f"/pedidos/{pedido['id']}/status",
-        json={"status": "em_preparo"},
+        json={"status": "preparando"},
         headers=headers,
     )
     assert resposta.status_code == 200
-    assert resposta.get_json()["status"] == "em_preparo"
+    assert resposta.get_json()["status"] == "preparando"
     assert len(resposta.get_json()["historico"]) == 2
 
 

@@ -20,7 +20,7 @@ def criar_pedido():
 
     total = sum(item["preco_unitario"] * item["quantidade"] for item in itens)
 
-    pedido = Pedido(usuario_id=usuario_id, tipo=tipo, status="aguardando", total=total)
+    pedido = Pedido(usuario_id=usuario_id, tipo=tipo, status="pendente", total=total)
     db.session.add(pedido)
     db.session.flush()  # gera o pedido.id antes de criar os itens
 
@@ -35,7 +35,7 @@ def criar_pedido():
             )
         )
 
-    db.session.add(HistoricoStatus(pedido_id=pedido.id, status="aguardando"))
+        db.session.add(HistoricoStatus(pedido_id=pedido.id, status="pendente"))
     db.session.commit()
 
     return jsonify(pedido.to_dict(incluir_historico=True)), 201

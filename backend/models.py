@@ -84,7 +84,7 @@ class HistoricoStatus(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     pedido_id = db.Column(db.Integer, db.ForeignKey("pedido.id"), nullable=False)
-    status = db.Column(db.String(30), nullable=False)
+    status = db.Column(db.String(30), nullable=False, default="pendente")
     mudou_em = db.Column(db.DateTime, default=datetime.utcnow)
 
     def to_dict(self):
