@@ -1,8 +1,14 @@
 import { useState } from "react";
+
 import { useCart } from "../../../context/CartContext";
-import { registrarPedidoOnline } from "../api/meusPedidos.service";
-import { criarPedido } from "../api/pedidos.service";
-import type { Pedido, CriarPedidoDTO, DadosCheckout } from "../types/pedido";
+import { criarPedidoCliente } from "../api/pedidosCliente.service";
+import { useClienteAuth } from "./ClienteAuthContext";
+
+import type {
+  Pedido,
+  CriarPedidoDTO,
+  DadosCheckout,
+} from "../types/pedido";
 
 const FORMAS_PAGAMENTO_VALIDAS: readonly CriarPedidoDTO["formaPagamento"][] = [
   "dinheiro",
@@ -24,6 +30,8 @@ function validarFormaPagamento(
 
 export function usePedido() {
   const { items, limparCarrinho } = useCart();
+  const { usuario } = useClienteAuth();
+
   const [pedido, setPedido] = useState<Pedido | null>(null);
   const [loading, setLoading] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
@@ -33,16 +41,23 @@ export function usePedido() {
       setLoading(true);
       setErro(null);
 
+      if (!usuario) {
+        throw new Error("Você precisa entrar na sua conta para fazer o pedido.");
+      }
+
       if (items.length === 0) {
         throw new Error("Carrinho vazio");
       }
 
-      const novoPedido = await criarPedido({
+      const novoPedido = await criarPedidoCliente({
         cliente: {
           nome: dados.nome,
+          email: usuario.email,
           telefone: dados.telefone,
         },
+
         endereco: dados.endereco,
+
         itens: items.map((item) => ({
           tipo: item.tipo ?? "pizza",
           pizzaId: item.id,
@@ -54,22 +69,31 @@ export function usePedido() {
               ? undefined
               : (item.tamanho as "P" | "M" | "G" | "GG") || "M",
         })),
+
         formaPagamento: validarFormaPagamento(dados.formaPagamento),
       });
 
-      registrarPedidoOnline(novoPedido.id);
       limparCarrinho();
       setPedido(novoPedido);
+
       return novoPedido;
     } catch (error) {
       setErro(
-        error instanceof Error ? error.message : "Erro ao finalizar pedido",
+        error instanceof Error
+          ? error.message
+          : "Erro ao finalizar pedido",
       );
+
       return null;
     } finally {
       setLoading(false);
     }
   }
 
-  return { pedido, loading, erro, finalizar };
+  return {
+    pedido,
+    loading,
+    erro,
+    finalizar,
+  };
 }

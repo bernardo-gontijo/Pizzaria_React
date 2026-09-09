@@ -7,6 +7,7 @@ import { ProtectedRoute } from "../features/admin/components/ProtectedRoute";
 import { Layout as GarcomLayout } from "../features/garcom/components/Layout";
 import { ProtectedRoute as GarcomProtectedRoute } from "../features/garcom/components/ProtectedRoute";
 import { Loading } from "../components/Loading";
+
 import {
   EntregadorDashboard,
   EntregadorEntregas,
@@ -14,99 +15,150 @@ import {
   EntregadorPedidos,
 } from "../features/entregador";
 
+/* =========================
+   ADMIN
+========================= */
+
 const ConfiguracaoPage = lazy(() =>
   import("../features/admin/pages/ConfiguracaoPage").then((m) => ({
     default: m.ConfiguracaoPage,
   })),
 );
+
 const DashboardPage = lazy(() =>
   import("../features/admin/pages/DashboardPage").then((m) => ({
     default: m.DashboardPage,
   })),
 );
+
 const LoginPage = lazy(() =>
   import("../features/admin/pages/LoginPage").then((m) => ({
     default: m.LoginPage,
   })),
 );
+
 const PedidoAdminPage = lazy(() =>
   import("../features/admin/pages/PedidoAdminPage").then((m) => ({
     default: m.PedidoAdminPage,
   })),
 );
+
 const PizzasPage = lazy(() =>
   import("../features/admin/pages/PizzasPage").then((m) => ({
     default: m.PizzasPage,
   })),
 );
+
 const CombosAdminPage = lazy(() =>
   import("../features/admin/pages/CombosAdminPage").then((m) => ({
     default: m.CombosAdminPage,
   })),
 );
+
 const MesasAdminPage = lazy(() =>
   import("../features/admin/pages/MesasAdminPage").then((m) => ({
     default: m.MesasAdminPage,
   })),
 );
+
+/* =========================
+   LOJA
+========================= */
+
 const AcompanharPedidoPage = lazy(() =>
   import("../features/loja/pages/AcompanharPedidoPage").then((m) => ({
     default: m.AcompanharPedidoPage,
   })),
 );
+
 const CardapioPage = lazy(() =>
   import("../features/loja/pages/CardapioPage").then((m) => ({
     default: m.CardapioPage,
   })),
 );
+
 const BebidasPage = lazy(() =>
   import("../features/loja/pages/BebidasPage").then((m) => ({
     default: m.BebidasPage,
   })),
 );
+
 const BebidaDetalhePage = lazy(() =>
   import("../features/loja/pages/BebidaDetalhePage").then((m) => ({
     default: m.BebidaDetalhePage,
   })),
 );
+
 const CarrinhoPage = lazy(() =>
   import("../features/loja/pages/CarrinhoPage").then((m) => ({
     default: m.CarrinhoPage,
   })),
 );
+
 const CategoriaPage = lazy(() =>
   import("../features/loja/pages/CategoriaPage").then((m) => ({
     default: m.CategoriaPage,
   })),
 );
+
 const CheckoutPage = lazy(() =>
   import("../features/loja/pages/CheckoutPage").then((m) => ({
     default: m.CheckoutPage,
   })),
 );
+
 const PagamentoPage = lazy(() =>
   import("../features/loja/pages/PagamentoPage").then((m) => ({
     default: m.PagamentoPage,
   })),
 );
+
 const PizzaDetalhePage = lazy(() =>
   import("../features/loja/pages/PizzaDetalhePage").then((m) => ({
     default: m.PizzaDetalhePage,
   })),
 );
+
 const MeusPedidosPage = lazy(() =>
   import("../features/loja/pages/MeusPedidosPage").then((m) => ({
     default: m.MeusPedidosPage,
   })),
 );
-const HomePage = lazy(() =>
-  import("../pages/HomePage").then((m) => ({ default: m.HomePage })),
+
+/* LOGIN / CADASTRO DO CLIENTE */
+
+const ClienteLoginPage = lazy(() =>
+  import("../features/loja/pages/ClienteLoginPage").then((m) => ({
+    default: m.ClienteLoginPage,
+  })),
 );
+
+const ClienteCadastroPage = lazy(() =>
+  import("../features/loja/pages/ClienteCadastroPage").then((m) => ({
+    default: m.ClienteCadastroPage,
+  })),
+);
+
+/* =========================
+   GERAL
+========================= */
+
+const HomePage = lazy(() =>
+  import("../pages/HomePage").then((m) => ({
+    default: m.HomePage,
+  })),
+);
+
 const NotFoundPage = lazy(() =>
   import("../pages/NotFoundPage").then((m) => ({
     default: m.NotFoundPage,
   })),
 );
+
+/* =========================
+   GARÇOM
+========================= */
+
 const GarcomLoginPage = lazy(() =>
   import("../features/garcom/pages/LoginPage").then((m) => ({
     default: m.LoginPage,
@@ -124,30 +176,93 @@ const PedidoMesaPage = lazy(() =>
     default: m.PedidoMesaPage,
   })),
 );
+
+/* =========================
+   COZINHA
+========================= */
+
 const CozinheiroPage = lazy(() =>
   import("../features/cozinheiro/pages/CozinheiroPage").then((m) => ({
     default: m.CozinheiroPage,
   })),
 );
+
+/* =========================
+   ROTAS
+========================= */
+
 export const router = createBrowserRouter([
   {
     path: "/",
     Component: Layout,
     children: [
-      { index: true, Component: HomePage },
-      { path: "cardapio", Component: CardapioPage },
-      { path: "bebidas", Component: BebidasPage },
-      { path: "bebida/:id", Component: BebidaDetalhePage },
-      { path: "categoria/:categoria", Component: CategoriaPage },
-      { path: "pizza/:id", Component: PizzaDetalhePage },
-      { path: "carrinho", Component: CarrinhoPage },
-      { path: "checkout", Component: CheckoutPage },
-      { path: "pagamento", Component: PagamentoPage },
-      { path: "meus-pedidos", Component: MeusPedidosPage },
-      { path: "acompanhar/:id", Component: AcompanharPedidoPage },
-      { path: "*", Component: NotFoundPage },
+      {
+        index: true,
+        Component: HomePage,
+      },
+      {
+        path: "cardapio",
+        Component: CardapioPage,
+      },
+      {
+        path: "bebidas",
+        Component: BebidasPage,
+      },
+      {
+        path: "bebida/:id",
+        Component: BebidaDetalhePage,
+      },
+      {
+        path: "categoria/:categoria",
+        Component: CategoriaPage,
+      },
+      {
+        path: "pizza/:id",
+        Component: PizzaDetalhePage,
+      },
+      {
+        path: "carrinho",
+        Component: CarrinhoPage,
+      },
+      {
+        path: "checkout",
+        Component: CheckoutPage,
+      },
+      {
+        path: "pagamento",
+        Component: PagamentoPage,
+      },
+      {
+        path: "meus-pedidos",
+        Component: MeusPedidosPage,
+      },
+      {
+        path: "acompanhar/:id",
+        Component: AcompanharPedidoPage,
+      },
+
+      /* NOVAS ROTAS DO CLIENTE */
+
+      {
+        path: "login",
+        Component: ClienteLoginPage,
+      },
+      {
+        path: "cadastro",
+        Component: ClienteCadastroPage,
+      },
+
+      {
+        path: "*",
+        Component: NotFoundPage,
+      },
     ],
   },
+
+  /* =========================
+     COZINHA
+  ========================= */
+
   {
     path: "/cozinha",
     element: (
@@ -156,6 +271,11 @@ export const router = createBrowserRouter([
       </Suspense>
     ),
   },
+
+  /* =========================
+     ADMIN LOGIN
+  ========================= */
+
   {
     path: "/admin/login",
     element: (
@@ -164,6 +284,11 @@ export const router = createBrowserRouter([
       </Suspense>
     ),
   },
+
+  /* =========================
+     ADMIN
+  ========================= */
+
   {
     path: "/admin",
     Component: ProtectedRoute,
@@ -203,6 +328,11 @@ export const router = createBrowserRouter([
       },
     ],
   },
+
+  /* =========================
+     GARÇOM LOGIN
+  ========================= */
+
   {
     path: "/garcom/login",
     element: (
@@ -211,6 +341,11 @@ export const router = createBrowserRouter([
       </Suspense>
     ),
   },
+
+  /* =========================
+     GARÇOM
+  ========================= */
+
   {
     path: "/garcom",
     Component: GarcomProtectedRoute,
@@ -235,14 +370,30 @@ export const router = createBrowserRouter([
     ],
   },
 
+  /* =========================
+     ENTREGADOR
+  ========================= */
+
   {
     path: "/entregador",
     element: <EntregadorLayout />,
     children: [
-      { index: true, element: <EntregadorDashboard /> },
-      { path: "dashboard", element: <EntregadorDashboard /> },
-      { path: "pedidos", element: <EntregadorPedidos /> },
-      { path: "entregas", element: <EntregadorEntregas /> },
+      {
+        index: true,
+        element: <EntregadorDashboard />,
+      },
+      {
+        path: "dashboard",
+        element: <EntregadorDashboard />,
+      },
+      {
+        path: "pedidos",
+        element: <EntregadorPedidos />,
+      },
+      {
+        path: "entregas",
+        element: <EntregadorEntregas />,
+      },
     ],
   },
 ]);
