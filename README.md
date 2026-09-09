@@ -38,30 +38,30 @@ Os dados (pizzas, bebidas, combos, pedidos, mesas) são persistidos no `localSto
 
 ## Módulo: Loja
 
-| Tela | Funcionalidade |
-| ---- | -------------- |
-| Cardápio | Pizzas, bebidas e combos, com filtro por categoria |
-| Combos e Promoções | Pacotes de itens reais do cardápio com desconto |
-| Detalhe do produto | Informações completas de pizza ou bebida |
-| Carrinho | Adicionar/remover itens, alterar quantidade, cálculo automático de subtotal e taxa de entrega |
-| Checkout | Formulário de dados do cliente e endereço, com preenchimento automático via CEP |
-| Pagamento | Seleção da forma de pagamento, com QR Code para PIX |
-| Acompanhamento | Status do pedido em tempo real (pendente → confirmado → preparando → pronto → entregue) |
-| Meus Pedidos | Histórico de pedidos do cliente |
+| Tela               | Funcionalidade                                                                                |
+| ------------------ | --------------------------------------------------------------------------------------------- |
+| Cardápio           | Pizzas, bebidas e combos, com filtro por categoria                                            |
+| Combos e Promoções | Pacotes de itens reais do cardápio com desconto                                               |
+| Detalhe do produto | Informações completas de pizza ou bebida                                                      |
+| Carrinho           | Adicionar/remover itens, alterar quantidade, cálculo automático de subtotal e taxa de entrega |
+| Checkout           | Formulário de dados do cliente e endereço, com preenchimento automático via CEP               |
+| Pagamento          | Seleção da forma de pagamento, com QR Code para PIX                                           |
+| Acompanhamento     | Status do pedido em tempo real (pendente → confirmado → preparando → pronto → entregue)       |
+| Meus Pedidos       | Histórico de pedidos do cliente                                                               |
 
 O carrinho persiste no `localStorage`: se o cliente fechar a aba no meio da compra, os itens continuam salvos.
 
 ## Módulo: Administração
 
-| Tela | Funcionalidade |
-| ---- | -------------- |
-| Login | Autenticação do administrador |
-| Dashboard | Total de pedidos, pedidos do dia, faturamento, pedidos entregues |
-| Gestão de Pizzas | CRUD completo do cardápio |
-| Gestão de Combos | Criação de combos escolhendo pizzas/bebidas reais do cardápio, definindo apenas o percentual de desconto |
-| Gestão de Mesas | Cadastro e remoção de mesas do salão, organizadas por fileira |
-| Gestão de Pedidos | Visualização de pedidos e alteração de status |
-| Configuração | Personalização da marca: nome, cores, logo (white-label) |
+| Tela              | Funcionalidade                                                                                           |
+| ----------------- | -------------------------------------------------------------------------------------------------------- |
+| Login             | Autenticação do administrador                                                                            |
+| Dashboard         | Total de pedidos, pedidos do dia, faturamento, pedidos entregues                                         |
+| Gestão de Pizzas  | CRUD completo do cardápio                                                                                |
+| Gestão de Combos  | Criação de combos escolhendo pizzas/bebidas reais do cardápio, definindo apenas o percentual de desconto |
+| Gestão de Mesas   | Cadastro e remoção de mesas do salão, organizadas por fileira                                            |
+| Gestão de Pedidos | Visualização de pedidos e alteração de status                                                            |
+| Configuração      | Personalização da marca: nome, cores, logo (white-label)                                                 |
 
 A alteração de status feita pelo admin reflete automaticamente na tela de acompanhamento do cliente, via sistema de eventos — sem necessidade de recarregar a página.
 
@@ -69,11 +69,11 @@ A alteração de status feita pelo admin reflete automaticamente na tela de acom
 
 Área própria e independente (login e rotas protegidas separadas do admin), para atendimento presencial das mesas do salão.
 
-| Tela | Funcionalidade |
-| ---- | -------------- |
-| Login | Autenticação do garçom |
-| Mesas | Grade de mesas (livre/ocupada), organizadas por fileira conforme configurado pelo admin |
-| Pedido da mesa | Adiciona itens ao pedido conforme o atendimento avança, e encerra a conta |
+| Tela           | Funcionalidade                                                                          |
+| -------------- | --------------------------------------------------------------------------------------- |
+| Login          | Autenticação do garçom                                                                  |
+| Mesas          | Grade de mesas (livre/ocupada), organizadas por fileira conforme configurado pelo admin |
+| Pedido da mesa | Adiciona itens ao pedido conforme o atendimento avança, e encerra a conta               |
 
 Um pedido por mesa, editável durante o atendimento. Ao encerrar a conta, a mesa fica livre novamente, o registro é preservado para prestação de contas, e o garçom pode registrar uma gorjeta opcional (10%, 15% ou 20%, a critério do cliente).
 

@@ -43,24 +43,17 @@ function lerHistorico(): HistoricoMesa[] {
 }
 
 function salvarHistorico(historico: HistoricoMesa[]): void {
-  localStorage.setItem(
-    HISTORICO_STORAGE_KEY,
-    JSON.stringify(historico),
-  );
+  localStorage.setItem(HISTORICO_STORAGE_KEY, JSON.stringify(historico));
 }
 
 export async function buscarMesas(): Promise<Mesa[]> {
   return lerMesas();
 }
 
-export async function criarMesa(
-  dados: MesaInput,
-): Promise<Mesa> {
+export async function criarMesa(dados: MesaInput): Promise<Mesa> {
   const mesas = lerMesas();
 
-  const jaExiste = mesas.some(
-    (mesa) => mesa.numero === dados.numero,
-  );
+  const jaExiste = mesas.some((mesa) => mesa.numero === dados.numero);
 
   if (jaExiste) {
     throw new Error(
@@ -82,9 +75,7 @@ export async function criarMesa(
 export async function removerMesa(id: string): Promise<void> {
   const mesas = lerMesas();
 
-  salvarMesas(
-    mesas.filter((mesa) => mesa.id !== id),
-  );
+  salvarMesas(mesas.filter((mesa) => mesa.id !== id));
 }
 
 /**
@@ -92,9 +83,7 @@ export async function removerMesa(id: string): Promise<void> {
  * como ocupada. O garçom adiciona itens a esse pedido conforme o
  * cliente vai pedindo.
  */
-export async function abrirMesa(
-  mesaId: string,
-): Promise<Mesa> {
+export async function abrirMesa(mesaId: string): Promise<Mesa> {
   const mesas = lerMesas();
   const mesa = mesas.find((m) => m.id === mesaId);
 
@@ -124,9 +113,7 @@ export async function abrirMesa(
 
   salvarMesas(mesasAtualizadas);
 
-  return mesasAtualizadas.find(
-    (m) => m.id === mesaId,
-  )!;
+  return mesasAtualizadas.find((m) => m.id === mesaId)!;
 }
 
 /**
@@ -147,45 +134,32 @@ export async function adicionarItemNaMesa(
     throw new Error("Mesa não está aberta");
   }
 
-  const pedido = await buscarPedidoPorId(
-    mesa.pedidoAtualId,
-  );
+  const pedido = await buscarPedidoPorId(mesa.pedidoAtualId);
 
   if (!pedido) {
-    throw new Error(
-      "Pedido da mesa não encontrado",
-    );
+    throw new Error("Pedido da mesa não encontrado");
   }
 
-  const itensExistentes = pedido.itens.map(
-    ({ id: _id, ...resto }) => resto,
-  );
+  const itensExistentes = pedido.itens.map(({ id: _id, ...resto }) => resto);
 
   const indiceExistente = itensExistentes.findIndex(
     (existente) =>
-      existente.pizzaId === item.pizzaId &&
-      existente.size === item.size,
+      existente.pizzaId === item.pizzaId && existente.size === item.size,
   );
 
   const itensAtualizados =
     indiceExistente >= 0
-      ? itensExistentes.map(
-          (existente, index) =>
-            index === indiceExistente
-              ? {
-                  ...existente,
-                  quantity:
-                    existente.quantity +
-                    item.quantity,
-                }
-              : existente,
+      ? itensExistentes.map((existente, index) =>
+          index === indiceExistente
+            ? {
+                ...existente,
+                quantity: existente.quantity + item.quantity,
+              }
+            : existente,
         )
       : [...itensExistentes, item];
 
-  return atualizarItensPedido(
-    mesa.pedidoAtualId,
-    itensAtualizados,
-  );
+  return atualizarItensPedido(mesa.pedidoAtualId, itensAtualizados);
 }
 
 /**
@@ -208,14 +182,10 @@ export async function atualizarQuantidadeItemNaMesa(
     throw new Error("Mesa não está aberta");
   }
 
-  const pedido = await buscarPedidoPorId(
-    mesa.pedidoAtualId,
-  );
+  const pedido = await buscarPedidoPorId(mesa.pedidoAtualId);
 
   if (!pedido) {
-    throw new Error(
-      "Pedido da mesa não encontrado",
-    );
+    throw new Error("Pedido da mesa não encontrado");
   }
 
   // No pedido, a quantidade mínima é 1.
@@ -223,32 +193,24 @@ export async function atualizarQuantidadeItemNaMesa(
   // deve ser usado removerItemNaMesa().
   const quantidadeSegura = Math.max(1, quantidade);
 
-  const itensAtualizados = pedido.itens.map(
-    (existente) => {
-      const { id, ...resto } = existente;
+  const itensAtualizados = pedido.itens.map((existente) => {
+    const { id, ...resto } = existente;
 
-      return id === itemId
-        ? {
-            ...resto,
-            quantity: quantidadeSegura,
-          }
-        : resto;
-    },
-  );
+    return id === itemId
+      ? {
+          ...resto,
+          quantity: quantidadeSegura,
+        }
+      : resto;
+  });
 
-  return atualizarItensPedido(
-    mesa.pedidoAtualId,
-    itensAtualizados,
-  );
+  return atualizarItensPedido(mesa.pedidoAtualId, itensAtualizados);
 }
 
 /**
  * Remove por completo um item do pedido da mesa.
  */
-export async function removerItemNaMesa(
-  mesaId: string,
-  itemId: string,
-) {
+export async function removerItemNaMesa(mesaId: string, itemId: string) {
   const mesas = lerMesas();
   const mesa = mesas.find((m) => m.id === mesaId);
 
@@ -256,28 +218,17 @@ export async function removerItemNaMesa(
     throw new Error("Mesa não está aberta");
   }
 
-  const pedido = await buscarPedidoPorId(
-    mesa.pedidoAtualId,
-  );
+  const pedido = await buscarPedidoPorId(mesa.pedidoAtualId);
 
   if (!pedido) {
-    throw new Error(
-      "Pedido da mesa não encontrado",
-    );
+    throw new Error("Pedido da mesa não encontrado");
   }
 
   const itensAtualizados = pedido.itens
-    .filter(
-      (existente) => existente.id !== itemId,
-    )
-    .map(
-      ({ id: _id, ...resto }) => resto,
-    );
+    .filter((existente) => existente.id !== itemId)
+    .map(({ id: _id, ...resto }) => resto);
 
-  return atualizarItensPedido(
-    mesa.pedidoAtualId,
-    itensAtualizados,
-  );
+  return atualizarItensPedido(mesa.pedidoAtualId, itensAtualizados);
 }
 
 /**
@@ -295,14 +246,10 @@ export async function encerrarContaMesa(
     throw new Error("Mesa não está aberta");
   }
 
-  const pedido = await buscarPedidoPorId(
-    mesa.pedidoAtualId,
-  );
+  const pedido = await buscarPedidoPorId(mesa.pedidoAtualId);
 
   if (!pedido) {
-    throw new Error(
-      "Pedido da mesa não encontrado",
-    );
+    throw new Error("Pedido da mesa não encontrado");
   }
 
   const registro: HistoricoMesa = {
@@ -315,10 +262,7 @@ export async function encerrarContaMesa(
     encerradoEm: new Date().toISOString(),
   };
 
-  salvarHistorico([
-    ...lerHistorico(),
-    registro,
-  ]);
+  salvarHistorico([...lerHistorico(), registro]);
 
   const mesasAtualizadas = mesas.map((m) =>
     m.id === mesaId
@@ -335,8 +279,6 @@ export async function encerrarContaMesa(
   return registro;
 }
 
-export async function buscarHistoricoMesas(): Promise<
-  HistoricoMesa[]
-> {
+export async function buscarHistoricoMesas(): Promise<HistoricoMesa[]> {
   return lerHistorico();
 }

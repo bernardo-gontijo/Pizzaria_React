@@ -82,7 +82,8 @@ export function PedidoMesaPage() {
           <div className="pedido-mesa-page__cabecalho">
             <h2>Itens do pedido</h2>
             <span className="pedido-mesa-page__badge">
-              {totalItens} {totalItens === 1 ? "item selecionado" : "itens selecionados"}
+              {totalItens}{" "}
+              {totalItens === 1 ? "item selecionado" : "itens selecionados"}
             </span>
           </div>
 
