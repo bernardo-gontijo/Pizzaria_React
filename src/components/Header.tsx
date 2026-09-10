@@ -1,11 +1,19 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 
 import { useCart } from "../context/CartContext";
 import { useTenantConfig } from "../context/TenantConfigContext";
+import { useClienteAuth } from "../features/loja/hooks/ClienteAuthContext";
 
 export function Header() {
   const { config } = useTenantConfig();
   const { items } = useCart();
+  const { usuario, autenticado, logout } = useClienteAuth();
+  const navigate = useNavigate();
+
+  function handleLogout() {
+    logout();
+    navigate("/");
+  }
 
   return (
     <header className="header">
@@ -15,11 +23,35 @@ export function Header() {
           src={config.logoUrl || "/images/hero-pizzaria.png"}
         />
       </NavLink>
+
       <nav aria-label="Navegação principal" className="navegacao">
         <NavLink to="/">Início</NavLink>
+
         <NavLink to="/cardapio">Cardápio</NavLink>
-        <NavLink to="/meus-pedidos">Meus pedidos</NavLink>
-        <NavLink to="/carrinho">Carrinho ({items.length})</NavLink>
+
+        <NavLink to="/meus-pedidos">
+          Meus pedidos
+        </NavLink>
+
+        <NavLink to="/carrinho">
+          Carrinho ({items.length})
+        </NavLink>
+
+        {!autenticado ? (
+          <NavLink to="/login">Entrar</NavLink>
+        ) : (
+          <>
+            <span>Olá, {usuario?.nome}</span>
+
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="botao"
+            >
+              Sair
+            </button>
+          </>
+        )}
       </nav>
     </header>
   );
