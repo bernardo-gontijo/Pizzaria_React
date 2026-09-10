@@ -2,11 +2,15 @@ import { lazy, Suspense } from "react";
 import { createBrowserRouter, Navigate } from "react-router-dom";
 
 import { Layout } from "../components/Layout";
+import { Loading } from "../components/Loading";
+
 import { Layout as AdminLayout } from "../features/admin/components/Layout";
 import { ProtectedRoute } from "../features/admin/components/ProtectedRoute";
+
 import { Layout as GarcomLayout } from "../features/garcom/components/Layout";
 import { ProtectedRoute as GarcomProtectedRoute } from "../features/garcom/components/ProtectedRoute";
-import { Loading } from "../components/Loading";
+
+import { ClienteProtectedRoute } from "../features/loja/components/ClienteProtectedRoute";
 
 import {
   EntregadorDashboard,
@@ -125,8 +129,6 @@ const MeusPedidosPage = lazy(() =>
   })),
 );
 
-/* LOGIN / CADASTRO DO CLIENTE */
-
 const ClienteLoginPage = lazy(() =>
   import("../features/loja/pages/ClienteLoginPage").then((m) => ({
     default: m.ClienteLoginPage,
@@ -200,6 +202,9 @@ export const router = createBrowserRouter([
         index: true,
         Component: HomePage,
       },
+
+      /* ROTAS PÚBLICAS DA LOJA */
+
       {
         path: "cardapio",
         Component: CardapioPage,
@@ -224,24 +229,8 @@ export const router = createBrowserRouter([
         path: "carrinho",
         Component: CarrinhoPage,
       },
-      {
-        path: "checkout",
-        Component: CheckoutPage,
-      },
-      {
-        path: "pagamento",
-        Component: PagamentoPage,
-      },
-      {
-        path: "meus-pedidos",
-        Component: MeusPedidosPage,
-      },
-      {
-        path: "acompanhar/:id",
-        Component: AcompanharPedidoPage,
-      },
 
-      /* NOVAS ROTAS DO CLIENTE */
+      /* LOGIN / CADASTRO DO CLIENTE */
 
       {
         path: "login",
@@ -250,6 +239,30 @@ export const router = createBrowserRouter([
       {
         path: "cadastro",
         Component: ClienteCadastroPage,
+      },
+
+      /* ROTAS PROTEGIDAS DO CLIENTE */
+
+      {
+        Component: ClienteProtectedRoute,
+        children: [
+          {
+            path: "checkout",
+            Component: CheckoutPage,
+          },
+          {
+            path: "pagamento",
+            Component: PagamentoPage,
+          },
+          {
+            path: "meus-pedidos",
+            Component: MeusPedidosPage,
+          },
+          {
+            path: "acompanhar/:id",
+            Component: AcompanharPedidoPage,
+          },
+        ],
       },
 
       {
