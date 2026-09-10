@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 
 import { buscarPedidoClientePorId } from "../api/pedidosCliente.service";
+import { HistoricoPedido } from "../components/HistoricoPedido";
+import { ItensPedido } from "../components/ItensPedido";
 import { StatusPedido } from "../components/StatusPedido";
 import type { Pedido } from "../types/pedido";
 
@@ -64,6 +66,10 @@ export function AcompanharPedidoPage() {
 
   return (
     <section className="pagina-loja acompanhar-page">
+      <Link className="acompanhar-page__voltar" to="/meus-pedidos">
+        ← Meus pedidos
+      </Link>
+
       <h1>Acompanhar pedido</h1>
 
       <p className="pagina-loja__introducao">
@@ -71,6 +77,10 @@ export function AcompanharPedidoPage() {
       </p>
 
       <StatusPedido pedido={pedido} />
+
+      <ItensPedido pedido={pedido} />
+
+      <HistoricoPedido statusHistorico={pedido.statusHistorico} />
     </section>
   );
 }
