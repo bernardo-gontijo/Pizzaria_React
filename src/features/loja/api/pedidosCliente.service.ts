@@ -1,4 +1,7 @@
-import { getClienteToken } from "./clienteAuth.service";
+import {
+  getClienteToken,
+  logoutCliente,
+} from "./clienteAuth.service";
 
 import type {
   AtualizarStatusPedidoDTO,
@@ -16,6 +19,7 @@ interface PedidoApi
   > {
   createdAt: string;
   updatedAt: string;
+
   statusHistorico: Array<
     Omit<Pedido["statusHistorico"][number], "timestamp"> & {
       timestamp: string;
@@ -26,8 +30,10 @@ interface PedidoApi
 function normalizarPedido(pedido: PedidoApi): Pedido {
   return {
     ...pedido,
+
     createdAt: new Date(pedido.createdAt),
     updatedAt: new Date(pedido.updatedAt),
+
     statusHistorico: pedido.statusHistorico.map((historico) => ({
       ...historico,
       timestamp: new Date(historico.timestamp),
@@ -48,6 +54,18 @@ function getHeaders(): HeadersInit {
   };
 }
 
+function verificarSessao(resposta: Response): void {
+  if (resposta.status === 401 || resposta.status === 422) {
+    logoutCliente();
+
+    window.location.href = "/login";
+
+    throw new Error(
+      "Sua sessão expirou. Entre novamente.",
+    );
+  }
+}
+
 async function obterErro(resposta: Response): Promise<string> {
   try {
     const dados = (await resposta.json()) as {
@@ -55,7 +73,11 @@ async function obterErro(resposta: Response): Promise<string> {
       msg?: string;
     };
 
-    return dados.erro ?? dados.msg ?? "Erro ao acessar o servidor";
+    return (
+      dados.erro ??
+      dados.msg ??
+      "Erro ao acessar o servidor"
+    );
   } catch {
     return "Erro ao acessar o servidor";
   }
@@ -67,25 +89,34 @@ export async function criarPedidoCliente(
   const resposta = await fetch(`${API_URL}/pedidos`, {
     method: "POST",
     headers: getHeaders(),
+
     body: JSON.stringify({
       tipo: dados.mesaId ? "local" : "delivery",
+
       cliente: dados.cliente,
       endereco: dados.endereco,
       itens: dados.itens,
+
       formaPagamento: dados.formaPagamento,
       trocoPara: dados.trocoPara,
       observacoes: dados.observacoes,
+
       mesaId: dados.mesaId,
+
       taxaEntrega: dados.mesaId ? 0 : 5,
       desconto: 0,
     }),
   });
 
+  verificarSessao(resposta);
+
   if (!resposta.ok) {
     throw new Error(await obterErro(resposta));
   }
 
-  return normalizarPedido((await resposta.json()) as PedidoApi);
+  return normalizarPedido(
+    (await resposta.json()) as PedidoApi,
+  );
 }
 
 export async function buscarPedidosCliente(): Promise<Pedido[]> {
@@ -93,6 +124,8 @@ export async function buscarPedidosCliente(): Promise<Pedido[]> {
     method: "GET",
     headers: getHeaders(),
   });
+
+  verificarSessao(resposta);
 
   if (!resposta.ok) {
     throw new Error(await obterErro(resposta));
@@ -106,10 +139,15 @@ export async function buscarPedidosCliente(): Promise<Pedido[]> {
 export async function buscarPedidoClientePorId(
   id: string,
 ): Promise<Pedido | null> {
-  const resposta = await fetch(`${API_URL}/pedidos/${id}`, {
-    method: "GET",
-    headers: getHeaders(),
-  });
+  const resposta = await fetch(
+    `${API_URL}/pedidos/${id}`,
+    {
+      method: "GET",
+      headers: getHeaders(),
+    },
+  );
+
+  verificarSessao(resposta);
 
   if (resposta.status === 404) {
     return null;
@@ -119,24 +157,34 @@ export async function buscarPedidoClientePorId(
     throw new Error(await obterErro(resposta));
   }
 
-  return normalizarPedido((await resposta.json()) as PedidoApi);
+  return normalizarPedido(
+    (await resposta.json()) as PedidoApi,
+  );
 }
 
 export async function atualizarStatusPedidoCliente(
   id: string,
   dados: AtualizarStatusPedidoDTO,
 ): Promise<Pedido> {
-  const resposta = await fetch(`${API_URL}/pedidos/${id}/status`, {
-    method: "PATCH",
-    headers: getHeaders(),
-    body: JSON.stringify({
-      status: dados.status,
-    }),
-  });
+  const resposta = await fetch(
+    `${API_URL}/pedidos/${id}/status`,
+    {
+      method: "PATCH",
+      headers: getHeaders(),
+
+      body: JSON.stringify({
+        status: dados.status,
+      }),
+    },
+  );
+
+  verificarSessao(resposta);
 
   if (!resposta.ok) {
     throw new Error(await obterErro(resposta));
   }
 
-  return normalizarPedido((await resposta.json()) as PedidoApi);
+  return normalizarPedido(
+    (await resposta.json()) as PedidoApi,
+  );
 }
