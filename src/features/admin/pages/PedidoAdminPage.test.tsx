@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+﻿// @vitest-environment jsdom
 
 import "@testing-library/jest-dom/vitest";
 
@@ -13,9 +13,22 @@ import {
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { Pedido } from "../../loja/types/pedido";
-import type { PedidoAdminPage as PedidoAdminPageComponent } from "./PedidoAdminPage";
+import { PedidoAdminPage } from "./PedidoAdminPage";
 
-const agora = new Date().toISOString();
+vi.mock("../api/pedidosAdmin.service", () => ({
+  buscarPedidos: vi.fn(),
+  atualizarStatusPedido: vi.fn(),
+}));
+
+import {
+  atualizarStatusPedido,
+  buscarPedidos,
+} from "../api/pedidosAdmin.service";
+
+const buscarPedidosMock = vi.mocked(buscarPedidos);
+const atualizarStatusPedidoMock = vi.mocked(atualizarStatusPedido);
+
+const agora = new Date();
 
 const pedidoTeste = {
   id: "pedido-1",
@@ -43,27 +56,15 @@ const pedidoTeste = {
   updatedAt: agora,
 } as unknown as Pedido;
 
-let PedidoAdminPage: typeof PedidoAdminPageComponent;
+beforeEach(() => {
+  buscarPedidosMock.mockReset();
+  atualizarStatusPedidoMock.mockReset();
 
-beforeEach(async () => {
-  localStorage.clear();
-
-  // Chave usada por pedidos.service.ts (initPedidos), que estrutura os
-  // pedidos de forma diferente do antigo store/order.store.ts.
-  localStorage.setItem("pedidos_loja", JSON.stringify([pedidoTeste]));
-
-  // pedidos.service.ts lê o localStorage apenas uma vez, no momento em
-  // que o módulo é importado (initPedidos() roda no topo do arquivo).
-  // Por isso, resetamos os módulos e reimportamos a página DEPOIS de
-  // popular o localStorage, garantindo que o cache em memória do
-  // serviço reflita os dados deste teste.
-  vi.resetModules();
-  ({ PedidoAdminPage } = await import("./PedidoAdminPage"));
+  buscarPedidosMock.mockResolvedValue([pedidoTeste]);
 });
 
 afterEach(() => {
   cleanup();
-  localStorage.clear();
 });
 
 describe("PedidoAdminPage", () => {
@@ -80,6 +81,10 @@ describe("PedidoAdminPage", () => {
   });
 
   it("permite alterar o status do pedido", async () => {
+    const pedidoAtualizado = { ...pedidoTeste, status: "preparando" as const };
+
+    atualizarStatusPedidoMock.mockResolvedValue(pedidoAtualizado);
+
     render(<PedidoAdminPage />);
 
     const campoStatus = await screen.findByLabelText(
@@ -87,6 +92,8 @@ describe("PedidoAdminPage", () => {
       {},
       { timeout: 3000 },
     );
+
+    buscarPedidosMock.mockResolvedValue([pedidoAtualizado]);
 
     fireEvent.change(campoStatus, {
       target: {
@@ -100,16 +107,11 @@ describe("PedidoAdminPage", () => {
           "preparando",
         );
       },
-      // O serviço simula atraso de rede: 500ms (atualizar status) +
-      // 300ms (recarregar pedidos) = até 800ms encadeados. Margem
-      // generosa para não flackear em ambientes de CI mais lentos.
       { timeout: 5000 },
     );
 
-    const pedidosSalvos = JSON.parse(
-      localStorage.getItem("pedidos_loja") ?? "[]",
-    ) as Pedido[];
-
-    expect(pedidosSalvos[0].status).toBe("preparando");
+    expect(atualizarStatusPedidoMock).toHaveBeenCalledWith("pedido-1", {
+      status: "preparando",
+    });
   }, 10000);
 });
