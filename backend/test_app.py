@@ -416,3 +416,148 @@ def test_atualizar_itens_bloqueado_para_cliente_comum(client):
         headers=headers,
     )
     assert resposta.status_code == 403
+
+
+def test_avaliar_pedido_entregue(client):
+    token = registrar_e_logar(client, email="avaliador@teste.com")
+    headers = {"Authorization": f"Bearer {token}"}
+
+    pedido = client.post(
+        "/pedidos", json=payload_pedido(nome_item="Calabresa"), headers=headers
+    ).get_json()
+
+    client.patch(
+        f"/pedidos/{pedido['id']}/status",
+        json={"status": "entregue"},
+        headers=headers,
+    )
+
+    resposta = client.post(
+        "/avaliacoes",
+        json={
+            "pedidoId": int(pedido["id"]),
+            "pizzaId": "pizza-1",
+            "nota": 5,
+            "comentario": "Muito boa!",
+        },
+        headers=headers,
+    )
+    assert resposta.status_code == 201
+    dados = resposta.get_json()
+    assert dados["nota"] == 5
+    assert dados["pizzaNome"] == "Calabresa"
+
+
+def test_nao_pode_avaliar_pedido_nao_entregue(client):
+    token = registrar_e_logar(client, email="avaliadorcedo@teste.com")
+    headers = {"Authorization": f"Bearer {token}"}
+
+    pedido = client.post("/pedidos", json=payload_pedido(), headers=headers).get_json()
+
+    resposta = client.post(
+        "/avaliacoes",
+        json={"pedidoId": int(pedido["id"]), "pizzaId": "pizza-1", "nota": 5},
+        headers=headers,
+    )
+    assert resposta.status_code == 400
+
+
+def test_nao_pode_avaliar_pizza_que_nao_esta_no_pedido(client):
+    token = registrar_e_logar(client, email="avaliadorerrado@teste.com")
+    headers = {"Authorization": f"Bearer {token}"}
+
+    pedido = client.post("/pedidos", json=payload_pedido(), headers=headers).get_json()
+
+    client.patch(
+        f"/pedidos/{pedido['id']}/status",
+        json={"status": "entregue"},
+        headers=headers,
+    )
+
+    resposta = client.post(
+        "/avaliacoes",
+        json={"pedidoId": int(pedido["id"]), "pizzaId": "pizza-inexistente", "nota": 5},
+        headers=headers,
+    )
+    assert resposta.status_code == 400
+
+
+def test_nota_invalida_e_rejeitada(client):
+    token = registrar_e_logar(client, email="avaliadornota@teste.com")
+    headers = {"Authorization": f"Bearer {token}"}
+
+    pedido = client.post("/pedidos", json=payload_pedido(), headers=headers).get_json()
+
+    client.patch(
+        f"/pedidos/{pedido['id']}/status",
+        json={"status": "entregue"},
+        headers=headers,
+    )
+
+    resposta = client.post(
+        "/avaliacoes",
+        json={"pedidoId": int(pedido["id"]), "pizzaId": "pizza-1", "nota": 6},
+        headers=headers,
+    )
+    assert resposta.status_code == 400
+
+
+def test_nao_pode_avaliar_a_mesma_pizza_duas_vezes(client):
+    token = registrar_e_logar(client, email="avaliadorduplo@teste.com")
+    headers = {"Authorization": f"Bearer {token}"}
+
+    pedido = client.post("/pedidos", json=payload_pedido(), headers=headers).get_json()
+
+    client.patch(
+        f"/pedidos/{pedido['id']}/status",
+        json={"status": "entregue"},
+        headers=headers,
+    )
+
+    client.post(
+        "/avaliacoes",
+        json={"pedidoId": int(pedido["id"]), "pizzaId": "pizza-1", "nota": 4},
+        headers=headers,
+    )
+
+    resposta = client.post(
+        "/avaliacoes",
+        json={"pedidoId": int(pedido["id"]), "pizzaId": "pizza-1", "nota": 5},
+        headers=headers,
+    )
+    assert resposta.status_code == 409
+
+
+def test_media_e_lista_de_avaliacoes_da_pizza(client):
+    token_a = registrar_e_logar(client, email="avaliadora@teste.com")
+    token_b = registrar_e_logar(client, email="avaliadorb@teste.com")
+
+    for token in (token_a, token_b):
+        headers = {"Authorization": f"Bearer {token}"}
+        pedido = client.post(
+            "/pedidos", json=payload_pedido(nome_item="Marguerita"), headers=headers
+        ).get_json()
+        client.patch(
+            f"/pedidos/{pedido['id']}/status",
+            json={"status": "entregue"},
+            headers=headers,
+        )
+        client.post(
+            "/avaliacoes",
+            json={"pedidoId": int(pedido["id"]), "pizzaId": "pizza-1", "nota": 4},
+            headers=headers,
+        )
+
+    resposta = client.get("/avaliacoes/pizza/pizza-1")
+    assert resposta.status_code == 200
+    dados = resposta.get_json()
+    assert dados["total"] == 2
+    assert dados["media"] == 4.0
+
+
+def test_avaliacao_de_pizza_sem_nenhum_review(client):
+    resposta = client.get("/avaliacoes/pizza/pizza-sem-avaliacao")
+    assert resposta.status_code == 200
+    dados = resposta.get_json()
+    assert dados["total"] == 0
+    assert dados["media"] is None
