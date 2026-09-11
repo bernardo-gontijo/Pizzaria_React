@@ -1,66 +1,86 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
+
+import { buscarPedidoClientePorId } from "../api/pedidosCliente.service";
+import { HistoricoPedido } from "../components/HistoricoPedido";
+import { ItensPedido } from "../components/ItensPedido";
 import { StatusPedido } from "../components/StatusPedido";
-import {
-  buscarPedidoPorId,
-  PEDIDOS_ATUALIZADOS_EVENT,
-} from "../api/pedidos.service";
 import type { Pedido } from "../types/pedido";
 
 export function AcompanharPedidoPage() {
   const { id } = useParams<{ id: string }>();
+
   const [pedido, setPedido] = useState<Pedido | null>(null);
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState<string | null>(null);
 
   useEffect(() => {
-    async function carregar() {
+    async function carregarPedido() {
+      if (!id) {
+        setErro("Pedido não encontrado");
+        setLoading(false);
+        return;
+      }
+
       try {
         setLoading(true);
         setErro(null);
-        const resultado = await buscarPedidoPorId(id!);
-        if (resultado) {
-          setPedido(resultado);
-        } else {
+
+        const resultado = await buscarPedidoClientePorId(id);
+
+        if (!resultado) {
           setErro("Pedido não encontrado");
+          return;
         }
+
+        setPedido(resultado);
       } catch (error) {
         setErro(
-          error instanceof Error ? error.message : "Erro ao carregar pedido",
+          error instanceof Error
+            ? error.message
+            : "Erro ao carregar pedido",
         );
       } finally {
         setLoading(false);
       }
     }
 
-    function atualizarPedido() {
-      void carregar();
-    }
-
-    if (id) {
-      void carregar();
-      window.addEventListener(PEDIDOS_ATUALIZADOS_EVENT, atualizarPedido);
-      window.addEventListener("storage", atualizarPedido);
-    }
-
-    return () => {
-      window.removeEventListener(PEDIDOS_ATUALIZADOS_EVENT, atualizarPedido);
-      window.removeEventListener("storage", atualizarPedido);
-    };
+    void carregarPedido();
   }, [id]);
 
-  if (loading) return <p className="feedback">Carregando pedido...</p>;
-  if (erro) return <p className="feedback feedback--erro">Erro: {erro}</p>;
-  if (!pedido)
-    return <p className="feedback feedback--erro">Pedido não encontrado</p>;
+  if (loading) {
+    return <p className="feedback">Carregando pedido...</p>;
+  }
+
+  if (erro) {
+    return <p className="feedback feedback--erro">Erro: {erro}</p>;
+  }
+
+  if (!pedido) {
+    return (
+      <p className="feedback feedback--erro">
+        Pedido não encontrado
+      </p>
+    );
+  }
 
   return (
     <section className="pagina-loja acompanhar-page">
+      <Link className="acompanhar-page__voltar" to="/meus-pedidos">
+        ← Meus pedidos
+      </Link>
+
       <h1>Acompanhar pedido</h1>
+
       <p className="pagina-loja__introducao">
-        Acompanhe em tempo real cada etapa do preparo da sua pizza.
+        Acompanhe cada etapa do preparo do seu pedido.
       </p>
+
       <StatusPedido pedido={pedido} />
+
+      <ItensPedido pedido={pedido} />
+
+      <HistoricoPedido statusHistorico={pedido.statusHistorico} />
     </section>
   );
 }

@@ -176,3 +176,60 @@ def test_relatorio_bloqueado_para_cliente_comum(client):
         "/relatorios/faturamento", headers={"Authorization": f"Bearer {token_cliente}"}
     )
     assert resposta.status_code == 403
+
+
+def test_admin_lista_todos_pedidos(client):
+    token_cliente_a = registrar_e_logar(client, email="admina@teste.com")
+    token_cliente_b = registrar_e_logar(client, email="adminb@teste.com")
+    token_admin = registrar_e_logar(client, email="adminlista@teste.com", role="admin")
+
+    client.post(
+        "/pedidos",
+        json=payload_pedido(nome_item="Calabresa"),
+        headers={"Authorization": f"Bearer {token_cliente_a}"},
+    )
+    client.post(
+        "/pedidos",
+        json=payload_pedido(nome_item="Marguerita"),
+        headers={"Authorization": f"Bearer {token_cliente_b}"},
+    )
+
+    resposta = client.get(
+        "/pedidos/admin", headers={"Authorization": f"Bearer {token_admin}"}
+    )
+    assert resposta.status_code == 200
+    assert len(resposta.get_json()) == 2
+
+
+def test_admin_lista_pedidos_filtra_por_status(client):
+    token_cliente = registrar_e_logar(client, email="filtro@teste.com")
+    token_admin = registrar_e_logar(client, email="adminfiltro@teste.com", role="admin")
+
+    pedido = client.post(
+        "/pedidos",
+        json=payload_pedido(),
+        headers={"Authorization": f"Bearer {token_cliente}"},
+    ).get_json()
+
+    client.patch(
+        f"/pedidos/{pedido['id']}/status",
+        json={"status": "entregue"},
+        headers={"Authorization": f"Bearer {token_cliente}"},
+    )
+
+    resposta = client.get(
+        "/pedidos/admin?status=entregue",
+        headers={"Authorization": f"Bearer {token_admin}"},
+    )
+    assert resposta.status_code == 200
+    assert len(resposta.get_json()) == 1
+    assert resposta.get_json()[0]["status"] == "entregue"
+
+
+def test_admin_lista_pedidos_bloqueada_para_cliente(client):
+    token_cliente = registrar_e_logar(client, email="clientebloqueado@teste.com")
+
+    resposta = client.get(
+        "/pedidos/admin", headers={"Authorization": f"Bearer {token_cliente}"}
+    )
+    assert resposta.status_code == 403

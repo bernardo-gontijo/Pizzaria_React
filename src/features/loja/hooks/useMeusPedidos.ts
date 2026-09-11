@@ -1,10 +1,6 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 
-import {
-  buscarMeusPedidos,
-  MEUS_PEDIDOS_ATUALIZADOS_EVENT,
-} from "../api/meusPedidos.service";
-import { PEDIDOS_ATUALIZADOS_EVENT } from "../api/pedidos.service";
+import { buscarPedidosCliente } from "../api/pedidosCliente.service";
 import type { Pedido } from "../types/pedido";
 
 export function useMeusPedidos() {
@@ -16,7 +12,10 @@ export function useMeusPedidos() {
     try {
       setLoading(true);
       setErro(null);
-      setPedidos(await buscarMeusPedidos());
+
+      const pedidosDoCliente = await buscarPedidosCliente();
+
+      setPedidos(pedidosDoCliente);
     } catch (error) {
       setErro(
         error instanceof Error
@@ -28,29 +27,10 @@ export function useMeusPedidos() {
     }
   }, []);
 
-  useEffect(() => {
-    const carregamentoInicial = window.setTimeout(() => {
-      void carregarPedidos();
-    }, 0);
-
-    function atualizarLista() {
-      void carregarPedidos();
-    }
-
-    window.addEventListener(PEDIDOS_ATUALIZADOS_EVENT, atualizarLista);
-    window.addEventListener(MEUS_PEDIDOS_ATUALIZADOS_EVENT, atualizarLista);
-    window.addEventListener("storage", atualizarLista);
-
-    return () => {
-      window.clearTimeout(carregamentoInicial);
-      window.removeEventListener(PEDIDOS_ATUALIZADOS_EVENT, atualizarLista);
-      window.removeEventListener(
-        MEUS_PEDIDOS_ATUALIZADOS_EVENT,
-        atualizarLista,
-      );
-      window.removeEventListener("storage", atualizarLista);
-    };
-  }, [carregarPedidos]);
-
-  return { pedidos, loading, erro, carregarPedidos };
+  return {
+    pedidos,
+    loading,
+    erro,
+    carregarPedidos,
+  };
 }
