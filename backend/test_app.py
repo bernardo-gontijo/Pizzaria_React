@@ -1,4 +1,4 @@
-def registrar_e_logar(client, email="teste@teste.com", role="cliente"):
+﻿def registrar_e_logar(client, email="teste@teste.com", role="cliente"):
     client.post(
         "/register",
         json={"nome": "Teste", "email": email, "senha": "123456", "role": role},
@@ -337,3 +337,82 @@ def test_cozinha_e_entregador_acessam_pedidos_admin(client):
         "/pedidos/admin", headers={"Authorization": f"Bearer {token_entregador}"}
     )
     assert resposta_entregador.status_code == 200
+
+
+def test_seed_cria_usuario_garcom(client):
+    resposta = client.post(
+        "/login", json={"email": "garcom@pizzashop.com", "senha": "123456"}
+    )
+    assert resposta.status_code == 200
+    assert resposta.get_json()["usuario"]["role"] == "garcom"
+
+
+def test_criar_pedido_vazio_para_mesa(client):
+    token = registrar_e_logar(client, email="garcomteste@teste.com", role="garcom")
+    headers = {"Authorization": f"Bearer {token}"}
+
+    resposta = client.post(
+        "/pedidos",
+        json={
+            "tipo": "local",
+            "cliente": {"nome": "Mesa 5"},
+            "itens": [],
+            "mesaId": "mesa-5",
+        },
+        headers=headers,
+    )
+    assert resposta.status_code == 201
+    pedido = resposta.get_json()
+    assert pedido["itens"] == []
+    assert pedido["total"] == 0
+    assert pedido["mesaId"] == "mesa-5"
+
+
+def test_atualizar_itens_de_pedido(client):
+    token = registrar_e_logar(client, email="garcomitens@teste.com", role="garcom")
+    headers = {"Authorization": f"Bearer {token}"}
+
+    pedido = client.post(
+        "/pedidos",
+        json={
+            "tipo": "local",
+            "cliente": {"nome": "Mesa 3"},
+            "itens": [],
+            "mesaId": "mesa-3",
+        },
+        headers=headers,
+    ).get_json()
+
+    resposta = client.patch(
+        f"/pedidos/{pedido['id']}/itens",
+        json={
+            "itens": [
+                {
+                    "tipo": "pizza",
+                    "pizzaId": "pizza-1",
+                    "pizzaName": "Calabresa",
+                    "quantity": 2,
+                    "price": 45.90,
+                }
+            ]
+        },
+        headers=headers,
+    )
+    assert resposta.status_code == 200
+    dados = resposta.get_json()
+    assert len(dados["itens"]) == 1
+    assert dados["total"] == 91.8
+
+
+def test_atualizar_itens_bloqueado_para_cliente_comum(client):
+    token_cliente = registrar_e_logar(client, email="clientesemacesso@teste.com")
+    headers = {"Authorization": f"Bearer {token_cliente}"}
+
+    pedido = client.post("/pedidos", json=payload_pedido(), headers=headers).get_json()
+
+    resposta = client.patch(
+        f"/pedidos/{pedido['id']}/itens",
+        json={"itens": []},
+        headers=headers,
+    )
+    assert resposta.status_code == 403

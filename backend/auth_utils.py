@@ -1,8 +1,8 @@
-from functools import wraps
+﻿from functools import wraps
 from flask import jsonify
 from flask_jwt_extended import jwt_required, get_jwt
 
-STAFF_ROLES = ("admin", "cozinha", "entregador")
+STAFF_ROLES = ("admin", "cozinha", "entregador", "garcom")
 
 
 def admin_required(fn):

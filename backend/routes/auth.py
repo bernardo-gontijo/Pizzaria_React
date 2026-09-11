@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify
+﻿from flask import Blueprint, request, jsonify
 from flask_jwt_extended import create_access_token
 from extensions import db
 from models import Usuario
@@ -15,13 +15,13 @@ def register():
     role = dados.get("role", "cliente")
 
     if not nome or not email or not senha:
-        return jsonify({"erro": "nome, email e senha são obrigatórios"}), 400
+        return jsonify({"erro": "nome, email e senha sÃ£o obrigatÃ³rios"}), 400
 
-    if role not in ("cliente", "admin", "cozinha", "entregador"):
+    if role not in ("cliente", "admin", "cozinha", "entregador", "garcom"):
         return jsonify({"erro": "role deve ser 'cliente' ou 'admin'"}), 400
 
     if Usuario.query.filter_by(email=email).first():
-        return jsonify({"erro": "email já cadastrado"}), 409
+        return jsonify({"erro": "email jÃ¡ cadastrado"}), 409
 
     usuario = Usuario(nome=nome, email=email, role=role)
     usuario.set_senha(senha)
@@ -39,7 +39,7 @@ def login():
 
     usuario = Usuario.query.filter_by(email=email).first()
     if not usuario or not usuario.checar_senha(senha):
-        return jsonify({"erro": "email ou senha inválidos"}), 401
+        return jsonify({"erro": "email ou senha invÃ¡lidos"}), 401
 
     token = create_access_token(
         identity=str(usuario.id),

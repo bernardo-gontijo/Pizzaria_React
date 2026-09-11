@@ -1,4 +1,4 @@
-import os
+﻿import os
 from flask import Flask
 from flask_cors import CORS
 from dotenv import load_dotenv
@@ -47,6 +47,7 @@ def _seed_usuarios_padrao():
         ("Administrador", "admin@pizzashop.com", "admin"),
         ("Cozinha", "cozinha@pizzashop.com", "cozinha"),
         ("Entregador", "entregador@pizzashop.com", "entregador"),
+        ("Garcom", "garcom@pizzashop.com", "garcom"),
     ]
 
     for nome, email, role in equipe_padrao:
