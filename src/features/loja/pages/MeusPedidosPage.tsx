@@ -1,10 +1,15 @@
+import { useEffect } from "react";
 import { Link } from "react-router-dom";
 
 import { MeuPedidoCard } from "../components/MeuPedidoCard";
 import { useMeusPedidos } from "../hooks/useMeusPedidos";
 
 export function MeusPedidosPage() {
-  const { pedidos, loading, erro } = useMeusPedidos();
+  const { pedidos, loading, erro, carregarPedidos } = useMeusPedidos();
+
+  useEffect(() => {
+    void carregarPedidos();
+  }, [carregarPedidos]);
 
   return (
     <section className="pagina-loja meus-pedidos-page">

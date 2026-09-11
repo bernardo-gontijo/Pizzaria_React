@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 
 import { buscarPedidosCliente } from "../api/pedidosCliente.service";
 import type { Pedido } from "../types/pedido";
@@ -26,10 +26,6 @@ export function useMeusPedidos() {
       setLoading(false);
     }
   }, []);
-
-  useEffect(() => {
-    void carregarPedidos();
-  }, [carregarPedidos]);
 
   return {
     pedidos,
