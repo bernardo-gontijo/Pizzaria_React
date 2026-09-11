@@ -2810,3 +2810,96 @@ body {
   width: min(100% - 40px, 720px);
   margin-inline: auto;
 }
+/* =========================
+   RELATÓRIOS (ADMIN)
+========================= */
+
+.relatorios-page__periodo {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.admin-layout__conteudo .relatorios-page__periodo-botao {
+  padding: 10px 16px;
+  border: 1px solid var(--borda);
+  border-radius: 999px;
+  background: white;
+  color: var(--cor-secundaria);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.relatorios-page__periodo-botao:hover {
+  border-color: var(--cor-primaria);
+}
+
+.admin-layout__conteudo .relatorios-page__periodo-botao--ativo {
+  border-color: var(--cor-primaria);
+  background: var(--cor-primaria);
+  color: white;
+}
+
+.relatorios-page__datas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  max-width: 420px;
+  margin-top: 16px;
+}
+
+.relatorios-page__datas > div {
+  display: grid;
+  gap: 6px;
+  flex: 1;
+  min-width: 160px;
+}
+
+.relatorios-page__datas label {
+  font-weight: 600;
+  color: var(--cor-secundaria);
+}
+
+.relatorios-page__datas input {
+  padding: 10px 12px;
+  border: 1px solid #cfc4bb;
+  border-radius: 8px;
+  font: inherit;
+  background: white;
+}
+
+.relatorios-page__grafico {
+  margin-top: 24px;
+  padding: 24px;
+  border: 1px solid var(--borda);
+  border-radius: 12px;
+  background: white;
+}
+
+.relatorios-page__grid-duplo {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: 24px;
+}
+
+.relatorios-page__grid-duplo .relatorios-page__grafico {
+  margin-top: 0;
+}
+
+@media (max-width: 700px) {
+  .relatorios-page__periodo {
+    gap: 8px;
+  }
+
+  .relatorios-page__periodo-botao {
+    padding: 8px 12px;
+    font-size: 0.85rem;
+  }
+
+  .relatorios-page__grafico {
+    padding: 16px;
+  }
+}

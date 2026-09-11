@@ -1,4 +1,4 @@
-import json
+﻿import json
 from datetime import datetime
 
 from flask import Blueprint, jsonify, request
@@ -220,10 +220,56 @@ def criar_pedido():
     )
 
 
-@pedidos_bp.route(
-    "/pedidos",
-    methods=["GET"],
-)
+@pedidos_bp.route("/pedidos/<int:pedido_id>/itens", methods=["PATCH"])
+@staff_required
+def atualizar_itens_pedido(pedido_id):
+    pedido = Pedido.query.filter_by(id=pedido_id).first()
+
+    if not pedido:
+        return jsonify({"erro": "pedido não encontrado"}), 404
+
+    dados = request.get_json()
+    itens = dados.get("itens")
+
+    if itens is None:
+        return jsonify({"erro": "itens é obrigatório"}), 400
+
+    try:
+        novo_subtotal = sum(item["price"] * item["quantity"] for item in itens)
+    except KeyError as erro:
+        return jsonify({"erro": f"item sem o campo obrigatório: {erro}"}), 400
+
+    for item_existente in list(pedido.itens):
+        db.session.delete(item_existente)
+    db.session.flush()
+
+    try:
+        for item in itens:
+            db.session.add(
+                ItemPedido(
+                    pedido_id=pedido.id,
+                    pizza_id=item.get("pizzaId"),
+                    nome_item=item["pizzaName"],
+                    tipo_item=item.get("tipo", "pizza"),
+                    quantidade=item["quantity"],
+                    preco_unitario=item["price"],
+                    tamanho=item.get("size"),
+                    observacoes=item.get("observations"),
+                )
+            )
+    except KeyError as erro:
+        db.session.rollback()
+        return jsonify({"erro": f"item sem o campo obrigatório: {erro}"}), 400
+
+    pedido.subtotal = novo_subtotal
+    pedido.total = novo_subtotal + pedido.taxa_entrega - pedido.desconto
+
+    db.session.commit()
+
+    return jsonify(pedido.to_dict()), 200
+
+
+@pedidos_bp.route("/pedidos", methods=["GET"])
 @jwt_required()
 def listar_pedidos():
     usuario_id = int(get_jwt_identity())
@@ -240,11 +286,8 @@ def listar_pedidos():
     )
 
 
-@pedidos_bp.route(
-    "/pedidos/admin",
-    methods=["GET"],
-)
-@admin_required
+@pedidos_bp.route("/pedidos/admin", methods=["GET"])
+@staff_required
 def listar_todos_pedidos():
     query = Pedido.query
 
@@ -266,6 +309,10 @@ def listar_todos_pedidos():
             )
 
         query = query.filter(Pedido.status == status)
+
+    tipo = request.args.get("tipo")
+    if tipo:
+        query = query.filter(Pedido.tipo == tipo)
 
     inicio = request.args.get("inicio")
 
@@ -292,11 +339,12 @@ def listar_todos_pedidos():
 @jwt_required()
 def detalhar_pedido(pedido_id):
     usuario_id = int(get_jwt_identity())
+    role = get_jwt().get("role")
 
-    pedido = Pedido.query.filter_by(
-        id=pedido_id,
-        usuario_id=usuario_id,
-    ).first()
+    if role in STAFF_ROLES:
+        pedido = Pedido.query.filter_by(id=pedido_id).first()
+    else:
+        pedido = Pedido.query.filter_by(id=pedido_id, usuario_id=usuario_id).first()
 
     if not pedido:
         return (
@@ -317,11 +365,12 @@ def detalhar_pedido(pedido_id):
 @jwt_required()
 def atualizar_status(pedido_id):
     usuario_id = int(get_jwt_identity())
+    role = get_jwt().get("role")
 
-    pedido = Pedido.query.filter_by(
-        id=pedido_id,
-        usuario_id=usuario_id,
-    ).first()
+    if role in STAFF_ROLES:
+        pedido = Pedido.query.filter_by(id=pedido_id).first()
+    else:
+        pedido = Pedido.query.filter_by(id=pedido_id, usuario_id=usuario_id).first()
 
     if not pedido:
         return (

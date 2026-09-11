@@ -1,10 +1,9 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+﻿import { useCallback, useMemo, useState } from "react";
 
 import {
   atualizarStatusPedido,
   buscarPedidos,
-  PEDIDOS_ATUALIZADOS_EVENT,
-} from "../../loja/api/pedidos.service";
+} from "../api/pedidosCozinha.service";
 
 import type { Pedido, StatusPedidoType } from "../../loja/types/pedido";
 
@@ -44,20 +43,6 @@ export function useCozinheiroPedidos() {
       setCarregando(false);
     }
   }, []);
-
-  useEffect(() => {
-    function atualizarLista() {
-      void carregarPedidos();
-    }
-
-    window.addEventListener(PEDIDOS_ATUALIZADOS_EVENT, atualizarLista);
-    window.addEventListener("storage", atualizarLista);
-
-    return () => {
-      window.removeEventListener(PEDIDOS_ATUALIZADOS_EVENT, atualizarLista);
-      window.removeEventListener("storage", atualizarLista);
-    };
-  }, [carregarPedidos]);
 
   const pedidosDaCozinha = useMemo(() => {
     return pedidos

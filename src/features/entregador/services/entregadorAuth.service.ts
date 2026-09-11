@@ -1,92 +1,83 @@
-const STORAGE_KEY = "@entregador:user";
-
-export interface EntregadorUser {
-  id: string;
+﻿export interface EntregadorUser {
   nome: string;
   email: string;
-  role: "entregador";
+  role: string;
 }
 
-// Credenciais mock para demonstração (igual ao padrão do garçom)
-const MOCK_ENTREGADOR: EntregadorUser = {
-  id: "1",
-  nome: "Carlos Silva",
-  email: "entregador@pizzashop.com",
-  role: "entregador",
-};
+const API_URL = import.meta.env.VITE_API_URL ?? "http://127.0.0.1:5000";
 
-// Credenciais válidas
-const VALID_CREDENTIALS = {
-  email: "entregador@pizzashop.com",
-  senha: "123456",
-};
+const STORAGE_KEY = "pizzashop:entregador-auth";
+
+interface EntregadorSessao {
+  token: string;
+  usuario: EntregadorUser;
+}
+
+interface LoginResponse {
+  token: string;
+  usuario: EntregadorUser;
+}
+
+function getSessao(): EntregadorSessao | null {
+  const dados = localStorage.getItem(STORAGE_KEY);
+
+  if (!dados) return null;
+
+  try {
+    return JSON.parse(dados) as EntregadorSessao;
+  } catch {
+    localStorage.removeItem(STORAGE_KEY);
+    return null;
+  }
+}
+
+export function getEntregadorToken(): string | null {
+  return getSessao()?.token ?? null;
+}
 
 export const entregadorAuthService = {
-  /**
-   * Realiza o login do entregador
-   * @param email - Email do entregador
-   * @param senha - Senha do entregador
-   * @returns Dados do entregador logado
-   * @throws Error se as credenciais forem inválidas
-   */
-  login(email: string, senha: string): EntregadorUser {
-    if (
-      email === VALID_CREDENTIALS.email &&
-      senha === VALID_CREDENTIALS.senha
-    ) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(MOCK_ENTREGADOR));
-      return MOCK_ENTREGADOR;
-    }
-    throw new Error(
-      "Credenciais inválidas. Use: entregador@pizzashop.com / 123456",
-    );
+  getUser(): EntregadorUser | null {
+    return getSessao()?.usuario ?? null;
   },
 
-  /**
-   * Realiza o logout do entregador
-   */
+  isAuthenticated(): boolean {
+    return getSessao() !== null;
+  },
+
+  getNome(): string {
+    return getSessao()?.usuario.nome ?? "Entregador";
+  },
+
+  async login(email: string, senha: string): Promise<EntregadorUser> {
+    const resposta = await fetch(`${API_URL}/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, senha }),
+    });
+
+    const dados = (await resposta.json()) as LoginResponse & {
+      erro?: string;
+    };
+
+    if (!resposta.ok) {
+      throw new Error(dados.erro ?? "E-mail ou senha inválidos");
+    }
+
+    if (dados.usuario.role !== "entregador") {
+      throw new Error("Esta conta não tem permissão de entregador.");
+    }
+
+    const sessao: EntregadorSessao = {
+      token: dados.token,
+      usuario: dados.usuario,
+    };
+
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(sessao));
+
+    return dados.usuario;
+  },
+
   logout(): void {
     localStorage.removeItem(STORAGE_KEY);
-  },
-
-  /**
-   * Retorna os dados do entregador logado
-   * @returns Dados do entregador ou null se não estiver logado
-   */
-  getUser(): EntregadorUser | null {
-    try {
-      const data = localStorage.getItem(STORAGE_KEY);
-      if (!data) return null;
-      return JSON.parse(data) as EntregadorUser;
-    } catch {
-      return null;
-    }
-  },
-
-  /**
-   * Verifica se o entregador está autenticado
-   * @returns true se estiver autenticado
-   */
-  isAuthenticated(): boolean {
-    return !!this.getUser();
-  },
-
-  /**
-   * Retorna o nome do entregador ou 'Entregador' como fallback
-   */
-  getNome(): string {
-    const user = this.getUser();
-    return user?.nome || "Entregador";
-  },
-
-  /**
-   * Atualiza os dados do entregador no localStorage
-   */
-  updateUser(user: Partial<EntregadorUser>): void {
-    const current = this.getUser();
-    if (current) {
-      const updated = { ...current, ...user };
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-    }
   },
 };

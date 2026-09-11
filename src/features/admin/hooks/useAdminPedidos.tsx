@@ -1,10 +1,9 @@
-import { useCallback, useEffect, useState } from "react";
+﻿import { useCallback, useState } from "react";
 
 import {
   atualizarStatusPedido,
   buscarPedidos,
-  PEDIDOS_ATUALIZADOS_EVENT,
-} from "../../loja/api/pedidos.service";
+} from "../api/pedidosAdmin.service";
 import type { Pedido, StatusPedidoType } from "../../loja/types/pedido";
 
 export function useAdminPedidos() {
@@ -27,20 +26,6 @@ export function useAdminPedidos() {
       setCarregando(false);
     }
   }, []);
-
-  useEffect(() => {
-    function atualizarPedidos() {
-      void carregarPedidos();
-    }
-
-    window.addEventListener("storage", atualizarPedidos);
-    window.addEventListener(PEDIDOS_ATUALIZADOS_EVENT, atualizarPedidos);
-
-    return () => {
-      window.removeEventListener("storage", atualizarPedidos);
-      window.removeEventListener(PEDIDOS_ATUALIZADOS_EVENT, atualizarPedidos);
-    };
-  }, [carregarPedidos]);
 
   async function atualizarStatus(id: string, status: StatusPedidoType) {
     try {

@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+﻿// @vitest-environment jsdom
 
 import "@testing-library/jest-dom/vitest";
 
@@ -13,9 +13,18 @@ import {
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { Pedido } from "../../loja/types/pedido";
-import type { DashboardPage as DashboardPageComponent } from "./DashboardPage";
+import { DashboardPage } from "./DashboardPage";
 
-const agora = new Date().toISOString();
+vi.mock("../api/pedidosAdmin.service", () => ({
+  buscarPedidos: vi.fn(),
+  atualizarStatusPedido: vi.fn(),
+}));
+
+import { buscarPedidos } from "../api/pedidosAdmin.service";
+
+const buscarPedidosMock = vi.mocked(buscarPedidos);
+
+const agora = new Date();
 
 function criarPedidoTeste(overrides: Partial<Pedido>): Pedido {
   return {
@@ -40,8 +49,8 @@ function criarPedidoTeste(overrides: Partial<Pedido>): Pedido {
     formaPagamento: "pix",
     status: "entregue",
     statusHistorico: [],
-    createdAt: agora as unknown as Date,
-    updatedAt: agora as unknown as Date,
+    createdAt: agora,
+    updatedAt: agora,
     ...overrides,
   } as Pedido;
 }
@@ -65,27 +74,13 @@ const pedidosTeste: Pedido[] = [
   }),
 ];
 
-let DashboardPage: typeof DashboardPageComponent;
-
-beforeEach(async () => {
-  localStorage.clear();
-
-  // Chave usada por pedidos.service.ts (initPedidos), que estrutura os
-  // pedidos de forma diferente do antigo store/order.store.ts.
-  localStorage.setItem("pedidos_loja", JSON.stringify(pedidosTeste));
-
-  // pedidos.service.ts lê o localStorage apenas uma vez, no momento em
-  // que o módulo é importado (initPedidos() roda no topo do arquivo).
-  // Por isso, resetamos os módulos e reimportamos a página DEPOIS de
-  // popular o localStorage, garantindo que o cache em memória do
-  // serviço reflita os dados deste teste.
-  vi.resetModules();
-  ({ DashboardPage } = await import("./DashboardPage"));
+beforeEach(() => {
+  buscarPedidosMock.mockReset();
+  buscarPedidosMock.mockResolvedValue(pedidosTeste);
 });
 
 afterEach(() => {
   cleanup();
-  localStorage.clear();
 });
 
 describe("DashboardPage", () => {
