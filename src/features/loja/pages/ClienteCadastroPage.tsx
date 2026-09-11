@@ -31,55 +31,58 @@ export function ClienteCadastroPage() {
   }
 
   return (
-    <section className="pagina-loja">
-      <h1>Criar conta</h1>
+    <div className="mx-auto flex min-h-screen max-w-sm flex-col justify-center gap-3">
+      <h1 className="text-2xl font-bold text-white">Criar conta</h1>
 
-      <form onSubmit={handleSubmit}>
-        {erro && <p className="feedback feedback--erro">{erro}</p>}
+      <form onSubmit={handleSubmit} className="space-y-3">
+        <input
+          type="text"
+          placeholder="Nome"
+          value={nome}
+          onChange={(event) => setNome(event.target.value)}
+          className="w-full rounded border px-3 py-2"
+          required
+        />
 
-        <div>
-          <label htmlFor="cliente-nome">Nome</label>
+        <input
+          type="email"
+          placeholder="E-mail"
+          value={email}
+          onChange={(event) => setEmail(event.target.value)}
+          className="w-full rounded border px-3 py-2"
+          required
+        />
 
-          <input
-            id="cliente-nome"
-            value={nome}
-            onChange={(event) => setNome(event.target.value)}
-            required
-          />
-        </div>
+        <input
+          type="password"
+          placeholder="Senha"
+          value={senha}
+          onChange={(event) => setSenha(event.target.value)}
+          className="w-full rounded border px-3 py-2"
+          required
+        />
 
-        <div>
-          <label htmlFor="cadastro-email">E-mail</label>
+        {erro && (
+          <p className="text-sm text-red-600" role="alert">
+            {erro}
+          </p>
+        )}
 
-          <input
-            id="cadastro-email"
-            type="email"
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-            required
-          />
-        </div>
-
-        <div>
-          <label htmlFor="cadastro-senha">Senha</label>
-
-          <input
-            id="cadastro-senha"
-            type="password"
-            value={senha}
-            onChange={(event) => setSenha(event.target.value)}
-            required
-          />
-        </div>
-
-        <button className="botao" type="submit" disabled={loading}>
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full rounded bg-primaria px-4 py-2 font-semibold text-white disabled:opacity-50"
+        >
           {loading ? "Criando conta..." : "Criar conta"}
         </button>
       </form>
 
-      <p>
-        Já possui conta? <Link to="/login">Entrar</Link>
+      <p className="text-white">
+        Já possui conta?{" "}
+        <Link to="/login" className="font-semibold text-white">
+          Entrar
+        </Link>
       </p>
-    </section>
+    </div>
   );
 }
