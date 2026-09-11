@@ -1,10 +1,10 @@
-import type { Mesa, MesaInput, HistoricoMesa } from "../types/mesa";
+﻿import type { Mesa, MesaInput, HistoricoMesa } from "../types/mesa";
 import type { ItemPedido } from "../../loja/types/pedido";
 import {
   criarPedido,
   buscarPedidoPorId,
   atualizarItensPedido,
-} from "../../loja/api/pedidos.service";
+} from "./pedidosGarcom.service";
 
 const MESAS_STORAGE_KEY = "pizzashop:mesas";
 const HISTORICO_STORAGE_KEY = "pizzashop:historico-mesas";
@@ -57,7 +57,7 @@ export async function criarMesa(dados: MesaInput): Promise<Mesa> {
 
   if (jaExiste) {
     throw new Error(
-      `Já existe uma mesa cadastrada com o número ${dados.numero}.`,
+      `JÃ¡ existe uma mesa cadastrada com o nÃºmero ${dados.numero}.`,
     );
   }
 
@@ -80,7 +80,7 @@ export async function removerMesa(id: string): Promise<void> {
 
 /**
  * Abre uma mesa: cria um pedido vazio vinculado a ela e marca a mesa
- * como ocupada. O garçom adiciona itens a esse pedido conforme o
+ * como ocupada. O garÃ§om adiciona itens a esse pedido conforme o
  * cliente vai pedindo.
  */
 export async function abrirMesa(mesaId: string): Promise<Mesa> {
@@ -88,7 +88,7 @@ export async function abrirMesa(mesaId: string): Promise<Mesa> {
   const mesa = mesas.find((m) => m.id === mesaId);
 
   if (!mesa) {
-    throw new Error("Mesa não encontrada");
+    throw new Error("Mesa nÃ£o encontrada");
   }
 
   const pedido = await criarPedido({
@@ -120,7 +120,7 @@ export async function abrirMesa(mesaId: string): Promise<Mesa> {
  * Adiciona um item ao pedido atual da mesa.
  *
  * Se o mesmo produto (mesmo pizzaId e tamanho)
- * já existir no pedido, a quantidade é somada
+ * jÃ¡ existir no pedido, a quantidade Ã© somada
  * em vez de criar uma linha duplicada.
  */
 export async function adicionarItemNaMesa(
@@ -131,13 +131,13 @@ export async function adicionarItemNaMesa(
   const mesa = mesas.find((m) => m.id === mesaId);
 
   if (!mesa?.pedidoAtualId) {
-    throw new Error("Mesa não está aberta");
+    throw new Error("Mesa nÃ£o estÃ¡ aberta");
   }
 
   const pedido = await buscarPedidoPorId(mesa.pedidoAtualId);
 
   if (!pedido) {
-    throw new Error("Pedido da mesa não encontrado");
+    throw new Error("Pedido da mesa nÃ£o encontrado");
   }
 
   const itensExistentes = pedido.itens.map(({ id: _id, ...resto }) => resto);
@@ -163,10 +163,10 @@ export async function adicionarItemNaMesa(
 }
 
 /**
- * Atualiza a quantidade de um item já lançado
+ * Atualiza a quantidade de um item jÃ¡ lanÃ§ado
  * no pedido da mesa.
  *
- * A quantidade mínima no pedido é 1.
+ * A quantidade mÃ­nima no pedido Ã© 1.
  * Para remover completamente o item, use
  * removerItemNaMesa.
  */
@@ -179,16 +179,16 @@ export async function atualizarQuantidadeItemNaMesa(
   const mesa = mesas.find((m) => m.id === mesaId);
 
   if (!mesa?.pedidoAtualId) {
-    throw new Error("Mesa não está aberta");
+    throw new Error("Mesa nÃ£o estÃ¡ aberta");
   }
 
   const pedido = await buscarPedidoPorId(mesa.pedidoAtualId);
 
   if (!pedido) {
-    throw new Error("Pedido da mesa não encontrado");
+    throw new Error("Pedido da mesa nÃ£o encontrado");
   }
 
-  // No pedido, a quantidade mínima é 1.
+  // No pedido, a quantidade mÃ­nima Ã© 1.
   // Para remover o item completamente,
   // deve ser usado removerItemNaMesa().
   const quantidadeSegura = Math.max(1, quantidade);
@@ -215,13 +215,13 @@ export async function removerItemNaMesa(mesaId: string, itemId: string) {
   const mesa = mesas.find((m) => m.id === mesaId);
 
   if (!mesa?.pedidoAtualId) {
-    throw new Error("Mesa não está aberta");
+    throw new Error("Mesa nÃ£o estÃ¡ aberta");
   }
 
   const pedido = await buscarPedidoPorId(mesa.pedidoAtualId);
 
   if (!pedido) {
-    throw new Error("Pedido da mesa não encontrado");
+    throw new Error("Pedido da mesa nÃ£o encontrado");
   }
 
   const itensAtualizados = pedido.itens
@@ -232,7 +232,7 @@ export async function removerItemNaMesa(mesaId: string, itemId: string) {
 }
 
 /**
- * Encerra a conta da mesa: registra o pedido no histórico
+ * Encerra a conta da mesa: registra o pedido no histÃ³rico
  * e libera a mesa para um novo atendimento.
  */
 export async function encerrarContaMesa(
@@ -243,13 +243,13 @@ export async function encerrarContaMesa(
   const mesa = mesas.find((m) => m.id === mesaId);
 
   if (!mesa?.pedidoAtualId) {
-    throw new Error("Mesa não está aberta");
+    throw new Error("Mesa nÃ£o estÃ¡ aberta");
   }
 
   const pedido = await buscarPedidoPorId(mesa.pedidoAtualId);
 
   if (!pedido) {
-    throw new Error("Pedido da mesa não encontrado");
+    throw new Error("Pedido da mesa nÃ£o encontrado");
   }
 
   const registro: HistoricoMesa = {
@@ -282,3 +282,4 @@ export async function encerrarContaMesa(
 export async function buscarHistoricoMesas(): Promise<HistoricoMesa[]> {
   return lerHistorico();
 }
+

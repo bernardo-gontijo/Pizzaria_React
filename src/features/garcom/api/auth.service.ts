@@ -1,28 +1,61 @@
-import type { AuthUser } from "../types/auth";
+﻿import type { AuthUser } from "../types/auth";
 
-const STORAGE_KEY = "pizzashop:garcom-user";
+const API_URL = import.meta.env.VITE_API_URL ?? "http://127.0.0.1:5000";
 
-const MOCK_GARCOM = {
-  email: "garcom@pizzashop.com",
-  senha: "123456",
-  nome: "Garçom",
-};
+const STORAGE_KEY = "pizzashop:garcom-auth";
+
+interface GarcomSessao {
+  token: string;
+  usuario: AuthUser;
+}
+
+interface LoginResponse {
+  token: string;
+  usuario: AuthUser;
+}
+
+function getSessao(): GarcomSessao | null {
+  const dados = localStorage.getItem(STORAGE_KEY);
+
+  if (!dados) return null;
+
+  try {
+    return JSON.parse(dados) as GarcomSessao;
+  } catch {
+    localStorage.removeItem(STORAGE_KEY);
+    return null;
+  }
+}
+
+export function getGarcomToken(): string | null {
+  return getSessao()?.token ?? null;
+}
 
 export function getAuthenticatedUser(): AuthUser | null {
-  const raw = localStorage.getItem(STORAGE_KEY);
-  return raw ? (JSON.parse(raw) as AuthUser) : null;
+  return getSessao()?.usuario ?? null;
 }
 
 export async function login(email: string, senha: string): Promise<AuthUser> {
-  await new Promise((resolve) => setTimeout(resolve, 500));
+  const resposta = await fetch(`${API_URL}/login`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, senha }),
+  });
 
-  if (email !== MOCK_GARCOM.email || senha !== MOCK_GARCOM.senha) {
-    throw new Error("E-mail ou senha inválidos");
+  const dados = (await resposta.json()) as LoginResponse & { erro?: string };
+
+  if (!resposta.ok) {
+    throw new Error(dados.erro ?? "E-mail ou senha inválidos");
   }
 
-  const user: AuthUser = { nome: MOCK_GARCOM.nome, email: MOCK_GARCOM.email };
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
-  return user;
+  if (dados.usuario.role !== "garcom") {
+    throw new Error("Esta conta não tem permissão de garçom.");
+  }
+
+  const sessao: GarcomSessao = { token: dados.token, usuario: dados.usuario };
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(sessao));
+
+  return dados.usuario;
 }
 
 export function logout(): void {
