@@ -350,7 +350,7 @@ class Avaliacao(db.Model):
     pizza_id = db.Column(db.String(50), nullable=False, index=True)
     pizza_nome = db.Column(db.String(120), nullable=False)
 
-    nota = db.Column(db.Integer, nullable=False)
+    nota = db.Column(db.Float, nullable=False)
     comentario = db.Column(db.Text, nullable=True)
 
     criado_em = db.Column(db.DateTime, default=datetime.utcnow)
