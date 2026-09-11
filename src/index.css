@@ -2903,3 +2903,44 @@ body {
     padding: 16px;
   }
 }
+/* =========================================================
+   GERENCIAMENTO DE PEDIDOS - ADMIN
+========================================================= */
+
+.admin-pedidos__secao {
+  display: block !important;
+  width: 100%;
+  max-width: 1050px;
+  margin-top: 32px !important;
+}
+
+.admin-pedidos__secao h2 {
+  margin: 0 0 16px;
+  color: var(--cor-secundaria);
+  font-size: 1.35rem;
+}
+
+.admin-pedidos__secao > p {
+  padding: 20px;
+  border: 1px solid var(--borda);
+  background: white;
+}
+
+.admin-pedidos__secao--concluidos {
+  margin-top: 56px !important;
+  padding-top: 32px;
+  border-top: 1px solid var(--borda);
+}
+
+/* A tabela ocupa toda a largura disponível,
+   como na interface original do admin. */
+.admin-pedidos__secao table {
+  width: 100%;
+  margin-top: 0;
+}
+
+/* Mantém a tabela alinhada à esquerda */
+.admin-pedidos__secao table {
+  margin-left: 0;
+  margin-right: 0;
+}
