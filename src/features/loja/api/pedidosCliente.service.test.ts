@@ -1,11 +1,4 @@
-import {
-  afterEach,
-  beforeEach,
-  describe,
-  expect,
-  it,
-  vi,
-} from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
   buscarPedidoClientePorId,
@@ -79,13 +72,11 @@ afterEach(() => {
 
 describe("pedidosCliente.service", () => {
   it("envia o token JWT ao buscar pedidos", async () => {
-    const fetchMock = vi
-      .spyOn(globalThis, "fetch")
-      .mockResolvedValue({
-        ok: true,
-        status: 200,
-        json: async () => [pedidoApi],
-      } as Response);
+    const fetchMock = vi.spyOn(globalThis, "fetch").mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => [pedidoApi],
+    } as Response);
 
     await buscarPedidosCliente();
 
@@ -114,9 +105,7 @@ describe("pedidosCliente.service", () => {
     expect(pedidos[0].createdAt).toBeInstanceOf(Date);
     expect(pedidos[0].updatedAt).toBeInstanceOf(Date);
 
-    expect(
-      pedidos[0].statusHistorico[0].timestamp,
-    ).toBeInstanceOf(Date);
+    expect(pedidos[0].statusHistorico[0].timestamp).toBeInstanceOf(Date);
   });
 
   it("retorna null quando o pedido não existe", async () => {
@@ -128,8 +117,7 @@ describe("pedidosCliente.service", () => {
       }),
     } as Response);
 
-    const pedido =
-      await buscarPedidoClientePorId("999");
+    const pedido = await buscarPedidoClientePorId("999");
 
     expect(pedido).toBeNull();
   });
@@ -137,9 +125,7 @@ describe("pedidosCliente.service", () => {
   it("exige autenticação para acessar pedidos", async () => {
     mockGetClienteToken.mockReturnValue(null);
 
-    await expect(
-      buscarPedidosCliente(),
-    ).rejects.toThrow(
+    await expect(buscarPedidosCliente()).rejects.toThrow(
       "Você precisa entrar na sua conta.",
     );
   });

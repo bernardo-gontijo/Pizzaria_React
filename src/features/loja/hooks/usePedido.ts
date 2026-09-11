@@ -4,11 +4,7 @@ import { useCart } from "../../../context/CartContext";
 import { criarPedidoCliente } from "../api/pedidosCliente.service";
 import { useClienteAuth } from "./ClienteAuthContext";
 
-import type {
-  Pedido,
-  CriarPedidoDTO,
-  DadosCheckout,
-} from "../types/pedido";
+import type { CriarPedidoDTO, DadosCheckout, Pedido } from "../types/pedido";
 
 const FORMAS_PAGAMENTO_VALIDAS: readonly CriarPedidoDTO["formaPagamento"][] = [
   "dinheiro",
@@ -29,11 +25,14 @@ function validarFormaPagamento(
 }
 
 export function usePedido() {
-  const { items, limparCarrinho } = useCart();
+  const { items, limparCarrinho, cupomAplicado } = useCart();
+
   const { usuario } = useClienteAuth();
 
   const [pedido, setPedido] = useState<Pedido | null>(null);
+
   const [loading, setLoading] = useState(false);
+
   const [erro, setErro] = useState<string | null>(null);
 
   async function finalizar(dados: DadosCheckout) {
@@ -42,7 +41,9 @@ export function usePedido() {
       setErro(null);
 
       if (!usuario) {
-        throw new Error("Você precisa entrar na sua conta para fazer o pedido.");
+        throw new Error(
+          "Você precisa entrar na sua conta para fazer o pedido.",
+        );
       }
 
       if (items.length === 0) {
@@ -60,10 +61,15 @@ export function usePedido() {
 
         itens: items.map((item) => ({
           tipo: item.tipo ?? "pizza",
+
           pizzaId: item.id,
+
           pizzaName: item.nome,
+
           quantity: item.quantidade,
+
           price: item.precoUnitario,
+
           size:
             item.tipo === "bebida"
               ? undefined
@@ -71,17 +77,18 @@ export function usePedido() {
         })),
 
         formaPagamento: validarFormaPagamento(dados.formaPagamento),
+
+        cupomCodigo: cupomAplicado?.codigo,
       });
 
       limparCarrinho();
+
       setPedido(novoPedido);
 
       return novoPedido;
     } catch (error) {
       setErro(
-        error instanceof Error
-          ? error.message
-          : "Erro ao finalizar pedido",
+        error instanceof Error ? error.message : "Erro ao finalizar pedido",
       );
 
       return null;
