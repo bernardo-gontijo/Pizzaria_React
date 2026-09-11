@@ -1,4 +1,4 @@
-import { lazy, Suspense } from "react";
+﻿import { lazy, Suspense } from "react";
 import { createBrowserRouter, Navigate } from "react-router-dom";
 
 import { Layout } from "../components/Layout";
@@ -17,6 +17,8 @@ import {
   EntregadorEntregas,
   EntregadorLayout,
   EntregadorPedidos,
+  EntregadorLoginPage,
+  EntregadorProtectedRoute,
 } from "../features/entregador";
 
 /* =========================
@@ -384,28 +386,46 @@ export const router = createBrowserRouter([
   },
 
   /* =========================
+     ENTREGADOR LOGIN
+  ========================= */
+
+  {
+    path: "/entregador/login",
+    element: (
+      <Suspense fallback={<Loading />}>
+        <EntregadorLoginPage />
+      </Suspense>
+    ),
+  },
+
+  /* =========================
      ENTREGADOR
   ========================= */
 
   {
     path: "/entregador",
-    element: <EntregadorLayout />,
+    Component: EntregadorProtectedRoute,
     children: [
       {
-        index: true,
-        element: <EntregadorDashboard />,
-      },
-      {
-        path: "dashboard",
-        element: <EntregadorDashboard />,
-      },
-      {
-        path: "pedidos",
-        element: <EntregadorPedidos />,
-      },
-      {
-        path: "entregas",
-        element: <EntregadorEntregas />,
+        element: <EntregadorLayout />,
+        children: [
+          {
+            index: true,
+            element: <EntregadorDashboard />,
+          },
+          {
+            path: "dashboard",
+            element: <EntregadorDashboard />,
+          },
+          {
+            path: "pedidos",
+            element: <EntregadorPedidos />,
+          },
+          {
+            path: "entregas",
+            element: <EntregadorEntregas />,
+          },
+        ],
       },
     ],
   },

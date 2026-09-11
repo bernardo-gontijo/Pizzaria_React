@@ -1,4 +1,4 @@
-import os
+﻿import os
 from flask import Flask
 from flask_cors import CORS
 from dotenv import load_dotenv
@@ -35,8 +35,28 @@ def criar_app(banco_teste=False):
 
     with app.app_context():
         db.create_all()
+        _seed_usuarios_padrao()
 
     return app
+
+
+def _seed_usuarios_padrao():
+    from models import Usuario
+
+    equipe_padrao = [
+        ("Administrador", "admin@pizzashop.com", "admin"),
+        ("Cozinha", "cozinha@pizzashop.com", "cozinha"),
+        ("Entregador", "entregador@pizzashop.com", "entregador"),
+        ("Garcom", "garcom@pizzashop.com", "garcom"),
+    ]
+
+    for nome, email, role in equipe_padrao:
+        if not Usuario.query.filter_by(email=email).first():
+            usuario = Usuario(nome=nome, email=email, role=role)
+            usuario.set_senha("123456")
+            db.session.add(usuario)
+
+    db.session.commit()
 
 
 app = criar_app()

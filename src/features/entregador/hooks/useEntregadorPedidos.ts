@@ -1,9 +1,6 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+﻿import { useCallback, useEffect, useMemo, useState } from "react";
 
-import {
-  pedidosService,
-  PEDIDOS_ATUALIZADOS_EVENT,
-} from "../services/pedidos.service";
+import { pedidosService } from "../services/pedidos.service";
 import type { Pedido } from "../../loja/types/pedido";
 
 export function useEntregadorPedidos() {
@@ -37,17 +34,8 @@ export function useEntregadorPedidos() {
       void carregarPedidos();
     }, 0);
 
-    function atualizarLista() {
-      void carregarPedidos();
-    }
-
-    window.addEventListener(PEDIDOS_ATUALIZADOS_EVENT, atualizarLista);
-    window.addEventListener("storage", atualizarLista);
-
     return () => {
       window.clearTimeout(carregamentoInicial);
-      window.removeEventListener(PEDIDOS_ATUALIZADOS_EVENT, atualizarLista);
-      window.removeEventListener("storage", atualizarLista);
     };
   }, [carregarPedidos]);
 

@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+﻿import { useCallback, useState } from "react";
 import {
   buscarMesas,
   abrirMesa,
@@ -7,7 +7,7 @@ import {
   removerItemNaMesa,
   encerrarContaMesa,
 } from "../api/mesa.service";
-import { buscarPedidoPorId } from "../../loja/api/pedidos.service";
+import { buscarPedidoPorId } from "../api/pedidosGarcom.service";
 import type { Mesa } from "../types/mesa";
 import type { ItemPedido, Pedido } from "../../loja/types/pedido";
 
@@ -78,3 +78,4 @@ export function usePedidoMesa(mesaId: string) {
     encerrarConta,
   };
 }
+

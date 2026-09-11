@@ -1,10 +1,10 @@
-import json
+﻿import json
 from datetime import datetime
 from flask import Blueprint, request, jsonify
-from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 from extensions import db
 from models import Pedido, ItemPedido, HistoricoStatus
-from auth_utils import admin_required
+from auth_utils import staff_required, STAFF_ROLES
 
 pedidos_bp = Blueprint("pedidos", __name__)
 
@@ -38,8 +38,8 @@ def criar_pedido():
     tipo = dados.get("tipo")
     itens = dados.get("itens", [])
 
-    if not tipo or not itens:
-        return jsonify({"erro": "tipo e itens são obrigatórios"}), 400
+    if not tipo:
+        return jsonify({"erro": "tipo é obrigatório"}), 400
 
     cliente = dados.get("cliente", {}) or {}
     endereco = dados.get("endereco")
@@ -103,6 +103,55 @@ def criar_pedido():
     return jsonify(pedido.to_dict()), 201
 
 
+@pedidos_bp.route("/pedidos/<int:pedido_id>/itens", methods=["PATCH"])
+@staff_required
+def atualizar_itens_pedido(pedido_id):
+    pedido = Pedido.query.filter_by(id=pedido_id).first()
+
+    if not pedido:
+        return jsonify({"erro": "pedido não encontrado"}), 404
+
+    dados = request.get_json()
+    itens = dados.get("itens")
+
+    if itens is None:
+        return jsonify({"erro": "itens é obrigatório"}), 400
+
+    try:
+        novo_subtotal = sum(item["price"] * item["quantity"] for item in itens)
+    except KeyError as erro:
+        return jsonify({"erro": f"item sem o campo obrigatório: {erro}"}), 400
+
+    for item_existente in list(pedido.itens):
+        db.session.delete(item_existente)
+    db.session.flush()
+
+    try:
+        for item in itens:
+            db.session.add(
+                ItemPedido(
+                    pedido_id=pedido.id,
+                    pizza_id=item.get("pizzaId"),
+                    nome_item=item["pizzaName"],
+                    tipo_item=item.get("tipo", "pizza"),
+                    quantidade=item["quantity"],
+                    preco_unitario=item["price"],
+                    tamanho=item.get("size"),
+                    observacoes=item.get("observations"),
+                )
+            )
+    except KeyError as erro:
+        db.session.rollback()
+        return jsonify({"erro": f"item sem o campo obrigatório: {erro}"}), 400
+
+    pedido.subtotal = novo_subtotal
+    pedido.total = novo_subtotal + pedido.taxa_entrega - pedido.desconto
+
+    db.session.commit()
+
+    return jsonify(pedido.to_dict()), 200
+
+
 @pedidos_bp.route("/pedidos", methods=["GET"])
 @jwt_required()
 def listar_pedidos():
@@ -116,7 +165,7 @@ def listar_pedidos():
 
 
 @pedidos_bp.route("/pedidos/admin", methods=["GET"])
-@admin_required
+@staff_required
 def listar_todos_pedidos():
     query = Pedido.query
 
@@ -130,6 +179,10 @@ def listar_todos_pedidos():
                 400,
             )
         query = query.filter(Pedido.status == status)
+
+    tipo = request.args.get("tipo")
+    if tipo:
+        query = query.filter(Pedido.tipo == tipo)
 
     inicio = request.args.get("inicio")
     fim = request.args.get("fim")
@@ -146,7 +199,12 @@ def listar_todos_pedidos():
 @jwt_required()
 def detalhar_pedido(pedido_id):
     usuario_id = int(get_jwt_identity())
-    pedido = Pedido.query.filter_by(id=pedido_id, usuario_id=usuario_id).first()
+    role = get_jwt().get("role")
+
+    if role in STAFF_ROLES:
+        pedido = Pedido.query.filter_by(id=pedido_id).first()
+    else:
+        pedido = Pedido.query.filter_by(id=pedido_id, usuario_id=usuario_id).first()
 
     if not pedido:
         return jsonify({"erro": "pedido não encontrado"}), 404
@@ -158,7 +216,12 @@ def detalhar_pedido(pedido_id):
 @jwt_required()
 def atualizar_status(pedido_id):
     usuario_id = int(get_jwt_identity())
-    pedido = Pedido.query.filter_by(id=pedido_id, usuario_id=usuario_id).first()
+    role = get_jwt().get("role")
+
+    if role in STAFF_ROLES:
+        pedido = Pedido.query.filter_by(id=pedido_id).first()
+    else:
+        pedido = Pedido.query.filter_by(id=pedido_id, usuario_id=usuario_id).first()
 
     if not pedido:
         return jsonify({"erro": "pedido não encontrado"}), 404
