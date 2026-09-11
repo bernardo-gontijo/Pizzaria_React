@@ -49,6 +49,12 @@ const PedidoAdminPage = lazy(() =>
   })),
 );
 
+const RelatoriosPage = lazy(() =>
+  import("../features/admin/pages/RelatoriosPage").then((m) => ({
+    default: m.RelatoriosPage,
+  })),
+);
+
 const PizzasPage = lazy(() =>
   import("../features/admin/pages/PizzasPage").then((m) => ({
     default: m.PizzasPage,
@@ -334,6 +340,10 @@ export const router = createBrowserRouter([
           {
             path: "pedidos",
             Component: PedidoAdminPage,
+          },
+          {
+            path: "relatorios",
+            Component: RelatoriosPage,
           },
           {
             path: "configuracao",

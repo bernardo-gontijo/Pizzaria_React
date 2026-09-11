@@ -23,6 +23,10 @@ export function SideBar() {
       caminho: "/admin/pedidos",
     },
     {
+      nome: "Relatórios",
+      caminho: "/admin/relatorios",
+    },
+    {
       nome: "Configurações",
       caminho: "/admin/configuracao",
     },
