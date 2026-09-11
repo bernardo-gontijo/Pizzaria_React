@@ -21,6 +21,13 @@ interface PedidoApi
 function normalizarPedido(pedido: PedidoApi): Pedido {
   return {
     ...pedido,
+    // O backend serializa pedidos sem mesa como "mesaId": null (não
+    // omite o campo). `null !== undefined` é `true` em JS, então sem
+    // essa conversão todo pedido delivery era tratado como se tivesse
+    // mesa (mesaId "definido") — é isso que fazia tudo cair em
+    // "pedidos locais". Aqui garantimos que a ausência de mesa vire
+    // sempre `undefined`, que é o que o resto do app espera.
+    mesaId: pedido.mesaId ?? undefined,
     createdAt: new Date(pedido.createdAt),
     updatedAt: new Date(pedido.updatedAt),
     statusHistorico: pedido.statusHistorico.map((historico) => ({

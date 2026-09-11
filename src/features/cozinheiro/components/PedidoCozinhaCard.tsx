@@ -45,7 +45,9 @@ export function PedidoCozinhaCard({
   onIniciarPreparo,
   onFinalizarPreparo,
 }: PedidoCozinhaCardProps) {
-  const pedidoLocal = pedido.mesaId !== undefined;
+  // Usar `!= null` (em vez de `!== undefined`) cobre tanto `undefined`
+  // quanto `null`, que é o que a API manda para pedidos sem mesa.
+  const pedidoLocal = pedido.mesaId != null;
 
   const horarioPedido = new Date(pedido.createdAt).toLocaleTimeString("pt-BR", {
     hour: "2-digit",

@@ -67,13 +67,16 @@ export function useCozinheiroPedidos() {
       });
   }, [pedidos]);
 
+  // `!= null` cobre `undefined` E `null` — a API manda `mesaId: null`
+  // para pedidos delivery, então checar só `!== undefined` classificava
+  // esses pedidos como "locais" por engano.
   const pedidosLocais = useMemo(
-    () => pedidosDaCozinha.filter((pedido) => pedido.mesaId !== undefined),
+    () => pedidosDaCozinha.filter((pedido) => pedido.mesaId != null),
     [pedidosDaCozinha],
   );
 
   const pedidosDelivery = useMemo(
-    () => pedidosDaCozinha.filter((pedido) => pedido.mesaId === undefined),
+    () => pedidosDaCozinha.filter((pedido) => pedido.mesaId == null),
     [pedidosDaCozinha],
   );
 
