@@ -35,6 +35,114 @@ class Usuario(db.Model):
         }
 
 
+class Mesa(db.Model):
+    __tablename__ = "mesa"
+
+    id = db.Column(db.String(50), primary_key=True)
+    numero = db.Column(db.Integer, unique=True, nullable=False)
+    status = db.Column(db.String(20), nullable=False, default="livre")
+
+    criada_em = db.Column(db.DateTime, default=datetime.utcnow)
+    atualizada_em = db.Column(
+        db.DateTime,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow,
+    )
+
+    comandas = db.relationship(
+        "Comanda",
+        backref="mesa",
+        lazy=True,
+        cascade="all, delete-orphan",
+    )
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "numero": self.numero,
+            "status": self.status,
+            "comandas": [comanda.to_dict() for comanda in self.comandas],
+            "createdAt": self.criada_em.isoformat(),
+            "updatedAt": self.atualizada_em.isoformat(),
+        }
+
+
+class Comanda(db.Model):
+    __tablename__ = "comanda"
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    mesa_id = db.Column(
+        db.String(50),
+        db.ForeignKey("mesa.id"),
+        nullable=False,
+    )
+
+    nome = db.Column(db.String(120), nullable=True)
+
+    status = db.Column(
+        db.String(20),
+        nullable=False,
+        default="aberta",
+    )
+
+    criada_em = db.Column(db.DateTime, default=datetime.utcnow)
+    atualizada_em = db.Column(
+        db.DateTime,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow,
+    )
+
+    pedidos_vinculados = db.relationship(
+        "ComandaPedido",
+        backref="comanda",
+        lazy=True,
+        cascade="all, delete-orphan",
+    )
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "mesaId": self.mesa_id,
+            "nome": self.nome,
+            "status": self.status,
+            "pedidos": [
+                vinculo.pedido.to_dict()
+                for vinculo in self.pedidos_vinculados
+                if vinculo.pedido is not None
+            ],
+            "createdAt": self.criada_em.isoformat(),
+            "updatedAt": self.atualizada_em.isoformat(),
+        }
+
+
+class ComandaPedido(db.Model):
+    __tablename__ = "comanda_pedido"
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    comanda_id = db.Column(
+        db.Integer,
+        db.ForeignKey("comanda.id"),
+        nullable=False,
+    )
+
+    pedido_id = db.Column(
+        db.Integer,
+        db.ForeignKey("pedido.id"),
+        nullable=False,
+        unique=True,
+    )
+
+    pedido = db.relationship(
+        "Pedido",
+        backref=db.backref(
+            "vinculo_comanda",
+            uselist=False,
+        ),
+    )
+
+
 class Pedido(db.Model):
     __tablename__ = "pedido"
 

@@ -9,6 +9,8 @@ from routes.auth import auth_bp
 from routes.cupons import cupons_bp
 from routes.pedidos import pedidos_bp
 from routes.relatorios import relatorios_bp
+from routes.mesas import mesas_bp
+from routes.comandas import comandas_bp
 
 load_dotenv()
 
@@ -42,6 +44,8 @@ def criar_app(banco_teste=False):
     app.register_blueprint(pedidos_bp)
     app.register_blueprint(relatorios_bp)
     app.register_blueprint(cupons_bp)
+    app.register_blueprint(mesas_bp)
+    app.register_blueprint(comandas_bp)
 
     with app.app_context():
         db.create_all()
