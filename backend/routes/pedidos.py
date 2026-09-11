@@ -1,10 +1,10 @@
 import json
 from datetime import datetime
 from flask import Blueprint, request, jsonify
-from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 from extensions import db
 from models import Pedido, ItemPedido, HistoricoStatus
-from auth_utils import admin_required
+from auth_utils import staff_required, STAFF_ROLES
 
 pedidos_bp = Blueprint("pedidos", __name__)
 
@@ -116,7 +116,7 @@ def listar_pedidos():
 
 
 @pedidos_bp.route("/pedidos/admin", methods=["GET"])
-@admin_required
+@staff_required
 def listar_todos_pedidos():
     query = Pedido.query
 
@@ -130,6 +130,10 @@ def listar_todos_pedidos():
                 400,
             )
         query = query.filter(Pedido.status == status)
+
+    tipo = request.args.get("tipo")
+    if tipo:
+        query = query.filter(Pedido.tipo == tipo)
 
     inicio = request.args.get("inicio")
     fim = request.args.get("fim")
@@ -146,7 +150,12 @@ def listar_todos_pedidos():
 @jwt_required()
 def detalhar_pedido(pedido_id):
     usuario_id = int(get_jwt_identity())
-    pedido = Pedido.query.filter_by(id=pedido_id, usuario_id=usuario_id).first()
+    role = get_jwt().get("role")
+
+    if role in STAFF_ROLES:
+        pedido = Pedido.query.filter_by(id=pedido_id).first()
+    else:
+        pedido = Pedido.query.filter_by(id=pedido_id, usuario_id=usuario_id).first()
 
     if not pedido:
         return jsonify({"erro": "pedido não encontrado"}), 404
@@ -158,7 +167,12 @@ def detalhar_pedido(pedido_id):
 @jwt_required()
 def atualizar_status(pedido_id):
     usuario_id = int(get_jwt_identity())
-    pedido = Pedido.query.filter_by(id=pedido_id, usuario_id=usuario_id).first()
+    role = get_jwt().get("role")
+
+    if role in STAFF_ROLES:
+        pedido = Pedido.query.filter_by(id=pedido_id).first()
+    else:
+        pedido = Pedido.query.filter_by(id=pedido_id, usuario_id=usuario_id).first()
 
     if not pedido:
         return jsonify({"erro": "pedido não encontrado"}), 404

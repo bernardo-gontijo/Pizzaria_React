@@ -233,3 +233,107 @@ def test_admin_lista_pedidos_bloqueada_para_cliente(client):
         "/pedidos/admin", headers={"Authorization": f"Bearer {token_cliente}"}
     )
     assert resposta.status_code == 403
+
+
+def test_seed_cria_usuarios_padrao(client):
+    resposta = client.post(
+        "/login", json={"email": "admin@pizzashop.com", "senha": "123456"}
+    )
+    assert resposta.status_code == 200
+    assert resposta.get_json()["usuario"]["role"] == "admin"
+
+    resposta = client.post(
+        "/login", json={"email": "cozinha@pizzashop.com", "senha": "123456"}
+    )
+    assert resposta.status_code == 200
+    assert resposta.get_json()["usuario"]["role"] == "cozinha"
+
+    resposta = client.post(
+        "/login", json={"email": "entregador@pizzashop.com", "senha": "123456"}
+    )
+    assert resposta.status_code == 200
+    assert resposta.get_json()["usuario"]["role"] == "entregador"
+
+
+def test_staff_atualiza_status_de_pedido_alheio(client):
+    token_cliente = registrar_e_logar(client, email="donodopedido@teste.com")
+    token_cozinha = registrar_e_logar(
+        client, email="cozinhastaff@teste.com", role="cozinha"
+    )
+
+    pedido = client.post(
+        "/pedidos",
+        json=payload_pedido(),
+        headers={"Authorization": f"Bearer {token_cliente}"},
+    ).get_json()
+
+    resposta = client.patch(
+        f"/pedidos/{pedido['id']}/status",
+        json={"status": "confirmado"},
+        headers={"Authorization": f"Bearer {token_cozinha}"},
+    )
+    assert resposta.status_code == 200
+    assert resposta.get_json()["status"] == "confirmado"
+
+
+def test_staff_ve_detalhe_de_pedido_alheio(client):
+    token_cliente = registrar_e_logar(client, email="outrodono@teste.com")
+    token_entregador = registrar_e_logar(
+        client, email="entregadorstaff@teste.com", role="entregador"
+    )
+
+    pedido = client.post(
+        "/pedidos",
+        json=payload_pedido(),
+        headers={"Authorization": f"Bearer {token_cliente}"},
+    ).get_json()
+
+    resposta = client.get(
+        f"/pedidos/{pedido['id']}",
+        headers={"Authorization": f"Bearer {token_entregador}"},
+    )
+    assert resposta.status_code == 200
+
+
+def test_cliente_comum_ainda_nao_ve_pedido_de_outro_cliente(client):
+    token_a = registrar_e_logar(client, email="clientex@teste.com")
+    token_b = registrar_e_logar(client, email="clientey@teste.com")
+
+    pedido = client.post(
+        "/pedidos",
+        json=payload_pedido(),
+        headers={"Authorization": f"Bearer {token_a}"},
+    ).get_json()
+
+    resposta = client.patch(
+        f"/pedidos/{pedido['id']}/status",
+        json={"status": "confirmado"},
+        headers={"Authorization": f"Bearer {token_b}"},
+    )
+    assert resposta.status_code == 404
+
+
+def test_cozinha_e_entregador_acessam_pedidos_admin(client):
+    token_cliente = registrar_e_logar(client, email="clientepedido@teste.com")
+    token_cozinha = registrar_e_logar(
+        client, email="cozinhalista@teste.com", role="cozinha"
+    )
+    token_entregador = registrar_e_logar(
+        client, email="entregadorlista@teste.com", role="entregador"
+    )
+
+    client.post(
+        "/pedidos",
+        json=payload_pedido(),
+        headers={"Authorization": f"Bearer {token_cliente}"},
+    )
+
+    resposta_cozinha = client.get(
+        "/pedidos/admin", headers={"Authorization": f"Bearer {token_cozinha}"}
+    )
+    assert resposta_cozinha.status_code == 200
+
+    resposta_entregador = client.get(
+        "/pedidos/admin", headers={"Authorization": f"Bearer {token_entregador}"}
+    )
+    assert resposta_entregador.status_code == 200

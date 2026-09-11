@@ -17,7 +17,7 @@ def register():
     if not nome or not email or not senha:
         return jsonify({"erro": "nome, email e senha são obrigatórios"}), 400
 
-    if role not in ("cliente", "admin"):
+    if role not in ("cliente", "admin", "cozinha", "entregador"):
         return jsonify({"erro": "role deve ser 'cliente' ou 'admin'"}), 400
 
     if Usuario.query.filter_by(email=email).first():
