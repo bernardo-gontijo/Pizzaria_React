@@ -1,4 +1,4 @@
-import json
+﻿import json
 from datetime import datetime
 
 from sqlalchemy import event
@@ -151,12 +151,10 @@ class Pedido(db.Model):
     tipo = db.Column(db.String(20), nullable=False)  # "local" ou "delivery"
     status = db.Column(db.String(30), nullable=False, default="pendente")
 
-    # Dados do cliente informados no checkout (podem diferir do perfil do usuário)
     cliente_nome = db.Column(db.String(120), nullable=True)
     cliente_email = db.Column(db.String(120), nullable=True)
     cliente_telefone = db.Column(db.String(30), nullable=True)
 
-    # Endereço de entrega, guardado como JSON (estrutura livre, definida pelo front)
     endereco = db.Column(db.Text, nullable=True)
 
     subtotal = db.Column(db.Float, nullable=False, default=0.0)
@@ -168,7 +166,6 @@ class Pedido(db.Model):
     troco_para = db.Column(db.Float, nullable=True)
     observacoes = db.Column(db.Text, nullable=True)
 
-    # Presentes apenas em pedidos feitos por um garçom, vinculados a uma mesa
     mesa_id = db.Column(db.String(50), nullable=True)
     gorjeta = db.Column(db.Float, nullable=True)
 
@@ -218,12 +215,12 @@ class ItemPedido(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     pedido_id = db.Column(db.Integer, db.ForeignKey("pedido.id"), nullable=False)
 
-    pizza_id = db.Column(db.String(50), nullable=True)  # id do item no cardápio
+    pizza_id = db.Column(db.String(50), nullable=True)
     nome_item = db.Column(db.String(120), nullable=False)
-    tipo_item = db.Column(db.String(20), nullable=False)  # "pizza", "bebida", "combo"
+    tipo_item = db.Column(db.String(20), nullable=False)
     quantidade = db.Column(db.Integer, nullable=False, default=1)
     preco_unitario = db.Column(db.Float, nullable=False)
-    tamanho = db.Column(db.String(5), nullable=True)  # "P", "M", "G", "GG"
+    tamanho = db.Column(db.String(5), nullable=True)
     observacoes = db.Column(db.Text, nullable=True)
 
     def to_dict(self):
@@ -269,14 +266,11 @@ class Cupom(db.Model):
         index=True,
     )
 
-    # "percentual" ou "fixo"
     tipo_desconto = db.Column(
         db.String(20),
         nullable=False,
     )
 
-    # percentual: 10 = 10%
-    # fixo: 10 = R$ 10,00
     valor = db.Column(
         db.Float,
         nullable=False,
@@ -298,7 +292,6 @@ class Cupom(db.Model):
         default=0.0,
     )
 
-    # None = sem limite
     limite_usos_total = db.Column(
         db.Integer,
         nullable=True,
@@ -406,8 +399,6 @@ class UsoCupom(db.Model):
         nullable=False,
     )
 
-    # Será preenchido quando o cupom
-    # realmente for aplicado a um pedido.
     pedido_id = db.Column(
         db.Integer,
         db.ForeignKey("pedido.id"),
@@ -445,3 +436,54 @@ class UsoCupom(db.Model):
 @event.listens_for(Cupom, "before_update")
 def validar_cupom_antes_de_salvar(mapper, connection, target):
     target.validar()
+
+
+class Avaliacao(db.Model):
+    __tablename__ = "avaliacao"
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    pedido_id = db.Column(
+        db.Integer,
+        db.ForeignKey("pedido.id"),
+        nullable=False,
+    )
+
+    usuario_id = db.Column(
+        db.Integer,
+        db.ForeignKey("usuario.id"),
+        nullable=False,
+    )
+
+    pizza_id = db.Column(db.String(50), nullable=False, index=True)
+    pizza_nome = db.Column(db.String(120), nullable=False)
+
+    nota = db.Column(db.Integer, nullable=False)
+    comentario = db.Column(db.Text, nullable=True)
+
+    criado_em = db.Column(db.DateTime, default=datetime.utcnow)
+
+    pedido = db.relationship("Pedido", backref="avaliacoes")
+    usuario = db.relationship("Usuario", backref="avaliacoes")
+
+    __table_args__ = (
+        db.UniqueConstraint(
+            "pedido_id",
+            "pizza_id",
+            name="uma_avaliacao_por_pizza_por_pedido",
+        ),
+    )
+
+    def to_dict(self, incluir_cliente=False):
+        dados = {
+            "id": self.id,
+            "pedidoId": self.pedido_id,
+            "pizzaId": self.pizza_id,
+            "pizzaNome": self.pizza_nome,
+            "nota": self.nota,
+            "comentario": self.comentario,
+            "criadoEm": self.criado_em.isoformat(),
+        }
+        if incluir_cliente:
+            dados["clienteNome"] = self.usuario.nome if self.usuario else None
+        return dados
