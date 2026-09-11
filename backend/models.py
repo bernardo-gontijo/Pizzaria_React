@@ -1,6 +1,9 @@
 import json
 from datetime import datetime
+
+from sqlalchemy import event
 from werkzeug.security import generate_password_hash, check_password_hash
+
 from extensions import db
 
 
@@ -144,3 +147,193 @@ class HistoricoStatus(db.Model):
             "timestamp": self.mudou_em.isoformat(),
             "message": self.mensagem,
         }
+
+
+class Cupom(db.Model):
+    __tablename__ = "cupom"
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    codigo = db.Column(
+        db.String(50),
+        unique=True,
+        nullable=False,
+        index=True,
+    )
+
+    # "percentual" ou "fixo"
+    tipo_desconto = db.Column(
+        db.String(20),
+        nullable=False,
+    )
+
+    # percentual: 10 = 10%
+    # fixo: 10 = R$ 10,00
+    valor = db.Column(
+        db.Float,
+        nullable=False,
+    )
+
+    data_inicio = db.Column(
+        db.DateTime,
+        nullable=True,
+    )
+
+    data_fim = db.Column(
+        db.DateTime,
+        nullable=True,
+    )
+
+    pedido_minimo = db.Column(
+        db.Float,
+        nullable=False,
+        default=0.0,
+    )
+
+    # None = sem limite
+    limite_usos_total = db.Column(
+        db.Integer,
+        nullable=True,
+    )
+
+    limite_usos_por_cliente = db.Column(
+        db.Integer,
+        nullable=True,
+    )
+
+    ativo = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=True,
+    )
+
+    criado_em = db.Column(
+        db.DateTime,
+        default=datetime.utcnow,
+    )
+
+    atualizado_em = db.Column(
+        db.DateTime,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow,
+    )
+
+    usos = db.relationship(
+        "UsoCupom",
+        backref="cupom",
+        lazy=True,
+        cascade="all, delete-orphan",
+    )
+
+    def validar(self):
+        self.codigo = self.codigo.strip().upper() if self.codigo else ""
+
+        if not self.codigo:
+            raise ValueError("O código do cupom é obrigatório")
+
+        if self.tipo_desconto not in {"percentual", "fixo"}:
+            raise ValueError("Tipo de desconto inválido")
+
+        if self.valor is None or self.valor <= 0:
+            raise ValueError("O valor do desconto deve ser maior que zero")
+
+        if self.tipo_desconto == "percentual" and self.valor > 100:
+            raise ValueError("O desconto percentual não pode ser maior que 100%")
+
+        if self.pedido_minimo is not None and self.pedido_minimo < 0:
+            raise ValueError("O pedido mínimo não pode ser negativo")
+
+        if self.limite_usos_total is not None and self.limite_usos_total <= 0:
+            raise ValueError("O limite total de usos deve ser maior que zero")
+
+        if (
+            self.limite_usos_por_cliente is not None
+            and self.limite_usos_por_cliente <= 0
+        ):
+            raise ValueError("O limite de usos por cliente deve ser maior que zero")
+
+        if (
+            self.data_inicio is not None
+            and self.data_fim is not None
+            and self.data_fim < self.data_inicio
+        ):
+            raise ValueError("A data final não pode ser anterior à data inicial")
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "codigo": self.codigo,
+            "tipoDesconto": self.tipo_desconto,
+            "valor": self.valor,
+            "dataInicio": (self.data_inicio.isoformat() if self.data_inicio else None),
+            "dataFim": (self.data_fim.isoformat() if self.data_fim else None),
+            "pedidoMinimo": self.pedido_minimo,
+            "limiteUsosTotal": self.limite_usos_total,
+            "limiteUsosPorCliente": self.limite_usos_por_cliente,
+            "ativo": self.ativo,
+            "criadoEm": (self.criado_em.isoformat() if self.criado_em else None),
+            "atualizadoEm": (
+                self.atualizado_em.isoformat() if self.atualizado_em else None
+            ),
+        }
+
+
+class UsoCupom(db.Model):
+    __tablename__ = "uso_cupom"
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True,
+    )
+
+    cupom_id = db.Column(
+        db.Integer,
+        db.ForeignKey("cupom.id"),
+        nullable=False,
+    )
+
+    usuario_id = db.Column(
+        db.Integer,
+        db.ForeignKey("usuario.id"),
+        nullable=False,
+    )
+
+    # Será preenchido quando o cupom
+    # realmente for aplicado a um pedido.
+    pedido_id = db.Column(
+        db.Integer,
+        db.ForeignKey("pedido.id"),
+        nullable=True,
+    )
+
+    desconto_aplicado = db.Column(
+        db.Float,
+        nullable=False,
+        default=0.0,
+    )
+
+    usado_em = db.Column(
+        db.DateTime,
+        default=datetime.utcnow,
+    )
+
+    usuario = db.relationship(
+        "Usuario",
+        backref="usos_cupom",
+    )
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "cupomId": self.cupom_id,
+            "usuarioId": self.usuario_id,
+            "pedidoId": self.pedido_id,
+            "descontoAplicado": self.desconto_aplicado,
+            "usadoEm": (self.usado_em.isoformat() if self.usado_em else None),
+        }
+
+
+@event.listens_for(Cupom, "before_insert")
+@event.listens_for(Cupom, "before_update")
+def validar_cupom_antes_de_salvar(mapper, connection, target):
+    target.validar()
