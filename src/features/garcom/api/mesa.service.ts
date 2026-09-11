@@ -1,146 +1,357 @@
-﻿import type { Mesa, MesaInput, HistoricoMesa } from "../types/mesa";
-import type { ItemPedido } from "../../loja/types/pedido";
+﻿import { getGarcomToken, logout as logoutGarcom } from "./auth.service";
+
 import {
-  criarPedido,
-  buscarPedidoPorId,
+  getAdminToken,
+  logout as logoutAdmin,
+} from "../../admin/api/auth.service";
+
+import {
   atualizarItensPedido,
+  buscarPedidoPorId,
+  criarPedido,
 } from "./pedidosGarcom.service";
 
-const MESAS_STORAGE_KEY = "pizzashop:mesas";
-const HISTORICO_STORAGE_KEY = "pizzashop:historico-mesas";
+import type { ItemPedido, Pedido } from "../../loja/types/pedido";
+
+import type { HistoricoMesa, Mesa, MesaInput } from "../types/mesa";
+
+const API_URL = import.meta.env.VITE_API_URL ?? "http://127.0.0.1:5000";
 
 export const MESAS_ATUALIZADAS_EVENT = "pizzashop:mesas-atualizadas";
 
-function lerMesas(): Mesa[] {
-  const dados = localStorage.getItem(MESAS_STORAGE_KEY);
+export interface Comanda {
+  id: number;
+  mesaId: string;
+  nome?: string | null;
+  status: "aberta" | "paga";
+  pedidos: Pedido[];
+  createdAt: string;
+  updatedAt: string;
+}
 
-  if (!dados) return [];
+interface MesaApi extends Mesa {
+  comandas: Comanda[];
+  createdAt?: string;
+  updatedAt?: string;
+}
 
-  try {
-    return JSON.parse(dados) as Mesa[];
-  } catch {
-    localStorage.removeItem(MESAS_STORAGE_KEY);
-    return [];
+interface PagamentoComandaResponse {
+  comanda: Comanda;
+  mesa: MesaApi;
+}
+
+interface SessaoApi {
+  token: string;
+  logout: () => void;
+  loginPath: string;
+}
+
+function getSessaoApi(): SessaoApi {
+  const estaNaAreaAdmin = window.location.pathname.startsWith("/admin");
+
+  const estaNaAreaGarcom = window.location.pathname.startsWith("/garcom");
+
+  if (estaNaAreaAdmin) {
+    const adminToken = getAdminToken();
+
+    if (adminToken) {
+      return {
+        token: adminToken,
+        logout: logoutAdmin,
+        loginPath: "/admin/login",
+      };
+    }
+
+    const garcomToken = getGarcomToken();
+
+    if (garcomToken) {
+      return {
+        token: garcomToken,
+        logout: logoutGarcom,
+        loginPath: "/garcom/login",
+      };
+    }
+  }
+
+  if (estaNaAreaGarcom) {
+    const garcomToken = getGarcomToken();
+
+    if (garcomToken) {
+      return {
+        token: garcomToken,
+        logout: logoutGarcom,
+        loginPath: "/garcom/login",
+      };
+    }
+
+    const adminToken = getAdminToken();
+
+    if (adminToken) {
+      return {
+        token: adminToken,
+        logout: logoutAdmin,
+        loginPath: "/admin/login",
+      };
+    }
+  }
+
+  const garcomToken = getGarcomToken();
+
+  if (garcomToken) {
+    return {
+      token: garcomToken,
+      logout: logoutGarcom,
+      loginPath: "/garcom/login",
+    };
+  }
+
+  const adminToken = getAdminToken();
+
+  if (adminToken) {
+    return {
+      token: adminToken,
+      logout: logoutAdmin,
+      loginPath: "/admin/login",
+    };
+  }
+
+  throw new Error("Você precisa entrar para acessar as mesas.");
+}
+
+function getHeaders(sessao: SessaoApi): HeadersInit {
+  return {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${sessao.token}`,
+  };
+}
+
+function verificarSessao(resposta: Response, sessao: SessaoApi): void {
+  if (resposta.status === 401 || resposta.status === 422) {
+    sessao.logout();
+
+    window.location.href = sessao.loginPath;
+
+    throw new Error("Sua sessão expirou. Entre novamente.");
   }
 }
 
-function salvarMesas(mesas: Mesa[]): void {
-  localStorage.setItem(MESAS_STORAGE_KEY, JSON.stringify(mesas));
+async function obterErro(resposta: Response): Promise<string> {
+  try {
+    const dados = (await resposta.json()) as {
+      erro?: string;
+      msg?: string;
+    };
+
+    return dados.erro ?? dados.msg ?? "Erro ao acessar o servidor.";
+  } catch {
+    return "Erro ao acessar o servidor.";
+  }
+}
+
+async function requisicao<T>(
+  caminho: string,
+  opcoes: RequestInit = {},
+): Promise<T> {
+  const sessao = getSessaoApi();
+
+  const resposta = await fetch(`${API_URL}${caminho}`, {
+    ...opcoes,
+    headers: {
+      ...getHeaders(sessao),
+      ...opcoes.headers,
+    },
+  });
+
+  verificarSessao(resposta, sessao);
+
+  if (!resposta.ok) {
+    throw new Error(await obterErro(resposta));
+  }
+
+  if (resposta.status === 204) {
+    return undefined as T;
+  }
+
+  return (await resposta.json()) as T;
+}
+
+function avisarAtualizacaoMesas(): void {
   window.dispatchEvent(new Event(MESAS_ATUALIZADAS_EVENT));
 }
 
-function lerHistorico(): HistoricoMesa[] {
-  const dados = localStorage.getItem(HISTORICO_STORAGE_KEY);
-
-  if (!dados) return [];
-
-  try {
-    return JSON.parse(dados) as HistoricoMesa[];
-  } catch {
-    localStorage.removeItem(HISTORICO_STORAGE_KEY);
-    return [];
-  }
-}
-
-function salvarHistorico(historico: HistoricoMesa[]): void {
-  localStorage.setItem(HISTORICO_STORAGE_KEY, JSON.stringify(historico));
-}
-
 export async function buscarMesas(): Promise<Mesa[]> {
-  return lerMesas();
+  return requisicao<MesaApi[]>("/mesas", {
+    method: "GET",
+  });
+}
+
+export async function buscarMesaPorId(mesaId: string): Promise<MesaApi> {
+  return requisicao<MesaApi>(`/mesas/${mesaId}`, {
+    method: "GET",
+  });
 }
 
 export async function criarMesa(dados: MesaInput): Promise<Mesa> {
-  const mesas = lerMesas();
+  const mesa = await requisicao<MesaApi>("/mesas", {
+    method: "POST",
 
-  const jaExiste = mesas.some((mesa) => mesa.numero === dados.numero);
+    body: JSON.stringify({
+      numero: dados.numero,
+    }),
+  });
 
-  if (jaExiste) {
-    throw new Error(
-      `JÃ¡ existe uma mesa cadastrada com o nÃºmero ${dados.numero}.`,
-    );
-  }
+  avisarAtualizacaoMesas();
 
-  const novaMesa: Mesa = {
-    id: crypto.randomUUID(),
-    numero: dados.numero,
-    status: "livre",
-  };
-
-  salvarMesas([...mesas, novaMesa]);
-
-  return novaMesa;
+  return mesa;
 }
 
 export async function removerMesa(id: string): Promise<void> {
-  const mesas = lerMesas();
+  await requisicao<void>(`/mesas/${id}`, {
+    method: "DELETE",
+  });
 
-  salvarMesas(mesas.filter((mesa) => mesa.id !== id));
+  avisarAtualizacaoMesas();
 }
 
-/**
- * Abre uma mesa: cria um pedido vazio vinculado a ela e marca a mesa
- * como ocupada. O garÃ§om adiciona itens a esse pedido conforme o
- * cliente vai pedindo.
- */
-export async function abrirMesa(mesaId: string): Promise<Mesa> {
-  const mesas = lerMesas();
-  const mesa = mesas.find((m) => m.id === mesaId);
+export async function buscarComandasDaMesa(mesaId: string): Promise<Comanda[]> {
+  return requisicao<Comanda[]>(`/mesas/${mesaId}/comandas`, {
+    method: "GET",
+  });
+}
 
-  if (!mesa) {
-    throw new Error("Mesa nÃ£o encontrada");
+export async function criarComanda(
+  mesaId: string,
+  nome?: string,
+): Promise<Comanda> {
+  const comanda = await requisicao<Comanda>(`/mesas/${mesaId}/comandas`, {
+    method: "POST",
+
+    body: JSON.stringify({
+      nome: nome?.trim() || undefined,
+    }),
+  });
+
+  avisarAtualizacaoMesas();
+
+  return comanda;
+}
+
+export async function vincularPedidoComanda(
+  comandaId: number,
+  pedidoId: string,
+): Promise<Comanda> {
+  return requisicao<Comanda>(`/comandas/${comandaId}/pedidos/${pedidoId}`, {
+    method: "POST",
+  });
+}
+
+export async function pagarComanda(
+  comandaId: number,
+): Promise<PagamentoComandaResponse> {
+  const resultado = await requisicao<PagamentoComandaResponse>(
+    `/comandas/${comandaId}/pagar`,
+    {
+      method: "PATCH",
+    },
+  );
+
+  avisarAtualizacaoMesas();
+
+  return resultado;
+}
+
+export async function abrirMesa(mesaId: string): Promise<Mesa> {
+  const mesa = await buscarMesaPorId(mesaId);
+
+  const comandasAbertas = mesa.comandas.filter(
+    (comanda) => comanda.status === "aberta",
+  );
+
+  if (comandasAbertas.length === 0) {
+    await criarComanda(mesaId, "Comanda principal");
   }
+
+  return buscarMesaPorId(mesaId);
+}
+
+async function obterComanda(
+  mesaId: string,
+  comandaId?: number,
+): Promise<Comanda> {
+  const comandas = await buscarComandasDaMesa(mesaId);
+
+  if (comandaId !== undefined) {
+    const comandaSelecionada = comandas.find(
+      (comanda) => comanda.id === comandaId,
+    );
+
+    if (!comandaSelecionada) {
+      throw new Error("Comanda não encontrada.");
+    }
+
+    if (comandaSelecionada.status === "paga") {
+      throw new Error("Esta comanda já foi paga.");
+    }
+
+    return comandaSelecionada;
+  }
+
+  const aberta = comandas.find((comanda) => comanda.status === "aberta");
+
+  if (aberta) {
+    return aberta;
+  }
+
+  return criarComanda(mesaId, "Comanda principal");
+}
+
+async function obterPedidoDaComanda(
+  mesaId: string,
+  comanda: Comanda,
+): Promise<Pedido> {
+  if (comanda.pedidos.length > 0) {
+    return comanda.pedidos[0];
+  }
+
+  const mesa = await buscarMesaPorId(mesaId);
 
   const pedido = await criarPedido({
     cliente: {
-      nome: `Mesa ${mesa.numero}`,
+      nome: comanda.nome || `Mesa ${mesa.numero}`,
+
       telefone: "",
     },
+
     itens: [],
+
     formaPagamento: "dinheiro",
-    mesaId: mesa.id,
+
+    mesaId,
   });
 
-  const mesasAtualizadas = mesas.map((m) =>
-    m.id === mesaId
-      ? {
-          ...m,
-          status: "ocupada" as const,
-          pedidoAtualId: pedido.id,
-        }
-      : m,
-  );
+  await vincularPedidoComanda(comanda.id, pedido.id);
 
-  salvarMesas(mesasAtualizadas);
-
-  return mesasAtualizadas.find((m) => m.id === mesaId)!;
+  return pedido;
 }
 
-/**
- * Adiciona um item ao pedido atual da mesa.
- *
- * Se o mesmo produto (mesmo pizzaId e tamanho)
- * jÃ¡ existir no pedido, a quantidade Ã© somada
- * em vez de criar uma linha duplicada.
- */
 export async function adicionarItemNaMesa(
   mesaId: string,
   item: Omit<ItemPedido, "id">,
-) {
-  const mesas = lerMesas();
-  const mesa = mesas.find((m) => m.id === mesaId);
+  comandaId?: number,
+): Promise<Pedido | null> {
+  const comanda = await obterComanda(mesaId, comandaId);
 
-  if (!mesa?.pedidoAtualId) {
-    throw new Error("Mesa nÃ£o estÃ¡ aberta");
+  const pedido = await obterPedidoDaComanda(mesaId, comanda);
+
+  const pedidoAtual = await buscarPedidoPorId(pedido.id);
+
+  if (!pedidoAtual) {
+    throw new Error("Pedido da comanda não encontrado.");
   }
 
-  const pedido = await buscarPedidoPorId(mesa.pedidoAtualId);
-
-  if (!pedido) {
-    throw new Error("Pedido da mesa nÃ£o encontrado");
-  }
-
-  const itensExistentes = pedido.itens.map(({ id: _id, ...resto }) => resto);
+  const itensExistentes = pedidoAtual.itens.map(
+    ({ id: _id, ...resto }) => resto,
+  );
 
   const indiceExistente = itensExistentes.findIndex(
     (existente) =>
@@ -153,133 +364,104 @@ export async function adicionarItemNaMesa(
           index === indiceExistente
             ? {
                 ...existente,
+
                 quantity: existente.quantity + item.quantity,
               }
             : existente,
         )
       : [...itensExistentes, item];
 
-  return atualizarItensPedido(mesa.pedidoAtualId, itensAtualizados);
+  return atualizarItensPedido(pedidoAtual.id, itensAtualizados);
 }
 
-/**
- * Atualiza a quantidade de um item jÃ¡ lanÃ§ado
- * no pedido da mesa.
- *
- * A quantidade mÃ­nima no pedido Ã© 1.
- * Para remover completamente o item, use
- * removerItemNaMesa.
- */
 export async function atualizarQuantidadeItemNaMesa(
   mesaId: string,
   itemId: string,
   quantidade: number,
-) {
-  const mesas = lerMesas();
-  const mesa = mesas.find((m) => m.id === mesaId);
+  comandaId?: number,
+): Promise<Pedido | null> {
+  const comanda = await obterComanda(mesaId, comandaId);
 
-  if (!mesa?.pedidoAtualId) {
-    throw new Error("Mesa nÃ£o estÃ¡ aberta");
+  const pedido = await obterPedidoDaComanda(mesaId, comanda);
+
+  const pedidoAtual = await buscarPedidoPorId(pedido.id);
+
+  if (!pedidoAtual) {
+    throw new Error("Pedido da comanda não encontrado.");
   }
 
-  const pedido = await buscarPedidoPorId(mesa.pedidoAtualId);
-
-  if (!pedido) {
-    throw new Error("Pedido da mesa nÃ£o encontrado");
-  }
-
-  // No pedido, a quantidade mÃ­nima Ã© 1.
-  // Para remover o item completamente,
-  // deve ser usado removerItemNaMesa().
   const quantidadeSegura = Math.max(1, quantidade);
 
-  const itensAtualizados = pedido.itens.map((existente) => {
+  const itensAtualizados = pedidoAtual.itens.map((existente) => {
     const { id, ...resto } = existente;
 
     return id === itemId
       ? {
           ...resto,
+
           quantity: quantidadeSegura,
         }
       : resto;
   });
 
-  return atualizarItensPedido(mesa.pedidoAtualId, itensAtualizados);
+  return atualizarItensPedido(pedidoAtual.id, itensAtualizados);
 }
 
-/**
- * Remove por completo um item do pedido da mesa.
- */
-export async function removerItemNaMesa(mesaId: string, itemId: string) {
-  const mesas = lerMesas();
-  const mesa = mesas.find((m) => m.id === mesaId);
+export async function removerItemNaMesa(
+  mesaId: string,
+  itemId: string,
+  comandaId?: number,
+): Promise<Pedido | null> {
+  const comanda = await obterComanda(mesaId, comandaId);
 
-  if (!mesa?.pedidoAtualId) {
-    throw new Error("Mesa nÃ£o estÃ¡ aberta");
+  const pedido = await obterPedidoDaComanda(mesaId, comanda);
+
+  const pedidoAtual = await buscarPedidoPorId(pedido.id);
+
+  if (!pedidoAtual) {
+    throw new Error("Pedido da comanda não encontrado.");
   }
 
-  const pedido = await buscarPedidoPorId(mesa.pedidoAtualId);
-
-  if (!pedido) {
-    throw new Error("Pedido da mesa nÃ£o encontrado");
-  }
-
-  const itensAtualizados = pedido.itens
+  const itensAtualizados = pedidoAtual.itens
     .filter((existente) => existente.id !== itemId)
     .map(({ id: _id, ...resto }) => resto);
 
-  return atualizarItensPedido(mesa.pedidoAtualId, itensAtualizados);
+  return atualizarItensPedido(pedidoAtual.id, itensAtualizados);
 }
 
-/**
- * Encerra a conta da mesa: registra o pedido no histÃ³rico
- * e libera a mesa para um novo atendimento.
- */
 export async function encerrarContaMesa(
   mesaId: string,
   gorjeta?: number,
 ): Promise<HistoricoMesa> {
-  const mesas = lerMesas();
-  const mesa = mesas.find((m) => m.id === mesaId);
+  const mesa = await buscarMesaPorId(mesaId);
 
-  if (!mesa?.pedidoAtualId) {
-    throw new Error("Mesa nÃ£o estÃ¡ aberta");
+  const comanda = mesa.comandas.find((item) => item.status === "aberta");
+
+  if (!comanda) {
+    throw new Error("Não existe comanda aberta nesta mesa.");
   }
 
-  const pedido = await buscarPedidoPorId(mesa.pedidoAtualId);
+  const pedido = comanda.pedidos[0];
 
-  if (!pedido) {
-    throw new Error("Pedido da mesa nÃ£o encontrado");
-  }
+  const pagamento = await pagarComanda(comanda.id);
 
-  const registro: HistoricoMesa = {
-    id: crypto.randomUUID(),
-    mesaId: mesa.id,
+  return {
+    id: `comanda-${pagamento.comanda.id}`,
+
+    mesaId,
+
     numeroMesa: mesa.numero,
-    pedidoId: pedido.id,
-    subtotal: pedido.subtotal,
+
+    pedidoId: pedido?.id ?? "",
+
+    subtotal: pedido?.subtotal ?? 0,
+
     gorjeta,
+
     encerradoEm: new Date().toISOString(),
   };
-
-  salvarHistorico([...lerHistorico(), registro]);
-
-  const mesasAtualizadas = mesas.map((m) =>
-    m.id === mesaId
-      ? {
-          id: m.id,
-          numero: m.numero,
-          status: "livre" as const,
-        }
-      : m,
-  );
-
-  salvarMesas(mesasAtualizadas);
-
-  return registro;
 }
 
 export async function buscarHistoricoMesas(): Promise<HistoricoMesa[]> {
-  return lerHistorico();
+  return [];
 }
-

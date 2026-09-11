@@ -2,9 +2,9 @@
 from datetime import datetime
 
 from flask import Blueprint, jsonify, request
-from flask_jwt_extended import get_jwt_identity, jwt_required
+from flask_jwt_extended import get_jwt, get_jwt_identity, jwt_required
 
-from auth_utils import admin_required, staff_required, STAFF_ROLES
+from auth_utils import STAFF_ROLES, staff_required
 from cupons_service import (
     calcular_desconto,
     motivo_cupom_invalido,
@@ -46,20 +46,24 @@ MENSAGENS_STATUS = {
 @jwt_required()
 def criar_pedido():
     usuario_id = int(get_jwt_identity())
+    role = get_jwt().get("role")
+
     dados = request.get_json(silent=True) or {}
 
     tipo = dados.get("tipo")
     itens = dados.get("itens", [])
+    mesa_id = dados.get("mesaId")
 
-    if not tipo or not itens:
-        return (
-            jsonify(
-                {
-                    "erro": "tipo e itens são obrigatórios",
-                }
-            ),
-            400,
-        )
+    if not tipo:
+        return jsonify({"erro": "tipo é obrigatório"}), 400
+
+    # Pedidos normais precisam possuir itens.
+    # Uma mesa, porém, pode ser aberta vazia pelo staff
+    # e receber os itens posteriormente.
+    pedido_vazio_de_mesa = tipo == "local" and mesa_id and role in STAFF_ROLES
+
+    if not itens and not pedido_vazio_de_mesa:
+        return jsonify({"erro": "itens são obrigatórios"}), 400
 
     cliente = dados.get("cliente", {}) or {}
     endereco = dados.get("endereco")
@@ -75,20 +79,18 @@ def criar_pedido():
 
     subtotal = round(subtotal, 2)
 
-    taxa_entrega = (
-        dados.get(
-            "taxaEntrega",
-            0,
-        )
-        or 0
-    )
+    taxa_entrega = dados.get("taxaEntrega", 0) or 0
 
     try:
         taxa_entrega = float(taxa_entrega)
 
     except (TypeError, ValueError):
         return (
-            jsonify({"erro": ("taxaEntrega deve ser um número")}),
+            jsonify(
+                {
+                    "erro": "taxaEntrega deve ser um número",
+                }
+            ),
             400,
         )
 
@@ -157,13 +159,13 @@ def criar_pedido():
         forma_pagamento=dados.get("formaPagamento"),
         troco_para=dados.get("trocoPara"),
         observacoes=dados.get("observacoes"),
-        mesa_id=dados.get("mesaId"),
+        mesa_id=mesa_id,
     )
 
     db.session.add(pedido)
 
-    # Precisamos do ID do pedido
-    # antes de cadastrar itens e uso do cupom.
+    # Precisamos do ID do pedido antes
+    # de cadastrar itens e uso do cupom.
     db.session.flush()
 
     try:
@@ -196,7 +198,7 @@ def criar_pedido():
         HistoricoStatus(
             pedido_id=pedido.id,
             status="pendente",
-            mensagem=("Pedido recebido com sucesso"),
+            mensagem="Pedido recebido com sucesso",
         )
     )
 
@@ -214,10 +216,7 @@ def criar_pedido():
 
     db.session.commit()
 
-    return (
-        jsonify(pedido.to_dict()),
-        201,
-    )
+    return jsonify(pedido.to_dict()), 201
 
 
 @pedidos_bp.route("/pedidos/<int:pedido_id>/itens", methods=["PATCH"])
