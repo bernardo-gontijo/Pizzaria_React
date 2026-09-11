@@ -4,7 +4,7 @@ from datetime import datetime
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import get_jwt_identity, jwt_required
 
-from auth_utils import admin_required
+from auth_utils import admin_required, staff_required, STAFF_ROLES
 from cupons_service import (
     calcular_desconto,
     motivo_cupom_invalido,
