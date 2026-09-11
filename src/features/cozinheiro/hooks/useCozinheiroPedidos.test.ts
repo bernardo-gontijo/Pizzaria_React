@@ -1,18 +1,17 @@
-import { act, renderHook } from "@testing-library/react";
+﻿import { act, renderHook } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
   atualizarStatusPedido,
   buscarPedidos,
-} from "../../loja/api/pedidos.service";
+} from "../api/pedidosCozinha.service";
 import type { Pedido } from "../../loja/types/pedido";
 
 import { useCozinheiroPedidos } from "./useCozinheiroPedidos";
 
-vi.mock("../../loja/api/pedidos.service", () => ({
+vi.mock("../api/pedidosCozinha.service", () => ({
   buscarPedidos: vi.fn(),
   atualizarStatusPedido: vi.fn(),
-  PEDIDOS_ATUALIZADOS_EVENT: "pizzashop:pedidos-atualizados",
 }));
 
 const pedidoBase: Pedido = {
@@ -74,7 +73,7 @@ describe("useCozinheiroPedidos", () => {
     expect(result.current.pedidosDelivery[0].id).toBe("pedido-delivery");
   });
 
-  it("ignora pedidos sem itens e pedidos que já estão prontos", async () => {
+  it("ignora pedidos sem itens e pedidos que jÃ¡ estÃ£o prontos", async () => {
     const pedidoSemItens: Pedido = {
       ...pedidoBase,
       id: "pedido-vazio",
@@ -100,7 +99,7 @@ describe("useCozinheiroPedidos", () => {
     expect(result.current.pedidosDelivery).toHaveLength(0);
   });
 
-  it("mantém pedidos em preparo na fila da cozinha", async () => {
+  it("mantÃ©m pedidos em preparo na fila da cozinha", async () => {
     const pedidoPreparando: Pedido = {
       ...pedidoBase,
       id: "pedido-preparando",
