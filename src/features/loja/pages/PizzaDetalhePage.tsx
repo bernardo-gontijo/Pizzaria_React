@@ -45,7 +45,7 @@ export function PizzaDetalhePage() {
   }
 
   if (loading) return <p>Carregando pizza...</p>;
-  if (!pizza) return <p>Pizza nÃ£o encontrada</p>;
+  if (!pizza) return <p>Pizza nao encontrada</p>;
 
   return (
     <section className="pizza-detalhe-page">
@@ -76,7 +76,7 @@ export function PizzaDetalhePage() {
               aria-label="Diminuir quantidade"
               onClick={() => setQuantidade(Math.max(1, quantidade - 1))}
             >
-              âˆ’
+              -
             </button>
             <strong>{quantidade}</strong>
             <button
@@ -101,7 +101,7 @@ export function PizzaDetalhePage() {
         >
           {pizza.disponivel
             ? "Adicionar ao carrinho"
-            : "IndisponÃ­vel no momento"}
+            : "Indisponivel no momento"}
         </button>
       </div>
 
@@ -109,4 +109,3 @@ export function PizzaDetalhePage() {
     </section>
   );
 }
-
