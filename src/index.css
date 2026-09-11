@@ -2810,3 +2810,79 @@ body {
   width: min(100% - 40px, 720px);
   margin-inline: auto;
 }
+.estrela-visual {
+  position: relative;
+  display: inline-block;
+  width: 1em;
+  font-size: 1.1em;
+  line-height: 1;
+}
+
+.estrela-visual__fundo {
+  color: #d0d0d0;
+}
+
+.estrela-visual__preenchida {
+  position: absolute;
+  top: 0;
+  left: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  color: #f5a623;
+}
+
+.estrela-media {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.estrela-media__estrelas {
+  display: inline-flex;
+}
+
+.estrela-media__numero {
+  font-weight: 600;
+}
+
+.estrela-media__total,
+.estrela-media__vazio {
+  color: #888;
+  font-size: 0.85em;
+}
+
+.seletor-estrelas {
+  display: flex;
+  align-items: center;
+  gap: 0.15rem;
+}
+
+.seletor-estrelas__item {
+  position: relative;
+  display: inline-block;
+}
+
+.seletor-estrelas__metade {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 50%;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+}
+
+.seletor-estrelas__metade--esquerda {
+  left: 0;
+}
+
+.seletor-estrelas__metade--direita {
+  right: 0;
+}
+
+.seletor-estrelas__valor {
+  margin-left: 0.5rem;
+  font-size: 0.9em;
+  color: #555;
+}
