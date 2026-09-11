@@ -6,6 +6,7 @@ from flask_cors import CORS
 
 from extensions import db, jwt
 from routes.auth import auth_bp
+from routes.avaliacoes import avaliacoes_bp
 from routes.cupons import cupons_bp
 from routes.pedidos import pedidos_bp
 from routes.relatorios import relatorios_bp
@@ -42,6 +43,7 @@ def criar_app(banco_teste=False):
     app.register_blueprint(pedidos_bp)
     app.register_blueprint(relatorios_bp)
     app.register_blueprint(cupons_bp)
+    app.register_blueprint(avaliacoes_bp)
 
     with app.app_context():
         db.create_all()

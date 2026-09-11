@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
 import { buscarPedidoClientePorId } from "../api/pedidosCliente.service";
+import { AvaliarPedido } from "../components/AvaliarPedido";
 import { HistoricoPedido } from "../components/HistoricoPedido";
 import { ItensPedido } from "../components/ItensPedido";
 import { StatusPedido } from "../components/StatusPedido";
@@ -81,6 +82,10 @@ export function AcompanharPedidoPage() {
       <ItensPedido pedido={pedido} />
 
       <HistoricoPedido statusHistorico={pedido.statusHistorico} />
+
+      {pedido.status === "entregue" && (
+        <AvaliarPedido pedidoId={Number(pedido.id)} itens={pedido.itens} />
+      )}
     </section>
   );
 }

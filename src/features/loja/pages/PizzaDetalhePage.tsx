@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useCart } from "../../../context/CartContext";
 import { buscarPizzaPorId } from "../api/loja.service";
 import type { Pizza } from "../types/pizza";
+import { AvaliacoesPizza } from "../components/AvaliacoesPizza";
 
 export function PizzaDetalhePage() {
   const { id } = useParams<{ id: string }>();
@@ -44,7 +45,7 @@ export function PizzaDetalhePage() {
   }
 
   if (loading) return <p>Carregando pizza...</p>;
-  if (!pizza) return <p>Pizza não encontrada</p>;
+  if (!pizza) return <p>Pizza nÃ£o encontrada</p>;
 
   return (
     <section className="pizza-detalhe-page">
@@ -75,7 +76,7 @@ export function PizzaDetalhePage() {
               aria-label="Diminuir quantidade"
               onClick={() => setQuantidade(Math.max(1, quantidade - 1))}
             >
-              −
+              âˆ’
             </button>
             <strong>{quantidade}</strong>
             <button
@@ -100,9 +101,12 @@ export function PizzaDetalhePage() {
         >
           {pizza.disponivel
             ? "Adicionar ao carrinho"
-            : "Indisponível no momento"}
+            : "IndisponÃ­vel no momento"}
         </button>
       </div>
+
+      <AvaliacoesPizza pizzaId={pizza.id} />
     </section>
   );
 }
+
