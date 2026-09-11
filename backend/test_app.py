@@ -178,6 +178,152 @@ def test_relatorio_bloqueado_para_cliente_comum(client):
     assert resposta.status_code == 403
 
 
+def test_relatorio_resumo(client):
+    token_cliente = registrar_e_logar(client, email="resumocliente@teste.com")
+    token_admin = registrar_e_logar(client, email="resumoadmin@teste.com", role="admin")
+    headers_cliente = {"Authorization": f"Bearer {token_cliente}"}
+
+    client.post(
+        "/pedidos",
+        json={
+            **payload_pedido(nome_item="Calabresa", quantity=2, price=45.90),
+            "formaPagamento": "pix",
+        },
+        headers=headers_cliente,
+    )
+    client.post(
+        "/pedidos",
+        json={
+            **payload_pedido(nome_item="Calabresa", quantity=1, price=45.90),
+            "formaPagamento": "pix",
+        },
+        headers=headers_cliente,
+    )
+    pedido_cancelado = client.post(
+        "/pedidos",
+        json={
+            **payload_pedido(nome_item="Marguerita", quantity=5, price=39.90),
+            "formaPagamento": "dinheiro",
+        },
+        headers=headers_cliente,
+    ).get_json()
+    client.patch(
+        f"/pedidos/{pedido_cancelado['id']}/status",
+        json={"status": "cancelado"},
+        headers=headers_cliente,
+    )
+
+    resposta = client.get(
+        "/relatorios/resumo", headers={"Authorization": f"Bearer {token_admin}"}
+    )
+    assert resposta.status_code == 200
+    dados = resposta.get_json()
+
+    # o pedido cancelado não deve contar em nenhuma métrica
+    assert dados["totalPedidos"] == 2
+    assert dados["faturamento"] == 91.8 + 45.90
+    assert round(dados["ticketMedio"], 2) == round((91.8 + 45.90) / 2, 2)
+    assert dados["pizzaMaisVendida"]["pizza"] == "Calabresa"
+    assert dados["pizzaMaisVendida"]["quantidade"] == 3
+    assert dados["formaPagamentoMaisUsada"] == "pix"
+
+
+def test_relatorio_resumo_bloqueado_para_staff_nao_admin(client):
+    token_cozinha = registrar_e_logar(
+        client, email="resumococinha@teste.com", role="cozinha"
+    )
+
+    resposta = client.get(
+        "/relatorios/resumo", headers={"Authorization": f"Bearer {token_cozinha}"}
+    )
+    assert resposta.status_code == 403
+
+
+def test_relatorio_produtos_mais_vendidos(client):
+    token_cliente = registrar_e_logar(client, email="produtoscliente@teste.com")
+    token_admin = registrar_e_logar(
+        client, email="produtosadmin@teste.com", role="admin"
+    )
+
+    client.post(
+        "/pedidos",
+        json=payload_pedido(nome_item="Calabresa", quantity=4, price=45.90),
+        headers={"Authorization": f"Bearer {token_cliente}"},
+    )
+    client.post(
+        "/pedidos",
+        json=payload_pedido(nome_item="Marguerita", quantity=1, price=39.90),
+        headers={"Authorization": f"Bearer {token_cliente}"},
+    )
+
+    resposta = client.get(
+        "/relatorios/produtos-mais-vendidos",
+        headers={"Authorization": f"Bearer {token_admin}"},
+    )
+    assert resposta.status_code == 200
+    dados = resposta.get_json()
+    assert dados[0]["produto"] == "Calabresa"
+    assert dados[0]["quantidade"] == 4
+
+
+def test_relatorio_formas_pagamento(client):
+    token_cliente = registrar_e_logar(client, email="pagamentocliente@teste.com")
+    token_admin = registrar_e_logar(
+        client, email="pagamentoadmin@teste.com", role="admin"
+    )
+    headers_cliente = {"Authorization": f"Bearer {token_cliente}"}
+
+    client.post(
+        "/pedidos",
+        json={**payload_pedido(), "formaPagamento": "cartao_credito"},
+        headers=headers_cliente,
+    )
+    client.post(
+        "/pedidos",
+        json={**payload_pedido(), "formaPagamento": "pix"},
+        headers=headers_cliente,
+    )
+    client.post(
+        "/pedidos",
+        json={**payload_pedido(), "formaPagamento": "pix"},
+        headers=headers_cliente,
+    )
+
+    resposta = client.get(
+        "/relatorios/formas-pagamento",
+        headers={"Authorization": f"Bearer {token_admin}"},
+    )
+    assert resposta.status_code == 200
+    dados = resposta.get_json()
+    assert dados[0]["formaPagamento"] == "pix"
+    assert dados[0]["quantidade"] == 2
+
+
+def test_relatorio_faturamento_filtra_por_periodo(client):
+    from datetime import datetime, timedelta
+
+    token_cliente = registrar_e_logar(client, email="periodocliente@teste.com")
+    token_admin = registrar_e_logar(
+        client, email="periodoadmin@teste.com", role="admin"
+    )
+
+    client.post(
+        "/pedidos",
+        json=payload_pedido(),
+        headers={"Authorization": f"Bearer {token_cliente}"},
+    )
+
+    amanha = (datetime.utcnow() + timedelta(days=1)).strftime("%Y-%m-%d")
+    depois_de_amanha = (datetime.utcnow() + timedelta(days=2)).strftime("%Y-%m-%d")
+
+    resposta = client.get(
+        f"/relatorios/resumo?inicio={amanha}&fim={depois_de_amanha}",
+        headers={"Authorization": f"Bearer {token_admin}"},
+    )
+    assert resposta.status_code == 200
+    assert resposta.get_json()["totalPedidos"] == 0
+
+
 def test_admin_lista_todos_pedidos(client):
     token_cliente_a = registrar_e_logar(client, email="admina@teste.com")
     token_cliente_b = registrar_e_logar(client, email="adminb@teste.com")

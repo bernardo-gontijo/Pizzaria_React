@@ -601,3 +601,143 @@ def test_cupom_inexistente(client):
     assert resposta.status_code == 404
     assert dados["valido"] is False
     assert dados["erro"] == "Cupom não encontrado"
+
+
+# =========================================================
+# CUPONS DISPONÍVEIS
+# =========================================================
+
+
+def test_listar_cupons_disponiveis_exige_login(client):
+    resposta = client.get("/cupons/disponiveis?subtotal=100")
+
+    assert resposta.status_code == 401
+
+
+def test_lista_cupom_disponivel_para_pedido(client):
+    token_admin, _ = registrar_e_logar(
+        client,
+        email="admin-disponiveis@teste.com",
+        role="admin",
+    )
+
+    token_cliente, _ = registrar_e_logar(
+        client,
+        email="cliente-disponiveis@teste.com",
+    )
+
+    criar_cupom_admin(
+        client,
+        token_admin,
+        codigo="DESC10",
+        valor=10,
+        pedidoMinimo=50,
+    )
+
+    resposta = client.get(
+        "/cupons/disponiveis?subtotal=80",
+        headers=headers(token_cliente),
+    )
+
+    assert resposta.status_code == 200
+
+    dados = resposta.get_json()
+
+    assert dados["subtotal"] == 80
+    assert len(dados["disponiveis"]) == 1
+
+    cupom = dados["disponiveis"][0]
+
+    assert cupom["codigo"] == "DESC10"
+    assert cupom["descontoCalculado"] == 8
+    assert dados["quaseDisponiveis"] == []
+
+
+def test_lista_cupom_quase_disponivel(client):
+    token_admin, _ = registrar_e_logar(
+        client,
+        email="admin-quase@teste.com",
+        role="admin",
+    )
+
+    token_cliente, _ = registrar_e_logar(
+        client,
+        email="cliente-quase@teste.com",
+    )
+
+    criar_cupom_admin(
+        client,
+        token_admin,
+        codigo="MINIMO100",
+        valor=10,
+        pedidoMinimo=100,
+    )
+
+    resposta = client.get(
+        "/cupons/disponiveis?subtotal=80",
+        headers=headers(token_cliente),
+    )
+
+    assert resposta.status_code == 200
+
+    dados = resposta.get_json()
+
+    assert dados["disponiveis"] == []
+    assert len(dados["quaseDisponiveis"]) == 1
+
+    cupom = dados["quaseDisponiveis"][0]
+
+    assert cupom["codigo"] == "MINIMO100"
+    assert cupom["pedidoMinimo"] == 100
+    assert cupom["faltanteParaUsar"] == 20
+
+
+def test_cupom_com_limite_do_cliente_atingido_nao_aparece(
+    client,
+    app,
+):
+    token_admin, _ = registrar_e_logar(
+        client,
+        email="admin-limite-lista@teste.com",
+        role="admin",
+    )
+
+    token_cliente, usuario_id = registrar_e_logar(
+        client,
+        email="cliente-limite-lista@teste.com",
+    )
+
+    resposta_criacao = criar_cupom_admin(
+        client,
+        token_admin,
+        codigo="USADO1",
+        valor=10,
+        limiteUsosPorCliente=1,
+    )
+
+    cupom_id = resposta_criacao.get_json()["id"]
+
+    with app.app_context():
+        uso = UsoCupom(
+            cupom_id=cupom_id,
+            usuario_id=usuario_id,
+            desconto_aplicado=10,
+        )
+
+        db.session.add(uso)
+        db.session.commit()
+
+    resposta = client.get(
+        "/cupons/disponiveis?subtotal=100",
+        headers=headers(token_cliente),
+    )
+
+    assert resposta.status_code == 200
+
+    dados = resposta.get_json()
+
+    codigos = [
+        cupom["codigo"] for cupom in (dados["disponiveis"] + dados["quaseDisponiveis"])
+    ]
+
+    assert "USADO1" not in codigos

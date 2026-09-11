@@ -1,10 +1,23 @@
 ﻿import json
 from datetime import datetime
-from flask import Blueprint, request, jsonify
-from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
+
+from flask import Blueprint, jsonify, request
+from flask_jwt_extended import get_jwt, get_jwt_identity, jwt_required
+
+from auth_utils import STAFF_ROLES, staff_required
+from cupons_service import (
+    calcular_desconto,
+    motivo_cupom_invalido,
+    normalizar_codigo,
+)
 from extensions import db
-from models import Pedido, ItemPedido, HistoricoStatus
-from auth_utils import staff_required, STAFF_ROLES
+from models import (
+    Cupom,
+    HistoricoStatus,
+    ItemPedido,
+    Pedido,
+    UsoCupom,
+)
 
 pedidos_bp = Blueprint("pedidos", __name__)
 
@@ -33,25 +46,103 @@ MENSAGENS_STATUS = {
 @jwt_required()
 def criar_pedido():
     usuario_id = int(get_jwt_identity())
-    dados = request.get_json()
+    role = get_jwt().get("role")
+
+    dados = request.get_json(silent=True) or {}
 
     tipo = dados.get("tipo")
     itens = dados.get("itens", [])
+    mesa_id = dados.get("mesaId")
 
     if not tipo:
         return jsonify({"erro": "tipo é obrigatório"}), 400
+
+    # Pedidos normais precisam possuir itens.
+    # Uma mesa, porém, pode ser aberta vazia pelo staff
+    # e receber os itens posteriormente.
+    pedido_vazio_de_mesa = tipo == "local" and mesa_id and role in STAFF_ROLES
+
+    if not itens and not pedido_vazio_de_mesa:
+        return jsonify({"erro": "itens são obrigatórios"}), 400
 
     cliente = dados.get("cliente", {}) or {}
     endereco = dados.get("endereco")
 
     try:
         subtotal = sum(item["price"] * item["quantity"] for item in itens)
-    except KeyError as erro:
-        return jsonify({"erro": f"item sem o campo obrigatório: {erro}"}), 400
+
+    except (KeyError, TypeError, ValueError) as erro:
+        return (
+            jsonify({"erro": ("item inválido ou sem campo " f"obrigatório: {erro}")}),
+            400,
+        )
+
+    subtotal = round(subtotal, 2)
 
     taxa_entrega = dados.get("taxaEntrega", 0) or 0
-    desconto = dados.get("desconto", 0) or 0
-    total = subtotal + taxa_entrega - desconto
+
+    try:
+        taxa_entrega = float(taxa_entrega)
+
+    except (TypeError, ValueError):
+        return (
+            jsonify(
+                {
+                    "erro": "taxaEntrega deve ser um número",
+                }
+            ),
+            400,
+        )
+
+    # O frontend envia somente o código.
+    # O desconto é calculado exclusivamente
+    # pelo backend.
+    cupom_codigo = normalizar_codigo(dados.get("cupomCodigo"))
+
+    desconto = 0.0
+    cupom = None
+
+    if cupom_codigo:
+        cupom = Cupom.query.filter_by(codigo=cupom_codigo).first()
+
+        if not cupom:
+            return (
+                jsonify(
+                    {
+                        "erro": "Cupom não encontrado",
+                    }
+                ),
+                400,
+            )
+
+        motivo = motivo_cupom_invalido(
+            cupom,
+            usuario_id,
+            subtotal,
+        )
+
+        if motivo:
+            return (
+                jsonify(
+                    {
+                        "erro": motivo,
+                    }
+                ),
+                400,
+            )
+
+        desconto = calcular_desconto(
+            cupom,
+            subtotal,
+        )
+
+    total = round(
+        max(
+            subtotal + taxa_entrega - desconto,
+            0,
+        ),
+        2,
+    )
 
     pedido = Pedido(
         usuario_id=usuario_id,
@@ -60,7 +151,7 @@ def criar_pedido():
         cliente_nome=cliente.get("nome"),
         cliente_email=cliente.get("email"),
         cliente_telefone=cliente.get("telefone"),
-        endereco=json.dumps(endereco) if endereco else None,
+        endereco=(json.dumps(endereco) if endereco else None),
         subtotal=subtotal,
         taxa_entrega=taxa_entrega,
         desconto=desconto,
@@ -68,9 +159,13 @@ def criar_pedido():
         forma_pagamento=dados.get("formaPagamento"),
         troco_para=dados.get("trocoPara"),
         observacoes=dados.get("observacoes"),
-        mesa_id=dados.get("mesaId"),
+        mesa_id=mesa_id,
     )
+
     db.session.add(pedido)
+
+    # Precisamos do ID do pedido antes
+    # de cadastrar itens e uso do cupom.
     db.session.flush()
 
     try:
@@ -80,16 +175,24 @@ def criar_pedido():
                     pedido_id=pedido.id,
                     pizza_id=item.get("pizzaId"),
                     nome_item=item["pizzaName"],
-                    tipo_item=item.get("tipo", "pizza"),
+                    tipo_item=item.get(
+                        "tipo",
+                        "pizza",
+                    ),
                     quantidade=item["quantity"],
                     preco_unitario=item["price"],
                     tamanho=item.get("size"),
                     observacoes=item.get("observations"),
                 )
             )
+
     except KeyError as erro:
         db.session.rollback()
-        return jsonify({"erro": f"item sem o campo obrigatório: {erro}"}), 400
+
+        return (
+            jsonify({"erro": ("item sem o campo " f"obrigatório: {erro}")}),
+            400,
+        )
 
     db.session.add(
         HistoricoStatus(
@@ -98,6 +201,19 @@ def criar_pedido():
             mensagem="Pedido recebido com sucesso",
         )
     )
+
+    # Só registra o uso depois que o pedido
+    # foi realmente criado.
+    if cupom is not None:
+        db.session.add(
+            UsoCupom(
+                cupom_id=cupom.id,
+                usuario_id=usuario_id,
+                pedido_id=pedido.id,
+                desconto_aplicado=desconto,
+            )
+        )
+
     db.session.commit()
 
     return jsonify(pedido.to_dict()), 201
@@ -156,12 +272,17 @@ def atualizar_itens_pedido(pedido_id):
 @jwt_required()
 def listar_pedidos():
     usuario_id = int(get_jwt_identity())
+
     pedidos = (
         Pedido.query.filter_by(usuario_id=usuario_id)
         .order_by(Pedido.criado_em.desc())
         .all()
     )
-    return jsonify([p.to_dict() for p in pedidos]), 200
+
+    return (
+        jsonify([pedido.to_dict() for pedido in pedidos]),
+        200,
+    )
 
 
 @pedidos_bp.route("/pedidos/admin", methods=["GET"])
@@ -170,14 +291,22 @@ def listar_todos_pedidos():
     query = Pedido.query
 
     status = request.args.get("status")
+
     if status:
         if status not in STATUS_VALIDOS:
             return (
                 jsonify(
-                    {"erro": f"status inválido. Use um de: {', '.join(STATUS_VALIDOS)}"}
+                    {
+                        "erro": (
+                            "status inválido. "
+                            "Use um de: "
+                            f"{', '.join(STATUS_VALIDOS)}"
+                        )
+                    }
                 ),
                 400,
             )
+
         query = query.filter(Pedido.status == status)
 
     tipo = request.args.get("tipo")
@@ -185,17 +314,27 @@ def listar_todos_pedidos():
         query = query.filter(Pedido.tipo == tipo)
 
     inicio = request.args.get("inicio")
+
     fim = request.args.get("fim")
+
     if inicio:
         query = query.filter(Pedido.criado_em >= datetime.fromisoformat(inicio))
+
     if fim:
         query = query.filter(Pedido.criado_em <= datetime.fromisoformat(fim))
 
     pedidos = query.order_by(Pedido.criado_em.desc()).all()
-    return jsonify([p.to_dict() for p in pedidos]), 200
+
+    return (
+        jsonify([pedido.to_dict() for pedido in pedidos]),
+        200,
+    )
 
 
-@pedidos_bp.route("/pedidos/<int:pedido_id>", methods=["GET"])
+@pedidos_bp.route(
+    "/pedidos/<int:pedido_id>",
+    methods=["GET"],
+)
 @jwt_required()
 def detalhar_pedido(pedido_id):
     usuario_id = int(get_jwt_identity())
@@ -207,12 +346,21 @@ def detalhar_pedido(pedido_id):
         pedido = Pedido.query.filter_by(id=pedido_id, usuario_id=usuario_id).first()
 
     if not pedido:
-        return jsonify({"erro": "pedido não encontrado"}), 404
+        return (
+            jsonify({"erro": ("pedido não encontrado")}),
+            404,
+        )
 
-    return jsonify(pedido.to_dict()), 200
+    return (
+        jsonify(pedido.to_dict()),
+        200,
+    )
 
 
-@pedidos_bp.route("/pedidos/<int:pedido_id>/status", methods=["PATCH"])
+@pedidos_bp.route(
+    "/pedidos/<int:pedido_id>/status",
+    methods=["PATCH"],
+)
 @jwt_required()
 def atualizar_status(pedido_id):
     usuario_id = int(get_jwt_identity())
@@ -224,28 +372,51 @@ def atualizar_status(pedido_id):
         pedido = Pedido.query.filter_by(id=pedido_id, usuario_id=usuario_id).first()
 
     if not pedido:
-        return jsonify({"erro": "pedido não encontrado"}), 404
+        return (
+            jsonify({"erro": ("pedido não encontrado")}),
+            404,
+        )
 
-    dados = request.get_json()
+    dados = request.get_json(silent=True) or {}
+
     novo_status = dados.get("status")
+
     if not novo_status:
-        return jsonify({"erro": "status é obrigatório"}), 400
+        return (
+            jsonify({"erro": ("status é obrigatório")}),
+            400,
+        )
+
     if novo_status not in STATUS_VALIDOS:
         return (
             jsonify(
-                {"erro": f"status inválido. Use um de: {', '.join(STATUS_VALIDOS)}"}
+                {
+                    "erro": (
+                        "status inválido. " "Use um de: " f"{', '.join(STATUS_VALIDOS)}"
+                    )
+                }
             ),
             400,
         )
 
     mensagem = dados.get("message") or MENSAGENS_STATUS.get(
-        novo_status, "Status atualizado"
+        novo_status,
+        "Status atualizado",
     )
 
     pedido.status = novo_status
+
     db.session.add(
-        HistoricoStatus(pedido_id=pedido.id, status=novo_status, mensagem=mensagem)
+        HistoricoStatus(
+            pedido_id=pedido.id,
+            status=novo_status,
+            mensagem=mensagem,
+        )
     )
+
     db.session.commit()
 
-    return jsonify(pedido.to_dict()), 200
+    return (
+        jsonify(pedido.to_dict()),
+        200,
+    )

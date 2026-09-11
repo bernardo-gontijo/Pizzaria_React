@@ -10,6 +10,8 @@ from routes.avaliacoes import avaliacoes_bp
 from routes.cupons import cupons_bp
 from routes.pedidos import pedidos_bp
 from routes.relatorios import relatorios_bp
+from routes.mesas import mesas_bp
+from routes.comandas import comandas_bp
 
 load_dotenv()
 

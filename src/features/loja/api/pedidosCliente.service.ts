@@ -1,7 +1,4 @@
-import {
-  getClienteToken,
-  logoutCliente,
-} from "./clienteAuth.service";
+import { getClienteToken, logoutCliente } from "./clienteAuth.service";
 
 import type {
   AtualizarStatusPedidoDTO,
@@ -9,14 +6,12 @@ import type {
   Pedido,
 } from "../types/pedido";
 
-const API_URL =
-  import.meta.env.VITE_API_URL ?? "http://127.0.0.1:5000";
+const API_URL = import.meta.env.VITE_API_URL ?? "http://127.0.0.1:5000";
 
-interface PedidoApi
-  extends Omit<
-    Pedido,
-    "createdAt" | "updatedAt" | "statusHistorico"
-  > {
+interface PedidoApi extends Omit<
+  Pedido,
+  "createdAt" | "updatedAt" | "statusHistorico"
+> {
   createdAt: string;
   updatedAt: string;
 
@@ -32,10 +27,12 @@ function normalizarPedido(pedido: PedidoApi): Pedido {
     ...pedido,
 
     createdAt: new Date(pedido.createdAt),
+
     updatedAt: new Date(pedido.updatedAt),
 
     statusHistorico: pedido.statusHistorico.map((historico) => ({
       ...historico,
+
       timestamp: new Date(historico.timestamp),
     })),
   };
@@ -50,6 +47,7 @@ function getHeaders(): HeadersInit {
 
   return {
     "Content-Type": "application/json",
+
     Authorization: `Bearer ${token}`,
   };
 }
@@ -60,9 +58,7 @@ function verificarSessao(resposta: Response): void {
 
     window.location.href = "/login";
 
-    throw new Error(
-      "Sua sessão expirou. Entre novamente.",
-    );
+    throw new Error("Sua sessão expirou. Entre novamente.");
   }
 }
 
@@ -73,11 +69,7 @@ async function obterErro(resposta: Response): Promise<string> {
       msg?: string;
     };
 
-    return (
-      dados.erro ??
-      dados.msg ??
-      "Erro ao acessar o servidor"
-    );
+    return dados.erro ?? dados.msg ?? "Erro ao acessar o servidor";
   } catch {
     return "Erro ao acessar o servidor";
   }
@@ -88,23 +80,36 @@ export async function criarPedidoCliente(
 ): Promise<Pedido> {
   const resposta = await fetch(`${API_URL}/pedidos`, {
     method: "POST",
+
     headers: getHeaders(),
 
     body: JSON.stringify({
       tipo: dados.mesaId ? "local" : "delivery",
 
       cliente: dados.cliente,
+
       endereco: dados.endereco,
+
       itens: dados.itens,
 
       formaPagamento: dados.formaPagamento,
+
       trocoPara: dados.trocoPara,
+
       observacoes: dados.observacoes,
 
       mesaId: dados.mesaId,
 
       taxaEntrega: dados.mesaId ? 0 : 5,
-      desconto: 0,
+
+      /*
+       * O frontend envia somente
+       * o código do cupom.
+       *
+       * O backend valida novamente
+       * e calcula o desconto real.
+       */
+      cupomCodigo: dados.cupomCodigo,
     }),
   });
 
@@ -114,14 +119,13 @@ export async function criarPedidoCliente(
     throw new Error(await obterErro(resposta));
   }
 
-  return normalizarPedido(
-    (await resposta.json()) as PedidoApi,
-  );
+  return normalizarPedido((await resposta.json()) as PedidoApi);
 }
 
 export async function buscarPedidosCliente(): Promise<Pedido[]> {
   const resposta = await fetch(`${API_URL}/pedidos`, {
     method: "GET",
+
     headers: getHeaders(),
   });
 
@@ -139,13 +143,11 @@ export async function buscarPedidosCliente(): Promise<Pedido[]> {
 export async function buscarPedidoClientePorId(
   id: string,
 ): Promise<Pedido | null> {
-  const resposta = await fetch(
-    `${API_URL}/pedidos/${id}`,
-    {
-      method: "GET",
-      headers: getHeaders(),
-    },
-  );
+  const resposta = await fetch(`${API_URL}/pedidos/${id}`, {
+    method: "GET",
+
+    headers: getHeaders(),
+  });
 
   verificarSessao(resposta);
 
@@ -157,26 +159,22 @@ export async function buscarPedidoClientePorId(
     throw new Error(await obterErro(resposta));
   }
 
-  return normalizarPedido(
-    (await resposta.json()) as PedidoApi,
-  );
+  return normalizarPedido((await resposta.json()) as PedidoApi);
 }
 
 export async function atualizarStatusPedidoCliente(
   id: string,
   dados: AtualizarStatusPedidoDTO,
 ): Promise<Pedido> {
-  const resposta = await fetch(
-    `${API_URL}/pedidos/${id}/status`,
-    {
-      method: "PATCH",
-      headers: getHeaders(),
+  const resposta = await fetch(`${API_URL}/pedidos/${id}/status`, {
+    method: "PATCH",
 
-      body: JSON.stringify({
-        status: dados.status,
-      }),
-    },
-  );
+    headers: getHeaders(),
+
+    body: JSON.stringify({
+      status: dados.status,
+    }),
+  });
 
   verificarSessao(resposta);
 
@@ -184,7 +182,5 @@ export async function atualizarStatusPedidoCliente(
     throw new Error(await obterErro(resposta));
   }
 
-  return normalizarPedido(
-    (await resposta.json()) as PedidoApi,
-  );
+  return normalizarPedido((await resposta.json()) as PedidoApi);
 }

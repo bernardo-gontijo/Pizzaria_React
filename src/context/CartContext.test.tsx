@@ -2,8 +2,7 @@ import { act, renderHook } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import type { ReactNode } from "react";
 
-import { CartProvider, useCart } from "./CartContext";
-import type { CartItem } from "../store/cart.store";
+import { CartProvider, useCart, type CartItem } from "./CartContext";
 import type { Pizza } from "../features/loja/types/pizza";
 
 const pizzaTeste: Pizza = {
@@ -66,15 +65,24 @@ describe("CartContext", () => {
 
     act(() => {
       result.current.adicionarItem(
-        criarItem({ id: "item-1", precoUnitario: 45, quantidade: 2 }),
+        criarItem({
+          id: "item-1",
+          precoUnitario: 45,
+          quantidade: 2,
+        }),
       );
+
       result.current.adicionarItem(
-        criarItem({ id: "item-2", precoUnitario: 30, quantidade: 1 }),
+        criarItem({
+          id: "item-2",
+          precoUnitario: 30,
+          quantidade: 1,
+        }),
       );
     });
 
-    // subtotal = 45*2 + 30*1 = 120
     expect(result.current.subtotal).toBe(120);
+
     expect(result.current.total).toBe(
       result.current.subtotal + result.current.taxaEntrega,
     );
@@ -84,8 +92,17 @@ describe("CartContext", () => {
     const { result } = renderHook(() => useCart(), { wrapper });
 
     act(() => {
-      result.current.adicionarItem(criarItem({ id: "item-1" }));
-      result.current.adicionarItem(criarItem({ id: "item-2" }));
+      result.current.adicionarItem(
+        criarItem({
+          id: "item-1",
+        }),
+      );
+
+      result.current.adicionarItem(
+        criarItem({
+          id: "item-2",
+        }),
+      );
     });
 
     act(() => {
@@ -100,7 +117,12 @@ describe("CartContext", () => {
     const { result } = renderHook(() => useCart(), { wrapper });
 
     act(() => {
-      result.current.adicionarItem(criarItem({ id: "item-1", quantidade: 1 }));
+      result.current.adicionarItem(
+        criarItem({
+          id: "item-1",
+          quantidade: 1,
+        }),
+      );
     });
 
     act(() => {
@@ -114,8 +136,17 @@ describe("CartContext", () => {
     const { result } = renderHook(() => useCart(), { wrapper });
 
     act(() => {
-      result.current.adicionarItem(criarItem({ id: "item-1" }));
-      result.current.adicionarItem(criarItem({ id: "item-2" }));
+      result.current.adicionarItem(
+        criarItem({
+          id: "item-1",
+        }),
+      );
+
+      result.current.adicionarItem(
+        criarItem({
+          id: "item-2",
+        }),
+      );
     });
 
     act(() => {
@@ -127,10 +158,16 @@ describe("CartContext", () => {
   });
 
   it("persiste o carrinho no localStorage entre montagens", () => {
-    const { result, unmount } = renderHook(() => useCart(), { wrapper });
+    const { result, unmount } = renderHook(() => useCart(), {
+      wrapper,
+    });
 
     act(() => {
-      result.current.adicionarItem(criarItem({ id: "item-1" }));
+      result.current.adicionarItem(
+        criarItem({
+          id: "item-1",
+        }),
+      );
     });
 
     unmount();
@@ -147,5 +184,210 @@ describe("CartContext", () => {
     expect(() => renderHook(() => useCart())).toThrow(
       "useCart deve ser utilizado dentro de CartProvider",
     );
+  });
+
+  it("aplica um cupom ao carrinho", () => {
+    const { result } = renderHook(() => useCart(), { wrapper });
+
+    act(() => {
+      result.current.adicionarItem(
+        criarItem({
+          precoUnitario: 80,
+        }),
+      );
+    });
+
+    act(() => {
+      result.current.aplicarCupom({
+        codigo: "PIZZA10",
+        tipoDesconto: "percentual",
+        valor: 10,
+        desconto: 8,
+      });
+    });
+
+    expect(result.current.cupomAplicado).toEqual({
+      codigo: "PIZZA10",
+      tipoDesconto: "percentual",
+      valor: 10,
+      desconto: 8,
+    });
+
+    expect(result.current.desconto).toBe(8);
+  });
+
+  it("calcula o total considerando o desconto do cupom", () => {
+    const { result } = renderHook(() => useCart(), { wrapper });
+
+    act(() => {
+      result.current.adicionarItem(
+        criarItem({
+          precoUnitario: 80,
+        }),
+      );
+    });
+
+    act(() => {
+      result.current.aplicarCupom({
+        codigo: "PIZZA10",
+        tipoDesconto: "percentual",
+        valor: 10,
+        desconto: 8,
+      });
+    });
+
+    expect(result.current.subtotal).toBe(80);
+    expect(result.current.desconto).toBe(8);
+
+    // 80 + 5 de entrega - 8 de desconto = 77
+    expect(result.current.total).toBe(77);
+  });
+
+  it("remove um cupom aplicado", () => {
+    const { result } = renderHook(() => useCart(), { wrapper });
+
+    act(() => {
+      result.current.adicionarItem(
+        criarItem({
+          precoUnitario: 80,
+        }),
+      );
+    });
+
+    act(() => {
+      result.current.aplicarCupom({
+        codigo: "PIZZA10",
+        tipoDesconto: "percentual",
+        valor: 10,
+        desconto: 8,
+      });
+    });
+
+    act(() => {
+      result.current.removerCupom();
+    });
+
+    expect(result.current.cupomAplicado).toBeNull();
+    expect(result.current.desconto).toBe(0);
+    expect(result.current.total).toBe(85);
+  });
+
+  it("remove o cupom quando a quantidade de um item muda", () => {
+    const { result } = renderHook(() => useCart(), { wrapper });
+
+    act(() => {
+      result.current.adicionarItem(
+        criarItem({
+          id: "item-1",
+        }),
+      );
+    });
+
+    act(() => {
+      result.current.aplicarCupom({
+        codigo: "PIZZA10",
+        tipoDesconto: "percentual",
+        valor: 10,
+        desconto: 4.5,
+      });
+    });
+
+    act(() => {
+      result.current.alterarQuantidade("item-1", 2);
+    });
+
+    expect(result.current.cupomAplicado).toBeNull();
+    expect(result.current.desconto).toBe(0);
+  });
+
+  it("remove o cupom quando um item é removido", () => {
+    const { result } = renderHook(() => useCart(), { wrapper });
+
+    act(() => {
+      result.current.adicionarItem(
+        criarItem({
+          id: "item-1",
+        }),
+      );
+
+      result.current.adicionarItem(
+        criarItem({
+          id: "item-2",
+        }),
+      );
+    });
+
+    act(() => {
+      result.current.aplicarCupom({
+        codigo: "PIZZA10",
+        tipoDesconto: "percentual",
+        valor: 10,
+        desconto: 9,
+      });
+    });
+
+    act(() => {
+      result.current.removerItem("item-1");
+    });
+
+    expect(result.current.cupomAplicado).toBeNull();
+    expect(result.current.desconto).toBe(0);
+  });
+
+  it("remove o cupom quando um novo item é adicionado", () => {
+    const { result } = renderHook(() => useCart(), { wrapper });
+
+    act(() => {
+      result.current.adicionarItem(
+        criarItem({
+          id: "item-1",
+        }),
+      );
+    });
+
+    act(() => {
+      result.current.aplicarCupom({
+        codigo: "PIZZA10",
+        tipoDesconto: "percentual",
+        valor: 10,
+        desconto: 4.5,
+      });
+    });
+
+    act(() => {
+      result.current.adicionarItem(
+        criarItem({
+          id: "item-2",
+        }),
+      );
+    });
+
+    expect(result.current.cupomAplicado).toBeNull();
+    expect(result.current.desconto).toBe(0);
+  });
+
+  it("remove o cupom quando o carrinho é limpo", () => {
+    const { result } = renderHook(() => useCart(), { wrapper });
+
+    act(() => {
+      result.current.adicionarItem(criarItem());
+    });
+
+    act(() => {
+      result.current.aplicarCupom({
+        codigo: "PIZZA10",
+        tipoDesconto: "percentual",
+        valor: 10,
+        desconto: 4.5,
+      });
+    });
+
+    act(() => {
+      result.current.limparCarrinho();
+    });
+
+    expect(result.current.items).toEqual([]);
+    expect(result.current.cupomAplicado).toBeNull();
+    expect(result.current.desconto).toBe(0);
   });
 });
