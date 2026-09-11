@@ -1,8 +1,10 @@
 import json
+from datetime import datetime
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from extensions import db
 from models import Pedido, ItemPedido, HistoricoStatus
+from auth_utils import admin_required
 
 pedidos_bp = Blueprint("pedidos", __name__)
 
@@ -110,6 +112,33 @@ def listar_pedidos():
         .order_by(Pedido.criado_em.desc())
         .all()
     )
+    return jsonify([p.to_dict() for p in pedidos]), 200
+
+
+@pedidos_bp.route("/pedidos/admin", methods=["GET"])
+@admin_required
+def listar_todos_pedidos():
+    query = Pedido.query
+
+    status = request.args.get("status")
+    if status:
+        if status not in STATUS_VALIDOS:
+            return (
+                jsonify(
+                    {"erro": f"status inválido. Use um de: {', '.join(STATUS_VALIDOS)}"}
+                ),
+                400,
+            )
+        query = query.filter(Pedido.status == status)
+
+    inicio = request.args.get("inicio")
+    fim = request.args.get("fim")
+    if inicio:
+        query = query.filter(Pedido.criado_em >= datetime.fromisoformat(inicio))
+    if fim:
+        query = query.filter(Pedido.criado_em <= datetime.fromisoformat(fim))
+
+    pedidos = query.order_by(Pedido.criado_em.desc()).all()
     return jsonify([p.to_dict() for p in pedidos]), 200
 
 
