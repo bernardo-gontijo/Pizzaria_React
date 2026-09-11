@@ -41,29 +41,41 @@ export interface EnderecoEntrega {
 
 export interface Pedido {
   id: string;
+
   cliente: {
     nome: string;
     email?: string;
     telefone: string;
   };
+
   endereco?: EnderecoEntrega;
+
   itens: ItemPedido[];
+
   subtotal: number;
   taxaEntrega: number;
   desconto: number;
   total: number;
+
   formaPagamento:
     "dinheiro" | "cartao_credito" | "cartao_debito" | "pix" | "vale_refeicao";
+
   trocoPara?: number;
+
   status: StatusPedidoType;
+
   statusHistorico: StatusHistorico[];
+
   observacoes?: string;
+
   createdAt: Date;
   updatedAt: Date;
-  // Presentes apenas em pedidos feitos por um garçom, vinculados a uma
-  // mesa do salão (ver src/features/garcom). Ausentes em pedidos de
-  // delivery feitos pelo cliente na loja.
+
+  // Presentes apenas em pedidos feitos por um garçom,
+  // vinculados a uma mesa do salão.
+  // Ausentes em pedidos de delivery feitos pelo cliente.
   mesaId?: string;
+
   gorjeta?: number;
 }
 
@@ -80,13 +92,19 @@ export interface CriarPedidoDTO {
     email?: string;
     telefone: string;
   };
+
   endereco?: EnderecoEntrega;
+
   itens: Omit<ItemPedido, "id">[];
+
   formaPagamento:
     "dinheiro" | "cartao_credito" | "cartao_debito" | "pix" | "vale_refeicao";
+
   trocoPara?: number;
   observacoes?: string;
   mesaId?: string;
+
+  cupomCodigo?: string;
 }
 
 export interface AtualizarStatusPedidoDTO {

@@ -1,5 +1,7 @@
 import { useNavigate } from "react-router-dom";
+
 import { useCart } from "../../../context/CartContext";
+import { CupomCarrinho } from "./CupomCarrinho";
 
 interface ResumoCarrinhoProps {
   showCheckoutButton?: boolean;
@@ -14,14 +16,18 @@ export function ResumoCarrinho({
     alterarQuantidade,
     subtotal,
     taxaEntrega,
+    desconto,
     total,
+    cupomAplicado,
   } = useCart();
+
   const navigate = useNavigate();
 
   if (items.length === 0) {
     return (
       <div className="carrinho-vazio">
         <p>Seu carrinho está vazio</p>
+
         <button onClick={() => navigate("/cardapio")}>Ver cardápio</button>
       </div>
     );
@@ -33,8 +39,10 @@ export function ResumoCarrinho({
         <div key={item.id} className="carrinho-item">
           <div className="carrinho-item__descricao">
             <strong>{item.nome}</strong>
+
             <span>R$ {item.precoUnitario.toFixed(2)} cada</span>
           </div>
+
           <div className="carrinho-item__acoes">
             <button
               aria-label={`Diminuir ${item.nome}`}
@@ -43,7 +51,9 @@ export function ResumoCarrinho({
             >
               -
             </button>
+
             <strong>{item.quantidade}</strong>
+
             <button
               aria-label={`Aumentar ${item.nome}`}
               onClick={() => alterarQuantidade(item.id, item.quantidade + 1)}
@@ -51,9 +61,11 @@ export function ResumoCarrinho({
               +
             </button>
           </div>
+
           <strong className="carrinho-item__subtotal">
             R$ {(item.precoUnitario * item.quantidade).toFixed(2)}
           </strong>
+
           <button
             className="carrinho-item__remover"
             aria-label={`Remover ${item.nome}`}
@@ -64,15 +76,27 @@ export function ResumoCarrinho({
         </div>
       ))}
 
+      <CupomCarrinho />
+
       <div className="carrinho-total">
         <p>
           <span>Subtotal</span>
           <span>R$ {subtotal.toFixed(2)}</span>
         </p>
+
         <p>
           <span>Entrega</span>
           <span>R$ {taxaEntrega.toFixed(2)}</span>
         </p>
+
+        {cupomAplicado && desconto > 0 && (
+          <p className="carrinho-total__desconto">
+            <span>Desconto ({cupomAplicado.codigo})</span>
+
+            <span>- R$ {desconto.toFixed(2)}</span>
+          </p>
+        )}
+
         <p className="carrinho-total__final">
           <span>Total</span>
           <span>R$ {total.toFixed(2)}</span>
