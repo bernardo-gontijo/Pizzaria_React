@@ -22,8 +22,13 @@ def criar_avaliacao():
     if not pedido_id or not pizza_id:
         return jsonify({"erro": "pedidoId e pizzaId são obrigatórios"}), 400
 
-    if not isinstance(nota, int) or nota < 1 or nota > 5:
-        return jsonify({"erro": "nota deve ser um número inteiro de 1 a 5"}), 400
+    if (
+        not isinstance(nota, (int, float))
+        or nota < 0.5
+        or nota > 5
+        or (nota * 2) % 1 != 0
+    ):
+        return jsonify({"erro": "nota deve ser de 0.5 a 5, em incrementos de 0.5"}), 400
 
     pedido = Pedido.query.filter_by(id=pedido_id, usuario_id=usuario_id).first()
 

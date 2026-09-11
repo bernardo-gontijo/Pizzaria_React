@@ -707,3 +707,90 @@ def test_avaliacao_de_pizza_sem_nenhum_review(client):
     dados = resposta.get_json()
     assert dados["total"] == 0
     assert dados["media"] is None
+
+
+def test_avaliar_com_meia_estrela(client):
+    token = registrar_e_logar(client, email="meiaestrela@teste.com")
+    headers = {"Authorization": f"Bearer {token}"}
+
+    pedido = client.post("/pedidos", json=payload_pedido(), headers=headers).get_json()
+
+    client.patch(
+        f"/pedidos/{pedido['id']}/status",
+        json={"status": "entregue"},
+        headers=headers,
+    )
+
+    resposta = client.post(
+        "/avaliacoes",
+        json={"pedidoId": int(pedido["id"]), "pizzaId": "pizza-1", "nota": 3.5},
+        headers=headers,
+    )
+    assert resposta.status_code == 201
+    assert resposta.get_json()["nota"] == 3.5
+
+
+def test_nota_meia_estrela_fora_do_incremento_e_rejeitada(client):
+    token = registrar_e_logar(client, email="incrementoinvalido@teste.com")
+    headers = {"Authorization": f"Bearer {token}"}
+
+    pedido = client.post("/pedidos", json=payload_pedido(), headers=headers).get_json()
+
+    client.patch(
+        f"/pedidos/{pedido['id']}/status",
+        json={"status": "entregue"},
+        headers=headers,
+    )
+
+    resposta = client.post(
+        "/avaliacoes",
+        json={"pedidoId": int(pedido["id"]), "pizzaId": "pizza-1", "nota": 3.7},
+        headers=headers,
+    )
+    assert resposta.status_code == 400
+
+
+def test_nota_abaixo_de_meia_estrela_e_rejeitada(client):
+    token = registrar_e_logar(client, email="notabaixa@teste.com")
+    headers = {"Authorization": f"Bearer {token}"}
+
+    pedido = client.post("/pedidos", json=payload_pedido(), headers=headers).get_json()
+
+    client.patch(
+        f"/pedidos/{pedido['id']}/status",
+        json={"status": "entregue"},
+        headers=headers,
+    )
+
+    resposta = client.post(
+        "/avaliacoes",
+        json={"pedidoId": int(pedido["id"]), "pizzaId": "pizza-1", "nota": 0},
+        headers=headers,
+    )
+    assert resposta.status_code == 400
+
+
+def test_media_com_meias_estrelas(client):
+    token_a = registrar_e_logar(client, email="mediameia_a@teste.com")
+    token_b = registrar_e_logar(client, email="mediameia_b@teste.com")
+
+    notas = [4.0, 3.5]
+    for token, nota in zip((token_a, token_b), notas):
+        headers = {"Authorization": f"Bearer {token}"}
+        pedido = client.post(
+            "/pedidos", json=payload_pedido(nome_item="Marguerita"), headers=headers
+        ).get_json()
+        client.patch(
+            f"/pedidos/{pedido['id']}/status",
+            json={"status": "entregue"},
+            headers=headers,
+        )
+        client.post(
+            "/avaliacoes",
+            json={"pedidoId": int(pedido["id"]), "pizzaId": "pizza-1", "nota": nota},
+            headers=headers,
+        )
+
+    resposta = client.get("/avaliacoes/pizza/pizza-1")
+    assert resposta.status_code == 200
+    assert resposta.get_json()["media"] == 3.75
