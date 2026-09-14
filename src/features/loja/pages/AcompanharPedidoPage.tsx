@@ -79,9 +79,11 @@ export function AcompanharPedidoPage() {
 
       <StatusPedido pedido={pedido} />
 
-      <ItensPedido pedido={pedido} />
+      <div className="acompanhar-page__grade">
+        <ItensPedido pedido={pedido} />
 
-      <HistoricoPedido statusHistorico={pedido.statusHistorico} />
+        <HistoricoPedido statusHistorico={pedido.statusHistorico} />
+      </div>
 
       {pedido.status === "entregue" && (
         <AvaliarPedido pedidoId={Number(pedido.id)} itens={pedido.itens} />

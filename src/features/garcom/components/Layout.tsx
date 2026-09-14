@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import { LogOut } from "lucide-react";
 import { Outlet, useNavigate } from "react-router-dom";
 import { Loading } from "../../../components/Loading";
 import { useAuth } from "../hooks/AuthContext";
@@ -14,12 +15,26 @@ export function Layout() {
 
   return (
     <div className="admin-layout">
-      <header className="admin-sidebar">
-        <div className="admin-sidebar__titulo">
-          <h2>Área do garçom</h2>
+      <header className="garcom-sidebar">
+        <div>
+          <div className="garcom-sidebar__titulo">
+            <h2>Área do garçom</h2>
+          </div>
+
+          <p className="garcom-sidebar__rotulo">Garçom</p>
+
+          <div className="garcom-sidebar__usuario">
+            <strong>{user?.nome}</strong>
+            <span>Em serviço</span>
+          </div>
         </div>
-        <p>{user?.nome}</p>
-        <button className="bg-primaria" onClick={aoSair}>
+
+        <button
+          type="button"
+          className="garcom-sidebar__sair"
+          onClick={aoSair}
+        >
+          <LogOut size={16} />
           Sair
         </button>
       </header>

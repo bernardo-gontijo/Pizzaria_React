@@ -1,5 +1,6 @@
 ﻿import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { Minus, Plus } from "lucide-react";
 import { useCart } from "../../../context/CartContext";
 import { buscarPizzaPorId } from "../api/loja.service";
 import type { Pizza } from "../types/pizza";
@@ -45,7 +46,7 @@ export function PizzaDetalhePage() {
   }
 
   if (loading) return <p>Carregando pizza...</p>;
-  if (!pizza) return <p>Pizza nÃ£o encontrada</p>;
+  if (!pizza) return <p>Pizza não encontrada</p>;
 
   return (
     <section className="pizza-detalhe-page">
@@ -76,14 +77,14 @@ export function PizzaDetalhePage() {
               aria-label="Diminuir quantidade"
               onClick={() => setQuantidade(Math.max(1, quantidade - 1))}
             >
-              âˆ’
+              <Minus size={14} />
             </button>
             <strong>{quantidade}</strong>
             <button
               aria-label="Aumentar quantidade"
               onClick={() => setQuantidade(quantidade + 1)}
             >
-              +
+              <Plus size={14} />
             </button>
           </div>
         </div>
@@ -109,4 +110,3 @@ export function PizzaDetalhePage() {
     </section>
   );
 }
-

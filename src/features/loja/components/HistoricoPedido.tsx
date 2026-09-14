@@ -1,3 +1,5 @@
+import { History } from "lucide-react";
+
 import type { StatusHistorico } from "../types/pedido";
 
 interface HistoricoPedidoProps {
@@ -30,12 +32,15 @@ export function HistoricoPedido({ statusHistorico }: HistoricoPedidoProps) {
   }
 
   const historicoOrdenado = [...statusHistorico].sort(
-    (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime(),
+    (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
   );
 
   return (
     <div className="historico-pedido">
-      <h2 className="historico-pedido__titulo">Histórico do pedido</h2>
+      <h2 className="historico-pedido__titulo">
+        <History size={18} aria-hidden="true" />
+        Histórico do pedido
+      </h2>
 
       <ol className="historico-pedido__lista">
         {historicoOrdenado.map((registro) => (

@@ -108,6 +108,99 @@ def test_criar_varias_comandas_na_mesma_mesa(client):
     assert comanda_2["nome"] == "Maria"
 
     assert comanda_1["status"] == "aberta"
+
+
+def test_nao_duplica_comanda_principal_ao_abrir_mesa_duas_vezes(client):
+    token = registrar_e_logar(
+        client,
+        "garcom.comanda2@teste.com",
+        "garcom",
+    )
+
+    headers = headers_com_token(token)
+
+    mesa = criar_mesa(
+        client,
+        headers,
+        31,
+    )
+
+    primeira = client.post(
+        f"/mesas/{mesa['id']}/comandas",
+        json={},
+        headers=headers,
+    )
+
+    segunda = client.post(
+        f"/mesas/{mesa['id']}/comandas",
+        json={},
+        headers=headers,
+    )
+
+    assert primeira.status_code == 201
+    assert segunda.status_code == 200
+
+    comanda_1 = primeira.get_json()
+    comanda_2 = segunda.get_json()
+
+    assert comanda_1["id"] == comanda_2["id"]
+
+    resposta_lista = client.get(
+        f"/mesas/{mesa['id']}/comandas",
+        headers=headers,
+    )
+
+    comandas = resposta_lista.get_json()
+
+    comandas_principal_abertas = [
+        c
+        for c in comandas
+        if c["status"] == "aberta" and (c["nome"] or "Comanda principal") == "Comanda principal"
+    ]
+
+    assert len(comandas_principal_abertas) == 1
+
+
+def test_permite_nova_comanda_principal_apos_a_anterior_ser_paga(client):
+    token = registrar_e_logar(
+        client,
+        "garcom.comanda3@teste.com",
+        "garcom",
+    )
+
+    headers = headers_com_token(token)
+
+    mesa = criar_mesa(
+        client,
+        headers,
+        32,
+    )
+
+    primeira = client.post(
+        f"/mesas/{mesa['id']}/comandas",
+        json={},
+        headers=headers,
+    )
+
+    comanda_1 = primeira.get_json()
+
+    client.patch(
+        f"/comandas/{comanda_1['id']}/pagar",
+        headers=headers,
+    )
+
+    segunda = client.post(
+        f"/mesas/{mesa['id']}/comandas",
+        json={},
+        headers=headers,
+    )
+
+    assert segunda.status_code == 201
+
+    comanda_2 = segunda.get_json()
+
+    assert comanda_2["id"] != comanda_1["id"]
+    assert comanda_2["status"] == "aberta"
     assert comanda_2["status"] == "aberta"
 
 
