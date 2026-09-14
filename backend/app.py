@@ -46,6 +46,8 @@ def criar_app(banco_teste=False):
     app.register_blueprint(relatorios_bp)
     app.register_blueprint(cupons_bp)
     app.register_blueprint(avaliacoes_bp)
+    app.register_blueprint(comandas_bp)
+    app.register_blueprint(mesas_bp)
 
     with app.app_context():
         db.create_all()
