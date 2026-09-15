@@ -238,17 +238,6 @@ export const router = createBrowserRouter([
         Component: CarrinhoPage,
       },
 
-      /* LOGIN / CADASTRO DO CLIENTE */
-
-      {
-        path: "login",
-        Component: ClienteLoginPage,
-      },
-      {
-        path: "cadastro",
-        Component: ClienteCadastroPage,
-      },
-
       /* ROTAS PROTEGIDAS DO CLIENTE */
 
       {
@@ -278,6 +267,29 @@ export const router = createBrowserRouter([
         Component: NotFoundPage,
       },
     ],
+  },
+
+  /* =========================
+     LOGIN / CADASTRO DO CLIENTE
+     (fora do Layout da loja: sem Header/Footer, mesmo padrão
+     visual das telas de login do admin/garçom/entregador)
+  ========================= */
+
+  {
+    path: "/login",
+    element: (
+      <Suspense fallback={<Loading />}>
+        <ClienteLoginPage />
+      </Suspense>
+    ),
+  },
+  {
+    path: "/cadastro",
+    element: (
+      <Suspense fallback={<Loading />}>
+        <ClienteCadastroPage />
+      </Suspense>
+    ),
   },
 
   /* =========================

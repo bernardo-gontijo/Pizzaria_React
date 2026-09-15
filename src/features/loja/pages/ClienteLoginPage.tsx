@@ -1,7 +1,9 @@
-
+import { Lock, Mail } from "lucide-react";
 import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
+import { AuthCard } from "../../../components/AuthCard";
+import { AuthInput } from "../../../components/AuthInput";
 import { useClienteAuth } from "../hooks/ClienteAuthContext";
 
 export function ClienteLoginPage() {
@@ -10,6 +12,7 @@ export function ClienteLoginPage() {
 
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
+  const [lembrar, setLembrar] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
 
   async function handleSubmit(event: FormEvent) {
@@ -31,51 +34,59 @@ export function ClienteLoginPage() {
   }
 
   return (
-    <div className="mx-auto flex min-h-screen max-w-sm flex-col justify-center gap-3">
-      <h1 className="text-2xl font-bold text-white">
-        Login do cliente
-      </h1>
-
-      <form onSubmit={handleSubmit} className="space-y-3">
-        <input
+    <AuthCard titulo="Login do cliente" descricao="Acompanhe seus pedidos">
+      <form onSubmit={handleSubmit} className="auth-form">
+        <AuthInput
+          id="email"
+          label="E-mail"
+          icone={<Mail size={16} />}
           type="email"
-          placeholder="E-mail"
+          placeholder="exemplo@email.com"
           value={email}
           onChange={(event) => setEmail(event.target.value)}
-          className="w-full rounded border px-3 py-2"
           required
         />
 
-        <input
+        <AuthInput
+          id="senha"
+          label="Senha"
+          icone={<Lock size={16} />}
           type="password"
-          placeholder="Senha"
+          placeholder="••••••••"
           value={senha}
           onChange={(event) => setSenha(event.target.value)}
-          className="w-full rounded border px-3 py-2"
           required
         />
 
+        <div className="auth-form__opcoes">
+          <label className="auth-form__lembrar">
+            <input
+              type="checkbox"
+              checked={lembrar}
+              onChange={(event) => setLembrar(event.target.checked)}
+            />
+            Lembrar de mim
+          </label>
+
+          <a href="#" className="auth-form__esqueci">
+            Esqueci a senha?
+          </a>
+        </div>
+
         {erro && (
-          <p className="text-sm text-red-600" role="alert">
+          <p className="auth-form__erro" role="alert">
             {erro}
           </p>
         )}
 
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full rounded bg-primaria px-4 py-2 font-semibold text-white disabled:opacity-50"
-        >
+        <button type="submit" disabled={loading} className="auth-form__botao">
           {loading ? "Entrando..." : "Entrar"}
         </button>
       </form>
 
-      <p className="text-white">
-        Ainda não tem conta?{" "}
-        <Link to="/cadastro" className="font-semibold text-white">
-          Criar conta
-        </Link>
+      <p className="auth-card__rodape">
+        Ainda não tem conta? <Link to="/cadastro">Criar conta</Link>
       </p>
-    </div>
+    </AuthCard>
   );
 }

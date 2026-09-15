@@ -1,6 +1,9 @@
+import { Lock, Mail, User } from "lucide-react";
 import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
+import { AuthCard } from "../../../components/AuthCard";
+import { AuthInput } from "../../../components/AuthInput";
 import { useClienteAuth } from "../hooks/ClienteAuthContext";
 
 export function ClienteCadastroPage() {
@@ -31,58 +34,55 @@ export function ClienteCadastroPage() {
   }
 
   return (
-    <div className="mx-auto flex min-h-screen max-w-sm flex-col justify-center gap-3">
-      <h1 className="text-2xl font-bold text-white">Criar conta</h1>
-
-      <form onSubmit={handleSubmit} className="space-y-3">
-        <input
+    <AuthCard titulo="Criar conta" descricao="Cadastre-se para fazer pedidos">
+      <form onSubmit={handleSubmit} className="auth-form">
+        <AuthInput
+          id="nome"
+          label="Nome"
+          icone={<User size={16} />}
           type="text"
-          placeholder="Nome"
+          placeholder="Seu nome"
           value={nome}
           onChange={(event) => setNome(event.target.value)}
-          className="w-full rounded border px-3 py-2"
           required
         />
 
-        <input
+        <AuthInput
+          id="email"
+          label="E-mail"
+          icone={<Mail size={16} />}
           type="email"
-          placeholder="E-mail"
+          placeholder="exemplo@email.com"
           value={email}
           onChange={(event) => setEmail(event.target.value)}
-          className="w-full rounded border px-3 py-2"
           required
         />
 
-        <input
+        <AuthInput
+          id="senha"
+          label="Senha"
+          icone={<Lock size={16} />}
           type="password"
-          placeholder="Senha"
+          placeholder="••••••••"
           value={senha}
           onChange={(event) => setSenha(event.target.value)}
-          className="w-full rounded border px-3 py-2"
           required
         />
 
         {erro && (
-          <p className="text-sm text-red-600" role="alert">
+          <p className="auth-form__erro" role="alert">
             {erro}
           </p>
         )}
 
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full rounded bg-primaria px-4 py-2 font-semibold text-white disabled:opacity-50"
-        >
+        <button type="submit" disabled={loading} className="auth-form__botao">
           {loading ? "Criando conta..." : "Criar conta"}
         </button>
       </form>
 
-      <p className="text-white">
-        Já possui conta?{" "}
-        <Link to="/login" className="font-semibold text-white">
-          Entrar
-        </Link>
+      <p className="auth-card__rodape">
+        Já possui conta? <Link to="/login">Entrar</Link>
       </p>
-    </div>
+    </AuthCard>
   );
 }
