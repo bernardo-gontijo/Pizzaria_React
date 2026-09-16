@@ -323,10 +323,17 @@ svg {
 }
 
 .admin-sidebar__link {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 10px;
   padding: 12px;
   border-radius: 8px;
   color: rgba(255, 255, 255, 0.82);
+}
+
+.admin-sidebar__link svg {
+  flex-shrink: 0;
+  opacity: 0.85;
 }
 
 .admin-sidebar__link:hover,

@@ -1,34 +1,50 @@
 import { NavLink } from "react-router-dom";
+import {
+  ClipboardList,
+  LayoutDashboard,
+  LineChart,
+  Layers,
+  Settings,
+  Table,
+  Utensils,
+} from "lucide-react";
 
 export function SideBar() {
   const links = [
     {
       nome: "Dashboard",
       caminho: "/admin/dashboard",
+      Icone: LayoutDashboard,
     },
     {
       nome: "Pizzas",
       caminho: "/admin/pizzas",
+      Icone: Utensils,
     },
     {
       nome: "Combos",
       caminho: "/admin/combos",
+      Icone: Layers,
     },
     {
       nome: "Mesas",
       caminho: "/admin/mesas",
+      Icone: Table,
     },
     {
       nome: "Pedidos",
       caminho: "/admin/pedidos",
+      Icone: ClipboardList,
     },
     {
       nome: "Relatórios",
       caminho: "/admin/relatorios",
+      Icone: LineChart,
     },
     {
       nome: "Configurações",
       caminho: "/admin/configuracao",
+      Icone: Settings,
     },
   ];
 
@@ -50,6 +66,7 @@ export function SideBar() {
                     : "admin-sidebar__link"
                 }
               >
+                <link.Icone size={17} aria-hidden="true" />
                 {link.nome}
               </NavLink>
             </li>
