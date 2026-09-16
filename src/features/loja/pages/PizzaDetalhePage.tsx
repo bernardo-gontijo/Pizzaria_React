@@ -36,7 +36,9 @@ export function PizzaDetalhePage() {
     adicionarItem({
       id: pizza.id,
       tipo: "pizza",
+      pizza,
       nome: pizza.nome,
+      imagem: pizza.imagem,
       precoUnitario: pizza.preco,
       quantidade: quantidade,
       observacoes: "",

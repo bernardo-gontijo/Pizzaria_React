@@ -16,6 +16,7 @@ export interface CartItem {
   tipo?: "pizza" | "bebida" | "combo";
   pizza?: Pizza;
   nome: string;
+  imagem?: string;
   precoUnitario: number;
   quantidade: number;
   tamanho?: string;
