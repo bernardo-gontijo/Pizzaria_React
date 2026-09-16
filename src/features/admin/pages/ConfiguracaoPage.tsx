@@ -1,13 +1,21 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useTenantConfig } from "../../../context/TenantConfigContext";
 import { salvarConfiguracao } from "../api/configuracao.service";
 import type { PaymentMethod } from "../../loja/types/tenant";
 
 const TODAS_FORMAS: PaymentMethod[] = ["pix", "cartao", "dinheiro"];
 
+// Limite conservador: o logotipo é guardado como data URL (base64) dentro
+// da configuração salva no localStorage, então precisa caber com folga no
+// limite de ~5MB por origem que os navegadores costumam impor.
+const TAMANHO_MAXIMO_LOGO_BYTES = 1.5 * 1024 * 1024; // 1.5 MB
+
 export function ConfiguracaoPage() {
   const { config, atualizarConfig } = useTenantConfig();
   const [form, setForm] = useState(config);
+  const [erroLogo, setErroLogo] = useState<string | null>(null);
+  const [carregandoLogo, setCarregandoLogo] = useState(false);
+  const inputArquivoRef = useRef<HTMLInputElement>(null);
 
   async function salvar(e: React.FormEvent) {
     e.preventDefault();
@@ -26,6 +34,55 @@ export function ConfiguracaoPage() {
     }));
   }
 
+  function aoEscolherArquivo(e: React.ChangeEvent<HTMLInputElement>) {
+    const arquivo = e.target.files?.[0];
+    e.target.value = ""; // permite escolher o mesmo arquivo de novo depois
+
+    if (!arquivo) return;
+
+    setErroLogo(null);
+
+    if (!arquivo.type.startsWith("image/")) {
+      setErroLogo("Escolha um arquivo de imagem (PNG, JPG, SVG...).");
+      return;
+    }
+
+    if (arquivo.size > TAMANHO_MAXIMO_LOGO_BYTES) {
+      setErroLogo(
+        `Imagem muito grande. O limite é ${(
+          TAMANHO_MAXIMO_LOGO_BYTES /
+          1024 /
+          1024
+        ).toFixed(1)} MB.`,
+      );
+      return;
+    }
+
+    const leitor = new FileReader();
+
+    setCarregandoLogo(true);
+
+    leitor.onload = () => {
+      setForm((atual) => ({
+        ...atual,
+        logoUrl: leitor.result as string,
+      }));
+      setCarregandoLogo(false);
+    };
+
+    leitor.onerror = () => {
+      setErroLogo("Não foi possível ler essa imagem. Tente outro arquivo.");
+      setCarregandoLogo(false);
+    };
+
+    leitor.readAsDataURL(arquivo);
+  }
+
+  function removerLogo() {
+    setForm((atual) => ({ ...atual, logoUrl: "" }));
+    setErroLogo(null);
+  }
+
   return (
     <section className="max-w-lg">
       <h1 className="mb-4 text-2xl font-bold">Customização da loja</h1>
@@ -37,12 +94,69 @@ export function ConfiguracaoPage() {
           className="w-full rounded border px-3 py-2"
         />
 
-        <input
-          value={form.logoUrl}
-          onChange={(e) => setForm({ ...form, logoUrl: e.target.value })}
-          placeholder="URL do logotipo"
-          className="w-full rounded border px-3 py-2"
-        />
+        <div className="configuracao-logo">
+          <p className="mb-1 font-medium">Logotipo</p>
+
+          <div className="configuracao-logo__linha">
+            {form.logoUrl ? (
+              <img
+                src={form.logoUrl}
+                alt="Pré-visualização do logotipo"
+                className="configuracao-logo__preview"
+              />
+            ) : (
+              <span className="configuracao-logo__preview configuracao-logo__preview--vazia">
+                Sem logo
+              </span>
+            )}
+
+            <div className="configuracao-logo__acoes">
+              <button
+                type="button"
+                onClick={() => inputArquivoRef.current?.click()}
+                disabled={carregandoLogo}
+                className="rounded border px-3 py-2 font-semibold"
+              >
+                {carregandoLogo ? "Carregando..." : "Carregar imagem"}
+              </button>
+
+              {form.logoUrl && (
+                <button
+                  type="button"
+                  onClick={removerLogo}
+                  className="configuracao-logo__remover"
+                >
+                  Remover
+                </button>
+              )}
+            </div>
+
+            <input
+              ref={inputArquivoRef}
+              type="file"
+              accept="image/*"
+              onChange={aoEscolherArquivo}
+              className="configuracao-logo__input-arquivo"
+            />
+          </div>
+
+          {erroLogo && (
+            <p className="configuracao-logo__erro" role="alert">
+              {erroLogo}
+            </p>
+          )}
+
+          <details className="configuracao-logo__url-manual">
+            <summary>Ou informar uma URL de imagem</summary>
+
+            <input
+              value={form.logoUrl}
+              onChange={(e) => setForm({ ...form, logoUrl: e.target.value })}
+              placeholder="https://exemplo.com/logo.png"
+              className="w-full rounded border px-3 py-2"
+            />
+          </details>
+        </div>
 
         <div className="flex gap-3">
           <label className="flex-1">
