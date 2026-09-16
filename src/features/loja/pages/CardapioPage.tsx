@@ -20,6 +20,7 @@ export function CardapioPage() {
       id: combo.id,
       tipo: "combo",
       nome: combo.nome,
+      imagem: combo.imagem,
       precoUnitario: combo.precoPromocional,
       quantidade: 1,
     });

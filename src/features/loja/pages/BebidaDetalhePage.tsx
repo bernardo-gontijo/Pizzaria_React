@@ -41,6 +41,7 @@ export function BebidaDetalhePage() {
       id: bebida.id,
       tipo: "bebida",
       nome: bebida.nome,
+      imagem: bebida.imagem,
       precoUnitario: bebida.preco,
       quantidade,
     });
