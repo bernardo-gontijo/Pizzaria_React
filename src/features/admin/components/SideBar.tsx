@@ -2,6 +2,7 @@ import { NavLink } from "react-router-dom";
 import {
   ClipboardList,
   CupSoda,
+  Flame,
   LayoutDashboard,
   LineChart,
   Layers,
@@ -10,7 +11,11 @@ import {
   Utensils,
 } from "lucide-react";
 
+import { usePromocaoDoDia } from "../../loja/hooks/usePromocaododia";
+
 export function SideBar() {
+  const { promocao } = usePromocaoDoDia();
+
   const links = [
     {
       nome: "Dashboard",
@@ -74,6 +79,15 @@ export function SideBar() {
               >
                 <link.Icone size={17} aria-hidden="true" />
                 {link.nome}
+
+                {link.caminho === "/admin/pizzas" && promocao && (
+                  <span
+                    className="admin-sidebar__badge-promocao"
+                    title={`Promoção ativa: ${promocao.pizza.nome}`}
+                  >
+                    <Flame size={12} aria-hidden="true" />
+                  </span>
+                )}
               </NavLink>
             </li>
           ))}

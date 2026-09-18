@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import type { Pizza } from "../../loja/types/pizza";
 
 import { PizzaForm, type PizzaFormData } from "../components/PizzaForm";
+import { PromocaoDoDiaAdmin } from "../components/PromocaoDoDiaAdmin";
 
 import { useAdminPizzas } from "../hooks/useAdminPizzas";
 
@@ -67,6 +68,10 @@ export function PizzasPage() {
         onSubmit={handleSubmit}
         onCancel={() => setPizzaEditando(undefined)}
       />
+
+      <hr />
+
+      <PromocaoDoDiaAdmin pizzas={pizzas} />
 
       <hr />
 
