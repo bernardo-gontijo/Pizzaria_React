@@ -1,6 +1,7 @@
 import { NavLink } from "react-router-dom";
 import {
   ClipboardList,
+  CupSoda,
   LayoutDashboard,
   LineChart,
   Layers,
@@ -20,6 +21,11 @@ export function SideBar() {
       nome: "Pizzas",
       caminho: "/admin/pizzas",
       Icone: Utensils,
+    },
+    {
+      nome: "Bebidas",
+      caminho: "/admin/bebidas",
+      Icone: CupSoda,
     },
     {
       nome: "Combos",
