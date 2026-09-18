@@ -1,14 +1,20 @@
 import { useRef, useState } from "react";
 import { useTenantConfig } from "../../../context/TenantConfigContext";
 import { salvarConfiguracao } from "../api/configuracao.service";
+import { comprimirImagem } from "../../../utils/imagem";
 import type { PaymentMethod } from "../../loja/types/tenant";
 
 const TODAS_FORMAS: PaymentMethod[] = ["pix", "cartao", "dinheiro"];
 
-// Limite conservador: o logotipo é guardado como data URL (base64) dentro
-// da configuração salva no localStorage, então precisa caber com folga no
-// limite de ~5MB por origem que os navegadores costumam impor.
-const TAMANHO_MAXIMO_LOGO_BYTES = 1.5 * 1024 * 1024; // 1.5 MB
+// Limite do arquivo ORIGINAL escolhido pelo admin, antes da compressão.
+// Generoso o bastante para cobrir fotos comuns de celular — o que
+// importa de verdade é o tamanho final após comprimirImagem().
+const TAMANHO_MAXIMO_ARQUIVO_ORIGINAL_BYTES = 10 * 1024 * 1024; // 10 MB
+
+// SVG é vetor: não faz sentido "comprimir" via canvas (isso o
+// rasterizaria, perdendo nitidez em qualquer escala), e o arquivo já
+// costuma ser leve por ser texto. Só validamos o tamanho dele à parte.
+const TAMANHO_MAXIMO_SVG_BYTES = 300 * 1024; // 300 KB
 
 export function ConfiguracaoPage() {
   const { config, atualizarConfig } = useTenantConfig();
@@ -34,7 +40,7 @@ export function ConfiguracaoPage() {
     }));
   }
 
-  function aoEscolherArquivo(e: React.ChangeEvent<HTMLInputElement>) {
+  async function aoEscolherArquivo(e: React.ChangeEvent<HTMLInputElement>) {
     const arquivo = e.target.files?.[0];
     e.target.value = ""; // permite escolher o mesmo arquivo de novo depois
 
@@ -47,35 +53,58 @@ export function ConfiguracaoPage() {
       return;
     }
 
-    if (arquivo.size > TAMANHO_MAXIMO_LOGO_BYTES) {
+    if (arquivo.size > TAMANHO_MAXIMO_ARQUIVO_ORIGINAL_BYTES) {
       setErroLogo(
-        `Imagem muito grande. O limite é ${(
-          TAMANHO_MAXIMO_LOGO_BYTES /
+        `Arquivo muito grande. O limite é ${(
+          TAMANHO_MAXIMO_ARQUIVO_ORIGINAL_BYTES /
           1024 /
           1024
-        ).toFixed(1)} MB.`,
+        ).toFixed(0)} MB.`,
       );
       return;
     }
 
-    const leitor = new FileReader();
-
     setCarregandoLogo(true);
 
-    leitor.onload = () => {
-      setForm((atual) => ({
-        ...atual,
-        logoUrl: leitor.result as string,
-      }));
-      setCarregandoLogo(false);
-    };
+    try {
+      if (arquivo.type === "image/svg+xml") {
+        if (arquivo.size > TAMANHO_MAXIMO_SVG_BYTES) {
+          setErroLogo(
+            `SVG muito grande. O limite é ${(
+              TAMANHO_MAXIMO_SVG_BYTES / 1024
+            ).toFixed(0)} KB.`,
+          );
+          return;
+        }
 
-    leitor.onerror = () => {
-      setErroLogo("Não foi possível ler essa imagem. Tente outro arquivo.");
-      setCarregandoLogo(false);
-    };
+        const leitor = new FileReader();
+        const dataUrl = await new Promise<string>((resolve, reject) => {
+          leitor.onload = () => resolve(leitor.result as string);
+          leitor.onerror = () =>
+            reject(new Error("Não foi possível ler esse SVG."));
+          leitor.readAsDataURL(arquivo);
+        });
 
-    leitor.readAsDataURL(arquivo);
+        setForm((atual) => ({ ...atual, logoUrl: dataUrl }));
+        return;
+      }
+
+      const dataUrlComprimida = await comprimirImagem(arquivo, {
+        larguraMaxima: 600,
+        alturaMaxima: 600,
+        tamanhoMaximoBytes: 200 * 1024, // 200 KB — o logo aparece pequeno
+      });
+
+      setForm((atual) => ({ ...atual, logoUrl: dataUrlComprimida }));
+    } catch (erro) {
+      setErroLogo(
+        erro instanceof Error
+          ? erro.message
+          : "Não foi possível processar essa imagem. Tente outro arquivo.",
+      );
+    } finally {
+      setCarregandoLogo(false);
+    }
   }
 
   function removerLogo() {
