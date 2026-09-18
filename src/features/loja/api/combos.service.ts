@@ -147,8 +147,12 @@ async function resolverCombo(combo: Combo): Promise<ComboResolvido> {
     disponivel: combo.disponivel,
     precoOriginal,
     precoPromocional,
-    // Usa a imagem do primeiro item resolvido como capa do combo.
-    imagem: itensResolvidos[0]?.imagem ?? "/images/banner-pizzaria.jpg",
+    // Prioriza a imagem própria do combo (definida pelo admin); na
+    // ausência dela, cai no comportamento antigo de usar a imagem do
+    // primeiro item resolvido como capa.
+    imagem:
+      combo.imagem || itensResolvidos[0]?.imagem || "/images/banner-pizzaria.jpg",
+    imagemPropria: combo.imagem,
   };
 }
 

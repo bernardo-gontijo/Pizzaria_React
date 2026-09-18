@@ -3729,6 +3729,22 @@ body {
   gap: 10px;
 }
 
+.admin-layout__conteudo .configuracao-logo__acoes button:not(.configuracao-logo__remover) {
+  border: 1px solid #cfc4bb;
+  background: white;
+  color: var(--texto);
+}
+
+.admin-layout__conteudo .configuracao-logo__acoes button:not(.configuracao-logo__remover):hover:not(:disabled) {
+  border-color: var(--cor-primaria);
+  color: var(--cor-primaria);
+}
+
+.admin-layout__conteudo .configuracao-logo__acoes button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .admin-layout__conteudo .configuracao-logo__remover {
   padding: 0;
   border: 0;
