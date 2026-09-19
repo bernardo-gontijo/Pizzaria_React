@@ -61,6 +61,12 @@ const PizzasPage = lazy(() =>
   })),
 );
 
+const BebidasAdminPage = lazy(() =>
+  import("../features/admin/pages/BebidasPage").then((m) => ({
+    default: m.BebidasPage,
+  })),
+);
+
 const CombosAdminPage = lazy(() =>
   import("../features/admin/pages/CombosAdminPage").then((m) => ({
     default: m.CombosAdminPage,
@@ -340,6 +346,10 @@ export const router = createBrowserRouter([
           {
             path: "pizzas",
             Component: PizzasPage,
+          },
+          {
+            path: "bebidas",
+            Component: BebidasAdminPage,
           },
           {
             path: "combos",
