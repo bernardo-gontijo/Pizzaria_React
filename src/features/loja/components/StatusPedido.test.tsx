@@ -1,6 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
+import { TenantConfigProvider } from "../../../context/TenantConfigContext";
 import { StatusPedido } from "./StatusPedido";
 
 const pedido = {
@@ -22,91 +23,52 @@ const pedido = {
 
   total: 50.9,
 
-  statusHistorico: [
-    {
-      id: "1",
-      status: "pendente",
-      timestamp: new Date(2026, 8, 10, 17, 30),
-      message: "Pedido recebido com sucesso",
-    },
+  formaPagamento: "cartao_credito",
 
-    {
-      id: "2",
-      status: "confirmado",
-      timestamp: new Date(2026, 8, 10, 17, 35),
-      message: "Pedido confirmado",
-    },
-  ],
+  createdAt: new Date(2026, 8, 10, 17, 30),
 };
+
+function renderComProvider(ui: React.ReactElement) {
+  return render(<TenantConfigProvider>{ui}</TenantConfigProvider>);
+}
 
 describe("StatusPedido", () => {
   it("mostra os dados principais do pedido", () => {
-    render(<StatusPedido pedido={pedido} />);
+    renderComProvider(<StatusPedido pedido={pedido} />);
 
-    expect(
-      screen.getByText("Pedido #2"),
-    ).toBeInTheDocument();
+    expect(screen.getByText("Pedido #2")).toBeInTheDocument();
 
-    expect(
-      screen.getByText("Kauan"),
-    ).toBeInTheDocument();
+    expect(screen.getByText("Kauan")).toBeInTheDocument();
 
-    expect(
-      screen.getByText(/R\$ 50\.90/),
-    ).toBeInTheDocument();
+    expect(screen.getByText(/R\$\s*50,90/)).toBeInTheDocument();
   });
 
-  it("mostra o histórico de status", () => {
-    render(<StatusPedido pedido={pedido} />);
+  it("mostra o endereço e a forma de pagamento", () => {
+    renderComProvider(<StatusPedido pedido={pedido} />);
 
-    expect(
-      screen.getByRole("heading", {
-        name: "Histórico do pedido",
-      }),
-    ).toBeInTheDocument();
-
-    expect(
-      screen.getByText("Pedido recebido com sucesso"),
-    ).toBeInTheDocument();
-
-    expect(
-      screen.getByText("Pedido confirmado"),
-    ).toBeInTheDocument();
-  });
-
-  it("mostra data e hora das mudanças", () => {
-    render(<StatusPedido pedido={pedido} />);
-
-    expect(
-      screen.getByText(/10\/09\/2026.*17:30/),
-    ).toBeInTheDocument();
-
-    expect(
-      screen.getByText(/10\/09\/2026.*17:35/),
-    ).toBeInTheDocument();
+    expect(screen.getByText("Endereço de entrega")).toBeInTheDocument();
+    expect(screen.getByText("Cartão de crédito")).toBeInTheDocument();
   });
 
   it("mostra as etapas do fluxo do pedido", () => {
-    render(<StatusPedido pedido={pedido} />);
+    renderComProvider(<StatusPedido pedido={pedido} />);
+
+    expect(screen.getAllByText("Aguardando").length).toBeGreaterThan(0);
+
+    expect(screen.getAllByText("Confirmado").length).toBeGreaterThan(0);
+
+    expect(screen.getByText("Preparando")).toBeInTheDocument();
+
+    expect(screen.getByText("Em rota")).toBeInTheDocument();
+
+    expect(screen.getByText("Entregue")).toBeInTheDocument();
+  });
+
+  it("não renderiza o histórico de status (responsabilidade do HistoricoPedido)", () => {
+    renderComProvider(<StatusPedido pedido={pedido} />);
 
     expect(
-      screen.getAllByText("Aguardando").length,
-    ).toBeGreaterThan(0);
-
-    expect(
-      screen.getAllByText("Confirmado").length,
-    ).toBeGreaterThan(0);
-
-    expect(
-      screen.getByText("Preparando"),
-    ).toBeInTheDocument();
-
-    expect(
-      screen.getByText("Saiu para entrega"),
-    ).toBeInTheDocument();
-
-    expect(
-      screen.getByText("Entregue"),
-    ).toBeInTheDocument();
+      screen.queryByRole("heading", { name: "Histórico do pedido" }),
+    ).not.toBeInTheDocument();
   });
 });

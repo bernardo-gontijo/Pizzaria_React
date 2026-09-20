@@ -1,3 +1,5 @@
+import { Utensils } from "lucide-react";
+
 import type { EnderecoEntrega, ItemPedido } from "../types/pedido";
 import { formatarEndereco } from "../utils/endereco";
 
@@ -32,13 +34,35 @@ function formatarMoeda(valor: number): string {
 }
 
 export function ItensPedido({ pedido }: ItensPedidoProps) {
+  const quantidadeItens = pedido.itens.reduce(
+    (total, item) => total + item.quantity,
+    0,
+  );
+
   return (
     <div className="itens-pedido">
-      <h2 className="itens-pedido__titulo">Itens do pedido</h2>
+      <div className="itens-pedido__cabecalho">
+        <h2 className="itens-pedido__titulo">
+          <Utensils size={18} aria-hidden="true" />
+          Itens do pedido
+        </h2>
+
+        <span className="itens-pedido__contagem">
+          {quantidadeItens} {quantidadeItens === 1 ? "item" : "itens"}
+        </span>
+      </div>
 
       <ul className="itens-pedido__lista">
         {pedido.itens.map((item) => (
           <li key={item.id} className="itens-pedido__item">
+            {item.pizza?.imagem && (
+              <img
+                className="itens-pedido__item-imagem"
+                src={item.pizza.imagem}
+                alt=""
+              />
+            )}
+
             <div className="itens-pedido__item-descricao">
               <strong>
                 {item.quantity}x {item.pizzaName}
@@ -46,6 +70,7 @@ export function ItensPedido({ pedido }: ItensPedidoProps) {
               {item.size && <span>Tamanho {item.size}</span>}
               {item.observations && <span>Obs.: {item.observations}</span>}
             </div>
+
             <span className="itens-pedido__item-preco">
               {formatarMoeda(item.price * item.quantity)}
             </span>

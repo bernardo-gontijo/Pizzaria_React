@@ -1,11 +1,6 @@
 import { Headset } from "lucide-react";
 import { useTenantConfig } from "../context/TenantConfigContext";
-
-const SUPORTE_WHATSAPP_NUMERO = "5592994969199";
-const SUPORTE_WHATSAPP_MENSAGEM = encodeURIComponent(
-  "Olá! Preciso de suporte com a Pizzaria.",
-);
-const SUPORTE_WHATSAPP_URL = `https://wa.me/${SUPORTE_WHATSAPP_NUMERO}?text=${SUPORTE_WHATSAPP_MENSAGEM}`;
+import { SUPORTE_WHATSAPP_URL } from "../utils/whatsapp";
 
 export function Footer() {
   const { config } = useTenantConfig();

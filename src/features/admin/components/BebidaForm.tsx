@@ -1,12 +1,12 @@
 import { useRef, useState, type FormEvent } from "react";
-import type { Pizza, PizzaCategory } from "../../loja/types/pizza";
+import type { Bebida } from "../../loja/types/bebidas";
 import { comprimirImagem } from "../../../utils/imagem";
 
-export type PizzaFormData = Omit<Pizza, "id">;
+export type BebidaFormData = Omit<Bebida, "id">;
 
-interface PizzaFormProps {
-  pizza?: Pizza;
-  onSubmit: (dados: PizzaFormData) => void;
+interface BebidaFormProps {
+  bebida?: Bebida;
+  onSubmit: (dados: BebidaFormData) => void;
   onCancel?: () => void;
 }
 
@@ -16,36 +16,32 @@ interface PizzaFormProps {
 // tamanho final após a compressão.
 const TAMANHO_MAXIMO_ARQUIVO_ORIGINAL_BYTES = 10 * 1024 * 1024; // 10 MB
 
-export function PizzaForm({ pizza, onSubmit, onCancel }: PizzaFormProps) {
-  const [nome, setNome] = useState(pizza?.nome ?? "");
+export function BebidaForm({ bebida, onSubmit, onCancel }: BebidaFormProps) {
+  const [nome, setNome] = useState(bebida?.nome ?? "");
 
-  const [descricao, setDescricao] = useState(pizza?.descricao ?? "");
+  const [descricao, setDescricao] = useState(bebida?.descricao ?? "");
 
-  const [preco, setPreco] = useState(pizza ? String(pizza.preco) : "");
+  const [preco, setPreco] = useState(bebida ? String(bebida.preco) : "");
 
-  const [ingredientes, setIngredientes] = useState(
-    pizza?.ingredientes.join(", ") ?? "",
-  );
+  const [quantidade, setQuantidade] = useState(bebida?.quantidade ?? "");
 
-  const [imagem, setImagem] = useState(pizza?.imagem ?? "");
+  const [imagem, setImagem] = useState(bebida?.imagem ?? "");
   const [erroImagem, setErroImagem] = useState<string | null>(null);
   const [carregandoImagem, setCarregandoImagem] = useState(false);
   const inputArquivoRef = useRef<HTMLInputElement>(null);
 
-  const [categoria, setCategoria] = useState<PizzaCategory>(
-    pizza?.categoria ?? "tradicional",
-  );
+  const [categoria, setCategoria] = useState(bebida?.categoria ?? "");
 
-  const [disponivel, setDisponivel] = useState(pizza?.disponivel ?? true);
+  const [disponivel, setDisponivel] = useState(bebida?.disponivel ?? true);
 
   function limparFormulario() {
     setNome("");
     setDescricao("");
     setPreco("");
-    setIngredientes("");
+    setQuantidade("");
     setImagem("");
     setErroImagem(null);
-    setCategoria("tradicional");
+    setCategoria("");
     setDisponivel(true);
   }
 
@@ -103,16 +99,11 @@ export function PizzaForm({ pizza, onSubmit, onCancel }: PizzaFormProps) {
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    const dados: PizzaFormData = {
+    const dados: BebidaFormData = {
       nome,
       descricao,
       preco: Number(preco),
-
-      ingredientes: ingredientes
-        .split(",")
-        .map((ingrediente) => ingrediente.trim())
-        .filter(Boolean),
-
+      quantidade,
       imagem,
       categoria,
       disponivel,
@@ -120,20 +111,20 @@ export function PizzaForm({ pizza, onSubmit, onCancel }: PizzaFormProps) {
 
     onSubmit(dados);
 
-    if (!pizza) {
+    if (!bebida) {
       limparFormulario();
     }
   }
 
   return (
     <form onSubmit={handleSubmit}>
-      <h2>{pizza ? "Editar pizza" : "Cadastrar pizza"}</h2>
+      <h2>{bebida ? "Editar bebida" : "Cadastrar bebida"}</h2>
 
       <div>
-        <label htmlFor="nome">Nome</label>
+        <label htmlFor="bebida-nome">Nome</label>
 
         <input
-          id="nome"
+          id="bebida-nome"
           type="text"
           value={nome}
           onChange={(event) => setNome(event.target.value)}
@@ -142,10 +133,10 @@ export function PizzaForm({ pizza, onSubmit, onCancel }: PizzaFormProps) {
       </div>
 
       <div>
-        <label htmlFor="descricao">Descrição</label>
+        <label htmlFor="bebida-descricao">Descrição</label>
 
         <textarea
-          id="descricao"
+          id="bebida-descricao"
           value={descricao}
           onChange={(event) => setDescricao(event.target.value)}
           required
@@ -153,10 +144,10 @@ export function PizzaForm({ pizza, onSubmit, onCancel }: PizzaFormProps) {
       </div>
 
       <div>
-        <label htmlFor="preco">Preço</label>
+        <label htmlFor="bebida-preco">Preço</label>
 
         <input
-          id="preco"
+          id="bebida-preco"
           type="number"
           min="0"
           step="0.01"
@@ -167,26 +158,26 @@ export function PizzaForm({ pizza, onSubmit, onCancel }: PizzaFormProps) {
       </div>
 
       <div>
-        <label htmlFor="ingredientes">Ingredientes</label>
+        <label htmlFor="bebida-quantidade">Quantidade</label>
 
         <input
-          id="ingredientes"
+          id="bebida-quantidade"
           type="text"
-          value={ingredientes}
-          onChange={(event) => setIngredientes(event.target.value)}
-          placeholder="Queijo, tomate, calabresa"
+          value={quantidade}
+          onChange={(event) => setQuantidade(event.target.value)}
+          placeholder="350ml, 600ml, 1L..."
           required
         />
       </div>
 
       <div className="configuracao-logo">
-        <label htmlFor="imagem">Imagem da pizza</label>
+        <label htmlFor="bebida-imagem">Imagem da bebida</label>
 
         <div className="configuracao-logo__linha">
           {imagem ? (
             <img
               src={imagem}
-              alt="Pré-visualização da imagem da pizza"
+              alt="Pré-visualização da imagem da bebida"
               className="configuracao-logo__preview"
             />
           ) : (
@@ -216,7 +207,7 @@ export function PizzaForm({ pizza, onSubmit, onCancel }: PizzaFormProps) {
           </div>
 
           <input
-            id="imagem"
+            id="bebida-imagem"
             ref={inputArquivoRef}
             type="file"
             accept="image/*"
@@ -244,23 +235,16 @@ export function PizzaForm({ pizza, onSubmit, onCancel }: PizzaFormProps) {
       </div>
 
       <div>
-        <label htmlFor="categoria">Categoria</label>
+        <label htmlFor="bebida-categoria">Categoria</label>
 
-        <select
-          id="categoria"
+        <input
+          id="bebida-categoria"
+          type="text"
           value={categoria}
-          onChange={(event) =>
-            setCategoria(event.target.value as PizzaCategory)
-          }
-        >
-          <option value="tradicional">Tradicional</option>
-
-          <option value="especial">Especial</option>
-
-          <option value="vegetariana">Vegetariana</option>
-
-          <option value="doce">Doce</option>
-        </select>
+          onChange={(event) => setCategoria(event.target.value)}
+          placeholder="refrigerante, suco, água..."
+          required
+        />
       </div>
 
       <div>
@@ -270,15 +254,15 @@ export function PizzaForm({ pizza, onSubmit, onCancel }: PizzaFormProps) {
             checked={disponivel}
             onChange={(event) => setDisponivel(event.target.checked)}
           />
-          Pizza disponível
+          Bebida disponível
         </label>
       </div>
 
       <button type="submit">
-        {pizza ? "Salvar alterações" : "Cadastrar pizza"}
+        {bebida ? "Salvar alterações" : "Cadastrar bebida"}
       </button>
 
-      {pizza && onCancel && (
+      {bebida && onCancel && (
         <button type="button" onClick={onCancel}>
           Cancelar
         </button>

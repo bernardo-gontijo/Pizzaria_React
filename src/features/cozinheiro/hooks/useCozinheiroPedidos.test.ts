@@ -73,7 +73,7 @@ describe("useCozinheiroPedidos", () => {
     expect(result.current.pedidosDelivery[0].id).toBe("pedido-delivery");
   });
 
-  it("ignora pedidos sem itens e pedidos que jÃ¡ estÃ£o prontos", async () => {
+  it("ignora pedidos sem itens e pedidos que já estão prontos", async () => {
     const pedidoSemItens: Pedido = {
       ...pedidoBase,
       id: "pedido-vazio",
@@ -99,7 +99,7 @@ describe("useCozinheiroPedidos", () => {
     expect(result.current.pedidosDelivery).toHaveLength(0);
   });
 
-  it("mantÃ©m pedidos em preparo na fila da cozinha", async () => {
+  it("mantém pedidos em preparo na fila da cozinha", async () => {
     const pedidoPreparando: Pedido = {
       ...pedidoBase,
       id: "pedido-preparando",

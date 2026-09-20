@@ -41,12 +41,14 @@ export function Header() {
           <NavLink to="/login">Entrar</NavLink>
         ) : (
           <>
-            <span>Olá, {usuario?.nome}</span>
+            <span className="header__saudacao">
+              Olá, <strong>{usuario?.nome}</strong>
+            </span>
 
             <button
               type="button"
               onClick={handleLogout}
-              className="botao"
+              className="botao header__sair"
             >
               Sair
             </button>

@@ -1,34 +1,61 @@
 import { NavLink } from "react-router-dom";
+import {
+  ClipboardList,
+  CupSoda,
+  Flame,
+  LayoutDashboard,
+  LineChart,
+  Layers,
+  Settings,
+  Table,
+  Utensils,
+} from "lucide-react";
+
+import { usePromocaoDoDia } from "../../loja/hooks/usePromocaododia";
 
 export function SideBar() {
+  const { promocao } = usePromocaoDoDia();
+
   const links = [
     {
       nome: "Dashboard",
       caminho: "/admin/dashboard",
+      Icone: LayoutDashboard,
     },
     {
       nome: "Pizzas",
       caminho: "/admin/pizzas",
+      Icone: Utensils,
+    },
+    {
+      nome: "Bebidas",
+      caminho: "/admin/bebidas",
+      Icone: CupSoda,
     },
     {
       nome: "Combos",
       caminho: "/admin/combos",
+      Icone: Layers,
     },
     {
       nome: "Mesas",
       caminho: "/admin/mesas",
+      Icone: Table,
     },
     {
       nome: "Pedidos",
       caminho: "/admin/pedidos",
+      Icone: ClipboardList,
     },
     {
       nome: "Relatórios",
       caminho: "/admin/relatorios",
+      Icone: LineChart,
     },
     {
       nome: "Configurações",
       caminho: "/admin/configuracao",
+      Icone: Settings,
     },
   ];
 
@@ -50,7 +77,17 @@ export function SideBar() {
                     : "admin-sidebar__link"
                 }
               >
+                <link.Icone size={17} aria-hidden="true" />
                 {link.nome}
+
+                {link.caminho === "/admin/pizzas" && promocao && (
+                  <span
+                    className="admin-sidebar__badge-promocao"
+                    title={`Promoção ativa: ${promocao.pizza.nome}`}
+                  >
+                    <Flame size={12} aria-hidden="true" />
+                  </span>
+                )}
               </NavLink>
             </li>
           ))}
