@@ -25,6 +25,70 @@ const FORMULARIO_PADRAO: FormularioPorItem = {
   erro: null,
 };
 
+const POSICOES_ESTRELA = [1, 2, 3, 4, 5];
+
+interface SeletorEstrelasProps {
+  valor: number;
+  aoEscolher: (novoValor: number) => void;
+}
+
+function SeletorEstrelas({ valor, aoEscolher }: SeletorEstrelasProps) {
+  const [hover, setHover] = useState(null as number | null);
+
+  const valorExibido = hover ?? valor;
+
+  return (
+    <div
+      className="seletor-estrelas"
+      role="radiogroup"
+      aria-label="Nota de 0.5 a 5 estrelas"
+      onMouseLeave={() => setHover(null)}
+    >
+      {POSICOES_ESTRELA.map((posicao) => {
+        const preenchimento =
+          valorExibido >= posicao
+            ? "100%"
+            : valorExibido >= posicao - 0.5
+              ? "50%"
+              : "0%";
+
+        return (
+          <span key={posicao} className="seletor-estrelas__item">
+            <span className="estrela-visual">
+              <span className="estrela-visual__fundo">★</span>
+              <span
+                className="estrela-visual__preenchida"
+                style={{ width: preenchimento }}
+              >
+                ★
+              </span>
+            </span>
+
+            <button
+              type="button"
+              className="seletor-estrelas__metade seletor-estrelas__metade--esquerda"
+              aria-label={`${posicao - 0.5} estrelas`}
+              onMouseEnter={() => setHover(posicao - 0.5)}
+              onClick={() => aoEscolher(posicao - 0.5)}
+            />
+            <button
+              type="button"
+              className="seletor-estrelas__metade seletor-estrelas__metade--direita"
+              aria-label={`${posicao} estrelas`}
+              onMouseEnter={() => setHover(posicao)}
+              onClick={() => aoEscolher(posicao)}
+            />
+          </span>
+        );
+      })}
+
+      <span className="seletor-estrelas__valor">
+        {valor > 0 ? `${valor.toFixed(1)} ★` : "Escolha uma nota"}
+      </span>
+    </div>
+  );
+}
+
 export function AvaliarPedido({ pedidoId, itens }: AvaliarPedidoProps) {
   const [pizzaIdsAvaliadas, setPizzaIdsAvaliadas] = useState(new Set() as Set<string>);
   const [carregando, setCarregando] = useState(true);
@@ -70,8 +134,8 @@ export function AvaliarPedido({ pedidoId, itens }: AvaliarPedidoProps) {
   async function enviarAvaliacao(pizzaId: string) {
     const formulario = formularios[pizzaId];
 
-    if (!formulario || formulario.nota < 1) {
-      atualizarFormulario(pizzaId, { erro: "Escolha de 1 a 5 estrelas" });
+    if (!formulario || formulario.nota < 0.5) {
+      atualizarFormulario(pizzaId, { erro: "Escolha de meia a 5 estrelas" });
       return;
     }
 
@@ -126,34 +190,15 @@ export function AvaliarPedido({ pedidoId, itens }: AvaliarPedidoProps) {
             <div key={item.pizzaId} className="avaliar-pedido__item">
               <strong>{item.pizzaName}</strong>
 
-              <div
-                className="avaliar-pedido__estrelas"
-                role="radiogroup"
-                aria-label={`Nota para ${item.pizzaName}`}
-              >
-                {[1, 2, 3, 4, 5].map((valor) => (
-                  <button
-                    key={valor}
-                    type="button"
-                    role="radio"
-                    aria-checked={formulario.nota === valor}
-                    aria-label={`${valor} estrela${valor > 1 ? "s" : ""}`}
-                    className={
-                      valor <= formulario.nota
-                        ? "avaliar-pedido__estrela avaliar-pedido__estrela--ativa"
-                        : "avaliar-pedido__estrela"
-                    }
-                    onClick={() =>
-                      atualizarFormulario(item.pizzaId, {
-                        nota: valor,
-                        erro: null,
-                      })
-                    }
-                  >
-                    ★
-                  </button>
-                ))}
-              </div>
+              <SeletorEstrelas
+                valor={formulario.nota}
+                aoEscolher={(novoValor) =>
+                  atualizarFormulario(item.pizzaId, {
+                    nota: novoValor,
+                    erro: null,
+                  })
+                }
+              />
 
               <textarea
                 className="avaliar-pedido__comentario"
