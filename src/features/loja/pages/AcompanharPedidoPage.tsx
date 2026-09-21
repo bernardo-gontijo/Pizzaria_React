@@ -24,6 +24,7 @@ export function AcompanharPedidoPage() {
           setErro("Pedido não encontrado");
           setLoading(false);
         }
+
         return;
       }
 
@@ -81,16 +82,20 @@ export function AcompanharPedidoPage() {
     return <p className="feedback feedback--erro">Pedido não encontrado</p>;
   }
 
+  const pedidoEntregue = pedido.status === "entregue";
+
   return (
     <section className="pagina-loja acompanhar-page">
       <Link className="acompanhar-page__voltar" to="/meus-pedidos">
         ← Meus pedidos
       </Link>
 
-      <h1>Acompanhar pedido</h1>
+      <h1>{pedidoEntregue ? "Histórico do pedido" : "Acompanhar pedido"}</h1>
 
       <p className="pagina-loja__introducao">
-        Acompanhe cada etapa do preparo do seu pedido.
+        {pedidoEntregue
+          ? "Consulte todas as etapas pelas quais seu pedido passou."
+          : "Acompanhe cada etapa do preparo do seu pedido."}
       </p>
 
       <StatusPedido pedido={pedido} />

@@ -22,6 +22,8 @@ export function MeuPedidoCard({ pedido }: MeuPedidoCardProps) {
     0,
   );
 
+  const pedidoEntregue = pedido.status === "entregue";
+
   const podeAcompanhar =
     pedido.status !== "entregue" && pedido.status !== "cancelado";
 
@@ -30,6 +32,7 @@ export function MeuPedidoCard({ pedido }: MeuPedidoCardProps) {
       <div className="meu-pedido-card__cabecalho">
         <div>
           <span>Pedido #{pedido.id.slice(-6)}</span>
+
           <time dateTime={new Date(pedido.createdAt).toISOString()}>
             {new Date(pedido.createdAt).toLocaleString("pt-BR")}
           </time>
@@ -56,6 +59,12 @@ export function MeuPedidoCard({ pedido }: MeuPedidoCardProps) {
       {podeAcompanhar && (
         <Link className="meu-pedido-card__link" to={`/acompanhar/${pedido.id}`}>
           Acompanhar pedido
+        </Link>
+      )}
+
+      {pedidoEntregue && (
+        <Link className="meu-pedido-card__link" to={`/acompanhar/${pedido.id}`}>
+          Ver histórico
         </Link>
       )}
     </article>
