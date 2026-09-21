@@ -22,6 +22,9 @@ export function MeuPedidoCard({ pedido }: MeuPedidoCardProps) {
     0,
   );
 
+  const podeAcompanhar =
+    pedido.status !== "entregue" && pedido.status !== "cancelado";
+
   return (
     <article className="meu-pedido-card">
       <div className="meu-pedido-card__cabecalho">
@@ -31,6 +34,7 @@ export function MeuPedidoCard({ pedido }: MeuPedidoCardProps) {
             {new Date(pedido.createdAt).toLocaleString("pt-BR")}
           </time>
         </div>
+
         <strong className={`meu-pedido-card__status status--${pedido.status}`}>
           {nomesStatus[pedido.status]}
         </strong>
@@ -40,6 +44,7 @@ export function MeuPedidoCard({ pedido }: MeuPedidoCardProps) {
         <span>
           {quantidadeItens} {quantidadeItens === 1 ? "item" : "itens"}
         </span>
+
         <strong>
           {pedido.total.toLocaleString("pt-BR", {
             style: "currency",
@@ -48,9 +53,11 @@ export function MeuPedidoCard({ pedido }: MeuPedidoCardProps) {
         </strong>
       </div>
 
-      <Link className="meu-pedido-card__link" to={`/acompanhar/${pedido.id}`}>
-        Acompanhar pedido
-      </Link>
+      {podeAcompanhar && (
+        <Link className="meu-pedido-card__link" to={`/acompanhar/${pedido.id}`}>
+          Acompanhar pedido
+        </Link>
+      )}
     </article>
   );
 }
