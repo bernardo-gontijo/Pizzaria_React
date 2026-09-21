@@ -16,18 +16,28 @@ export function AcompanharPedidoPage() {
   const [erro, setErro] = useState<string | null>(null);
 
   useEffect(() => {
-    async function carregarPedido() {
+    let ativo = true;
+
+    async function carregarPedido(primeiroCarregamento = false) {
       if (!id) {
-        setErro("Pedido não encontrado");
-        setLoading(false);
+        if (ativo) {
+          setErro("Pedido não encontrado");
+          setLoading(false);
+        }
+
         return;
       }
 
       try {
-        setLoading(true);
+        if (primeiroCarregamento) {
+          setLoading(true);
+        }
+
         setErro(null);
 
         const resultado = await buscarPedidoClientePorId(id);
+
+        if (!ativo) return;
 
         if (!resultado) {
           setErro("Pedido não encontrado");
@@ -36,17 +46,28 @@ export function AcompanharPedidoPage() {
 
         setPedido(resultado);
       } catch (error) {
+        if (!ativo) return;
+
         setErro(
-          error instanceof Error
-            ? error.message
-            : "Erro ao carregar pedido",
+          error instanceof Error ? error.message : "Erro ao carregar pedido",
         );
       } finally {
-        setLoading(false);
+        if (ativo && primeiroCarregamento) {
+          setLoading(false);
+        }
       }
     }
 
-    void carregarPedido();
+    void carregarPedido(true);
+
+    const intervalo = window.setInterval(() => {
+      void carregarPedido();
+    }, 5000);
+
+    return () => {
+      ativo = false;
+      window.clearInterval(intervalo);
+    };
   }, [id]);
 
   if (loading) {
@@ -58,12 +79,10 @@ export function AcompanharPedidoPage() {
   }
 
   if (!pedido) {
-    return (
-      <p className="feedback feedback--erro">
-        Pedido não encontrado
-      </p>
-    );
+    return <p className="feedback feedback--erro">Pedido não encontrado</p>;
   }
+
+  const pedidoEntregue = pedido.status === "entregue";
 
   return (
     <section className="pagina-loja acompanhar-page">
@@ -71,10 +90,12 @@ export function AcompanharPedidoPage() {
         ← Meus pedidos
       </Link>
 
-      <h1>Acompanhar pedido</h1>
+      <h1>{pedidoEntregue ? "Histórico do pedido" : "Acompanhar pedido"}</h1>
 
       <p className="pagina-loja__introducao">
-        Acompanhe cada etapa do preparo do seu pedido.
+        {pedidoEntregue
+          ? "Consulte todas as etapas pelas quais seu pedido passou."
+          : "Acompanhe cada etapa do preparo do seu pedido."}
       </p>
 
       <StatusPedido pedido={pedido} />

@@ -22,15 +22,22 @@ export function MeuPedidoCard({ pedido }: MeuPedidoCardProps) {
     0,
   );
 
+  const pedidoEntregue = pedido.status === "entregue";
+
+  const podeAcompanhar =
+    pedido.status !== "entregue" && pedido.status !== "cancelado";
+
   return (
     <article className="meu-pedido-card">
       <div className="meu-pedido-card__cabecalho">
         <div>
           <span>Pedido #{pedido.id.slice(-6)}</span>
+
           <time dateTime={new Date(pedido.createdAt).toISOString()}>
             {new Date(pedido.createdAt).toLocaleString("pt-BR")}
           </time>
         </div>
+
         <strong className={`meu-pedido-card__status status--${pedido.status}`}>
           {nomesStatus[pedido.status]}
         </strong>
@@ -40,6 +47,7 @@ export function MeuPedidoCard({ pedido }: MeuPedidoCardProps) {
         <span>
           {quantidadeItens} {quantidadeItens === 1 ? "item" : "itens"}
         </span>
+
         <strong>
           {pedido.total.toLocaleString("pt-BR", {
             style: "currency",
@@ -48,9 +56,17 @@ export function MeuPedidoCard({ pedido }: MeuPedidoCardProps) {
         </strong>
       </div>
 
-      <Link className="meu-pedido-card__link" to={`/acompanhar/${pedido.id}`}>
-        Acompanhar pedido
-      </Link>
+      {podeAcompanhar && (
+        <Link className="meu-pedido-card__link" to={`/acompanhar/${pedido.id}`}>
+          Acompanhar pedido
+        </Link>
+      )}
+
+      {pedidoEntregue && (
+        <Link className="meu-pedido-card__link" to={`/acompanhar/${pedido.id}`}>
+          Ver histórico
+        </Link>
+      )}
     </article>
   );
 }
