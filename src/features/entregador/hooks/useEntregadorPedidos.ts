@@ -17,7 +17,7 @@ export function useEntregadorPedidos() {
       setError(null);
 
       const todosPedidos = await pedidosService.listarPedidos();
-      setPedidos(todosPedidos.filter((pedido) => pedido.mesaId === undefined));
+      setPedidos(todosPedidos.filter((pedido) => pedido.mesaId == null));
     } catch (error) {
       setError(
         error instanceof Error
@@ -100,3 +100,5 @@ export function useEntregadorPedidos() {
     carregarPedidos,
   };
 }
+
+
