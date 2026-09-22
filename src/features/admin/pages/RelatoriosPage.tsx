@@ -19,11 +19,11 @@ import { useRelatorios, type PresetPeriodo } from "../hooks/useRelatorios";
 
 const NOMES_FORMA_PAGAMENTO: Record<string, string> = {
   dinheiro: "Dinheiro",
-  cartao_credito: "CartÃ£o de crÃ©dito",
-  cartao_debito: "CartÃ£o de dÃ©bito",
+  cartao_credito: "Cartao de credito",
+  cartao_debito: "Cartao de debito",
   pix: "Pix",
-  vale_refeicao: "Vale-refeiÃ§Ã£o",
-  "nÃ£o informado": "NÃ£o informado",
+  vale_refeicao: "Vale-refeicao",
+  "nao informado": "Nao informado",
 };
 
 const CORES_GRAFICO = [
@@ -57,9 +57,9 @@ function formatarDataCurta(periodo: string): string {
 
 const PRESETS: Array<{ id: PresetPeriodo; rotulo: string }> = [
   { id: "dia", rotulo: "Hoje" },
-  { id: "semana", rotulo: "Ãšltimos 7 dias" },
-  { id: "mes", rotulo: "Este mÃªs" },
-  { id: "personalizado", rotulo: "PerÃ­odo personalizado" },
+  { id: "semana", rotulo: "Ultimos 7 dias" },
+  { id: "mes", rotulo: "Este mes" },
+  { id: "personalizado", rotulo: "Periodo personalizado" },
 ];
 
 export function RelatoriosPage() {
@@ -85,8 +85,8 @@ export function RelatoriosPage() {
 
   return (
     <main className="relatorios-page">
-      <h1>RelatÃ³rios</h1>
-      <p>Faturamento e mÃ©tricas de vendas da pizzaria.</p>
+      <h1>Relatorios</h1>
+      <p>Faturamento e metricas de vendas da pizzaria.</p>
 
       <div className="relatorios-page__periodo">
         {PRESETS.map((item) => (
@@ -142,21 +142,21 @@ export function RelatoriosPage() {
       {erro && <p role="alert">{erro}</p>}
 
       {carregando && !resumo ? (
-        <p>Carregando relatÃ³rios...</p>
+        <p>Carregando relatorios...</p>
       ) : (
         resumo && (
           <>
             <section>
               <DashboardCard
-                titulo="Faturamento do perÃ­odo"
+                titulo="Faturamento do periodo"
                 valor={formatarMoeda(resumo.faturamento)}
               />
               <DashboardCard
-                titulo="Ticket mÃ©dio"
+                titulo="Ticket medio"
                 valor={formatarMoeda(resumo.ticketMedio)}
               />
               <DashboardCard
-                titulo="Pedidos no perÃ­odo"
+                titulo="Pedidos no periodo"
                 valor={resumo.totalPedidos}
               />
               <DashboardCard
@@ -165,7 +165,7 @@ export function RelatoriosPage() {
                 descricao={
                   resumo.pizzaMaisVendida
                     ? `${resumo.pizzaMaisVendida.quantidade} unidades`
-                    : "Sem vendas no perÃ­odo"
+                    : "Sem vendas no periodo"
                 }
               />
               <DashboardCard
@@ -181,7 +181,7 @@ export function RelatoriosPage() {
             <article className="relatorios-page__grafico">
               <h2>Faturamento por dia</h2>
               {faturamentoDiario.length === 0 ? (
-                <p>Sem faturamento no perÃ­odo selecionado.</p>
+                <p>Sem faturamento no periodo selecionado.</p>
               ) : (
                 <ResponsiveContainer width="100%" height={280}>
                   <BarChart data={faturamentoDiario}>
@@ -217,7 +217,7 @@ export function RelatoriosPage() {
               <article className="relatorios-page__grafico">
                 <h2>Produtos mais vendidos</h2>
                 {produtos.length === 0 ? (
-                  <p>Sem vendas no perÃ­odo selecionado.</p>
+                  <p>Sem vendas no periodo selecionado.</p>
                 ) : (
                   <ResponsiveContainer width="100%" height={280}>
                     <BarChart data={produtos} layout="vertical">
@@ -246,7 +246,7 @@ export function RelatoriosPage() {
               <article className="relatorios-page__grafico">
                 <h2>Formas de pagamento</h2>
                 {formasPagamento.length === 0 ? (
-                  <p>Sem pedidos no perÃ­odo selecionado.</p>
+                  <p>Sem pedidos no periodo selecionado.</p>
                 ) : (
                   <ResponsiveContainer width="100%" height={280}>
                     <PieChart>

@@ -48,12 +48,12 @@ export function SideBar() {
       Icone: ClipboardList,
     },
     {
-      nome: "RelatÃ³rios",
+      nome: "Relatorios",
       caminho: "/admin/relatorios",
       Icone: LineChart,
     },
     {
-      nome: "ConfiguraÃ§Ãµes",
+      nome: "Configuracoes",
       caminho: "/admin/configuracao",
       Icone: Settings,
     },
@@ -83,7 +83,7 @@ export function SideBar() {
                 {link.caminho === "/admin/pizzas" && promocao && (
                   <span
                     className="admin-sidebar__badge-promocao"
-                    title={`PromoÃ§Ã£o ativa: ${promocao.pizza.nome}`}
+                    title={`Promocao ativa: ${promocao.pizza.nome}`}
                   >
                     <Flame size={12} aria-hidden="true" />
                   </span>
