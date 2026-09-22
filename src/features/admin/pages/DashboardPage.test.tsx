@@ -11,6 +11,7 @@ import {
 } from "@testing-library/react";
 
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { MemoryRouter } from "react-router-dom";
 
 import type { Pedido } from "../../loja/types/pedido";
 import { DashboardPage } from "./DashboardPage";
@@ -85,7 +86,11 @@ afterEach(() => {
 
 describe("DashboardPage", () => {
   it("calcula corretamente os dados dos pedidos", async () => {
-    render(<DashboardPage />);
+    render(
+      <MemoryRouter>
+        <DashboardPage />
+      </MemoryRouter>,
+    );
 
     await waitFor(() => {
       const totalPedidos = screen
@@ -117,7 +122,11 @@ describe("DashboardPage", () => {
   });
 
   it("calcula corretamente o faturamento", async () => {
-    render(<DashboardPage />);
+    render(
+      <MemoryRouter>
+        <DashboardPage />
+      </MemoryRouter>,
+    );
 
     await waitFor(() => {
       expect(screen.getAllByText("R$ 85,00")).toHaveLength(2);
