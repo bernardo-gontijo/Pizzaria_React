@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+﻿import { useCallback, useMemo, useState } from "react";
 
 import {
   buscarFaturamentoPorPeriodo,
@@ -69,7 +69,7 @@ export function useRelatorios() {
     }
 
     if (periodo.inicio && periodo.fim && periodo.inicio > periodo.fim) {
-      setErro("A data inicial não pode ser depois da data final.");
+      setErro("A data inicial nÃ£o pode ser depois da data final.");
       return;
     }
 
@@ -93,16 +93,12 @@ export function useRelatorios() {
       setErro(
         error instanceof Error
           ? error.message
-          : "Não foi possível carregar os relatórios",
+          : "NÃ£o foi possÃ­vel carregar os relatÃ³rios",
       );
     } finally {
       setCarregando(false);
     }
   }, [preset, periodo]);
-
-  useEffect(() => {
-    void carregar();
-  }, [carregar]);
 
   return {
     preset,

@@ -1,4 +1,4 @@
-import { NavLink } from "react-router-dom";
+﻿import { NavLink } from "react-router-dom";
 import {
   ClipboardList,
   CupSoda,
@@ -11,7 +11,7 @@ import {
   Utensils,
 } from "lucide-react";
 
-import { usePromocaoDoDia } from "../../loja/hooks/usePromocaododia";
+import { usePromocaoDoDia } from "../../loja/hooks/usePromocaoDoDia";
 
 export function SideBar() {
   const { promocao } = usePromocaoDoDia();
@@ -48,12 +48,12 @@ export function SideBar() {
       Icone: ClipboardList,
     },
     {
-      nome: "Relatórios",
+      nome: "RelatÃ³rios",
       caminho: "/admin/relatorios",
       Icone: LineChart,
     },
     {
-      nome: "Configurações",
+      nome: "ConfiguraÃ§Ãµes",
       caminho: "/admin/configuracao",
       Icone: Settings,
     },
@@ -83,7 +83,7 @@ export function SideBar() {
                 {link.caminho === "/admin/pizzas" && promocao && (
                   <span
                     className="admin-sidebar__badge-promocao"
-                    title={`Promoção ativa: ${promocao.pizza.nome}`}
+                    title={`PromoÃ§Ã£o ativa: ${promocao.pizza.nome}`}
                   >
                     <Flame size={12} aria-hidden="true" />
                   </span>

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+﻿import { useCallback, useEffect, useState } from "react";
 
 import {
   buscarPedidoPorId,
@@ -42,34 +42,55 @@ export function usePedidoDetalhes(id?: string) {
   }, [id]);
 
   useEffect(() => {
-    void carregar();
+    let cancelado = false;
 
-    const atualizar = () => {
-      void carregar();
-    };
+    async function carregarInicial() {
+      if (!id) {
+        if (!cancelado) {
+          setPedido(null);
+          setErro("Pedido não informado.");
+          setLoading(false);
+        }
+        return;
+      }
 
-    window.addEventListener(
-      PEDIDOS_ATUALIZADOS_EVENT,
-      atualizar,
-    );
+      try {
+        setLoading(true);
+        setErro(null);
 
-    window.addEventListener(
-      "storage",
-      atualizar,
-    );
+        const resultado = await buscarPedidoPorId(id);
+
+        if (!cancelado) {
+          setPedido(resultado);
+
+          if (!resultado) {
+            setErro("Pedido não encontrado.");
+          }
+        }
+      } catch (error) {
+        if (!cancelado) {
+          setErro(
+            error instanceof Error
+              ? error.message
+              : "Não foi possível carregar o pedido.",
+          );
+        }
+      } finally {
+        if (!cancelado) setLoading(false);
+      }
+    }
+
+    void carregarInicial();
+
+    window.addEventListener(PEDIDOS_ATUALIZADOS_EVENT, carregar);
+    window.addEventListener("storage", carregar);
 
     return () => {
-      window.removeEventListener(
-        PEDIDOS_ATUALIZADOS_EVENT,
-        atualizar,
-      );
-
-      window.removeEventListener(
-        "storage",
-        atualizar,
-      );
+      cancelado = true;
+      window.removeEventListener(PEDIDOS_ATUALIZADOS_EVENT, carregar);
+      window.removeEventListener("storage", carregar);
     };
-  }, [carregar]);
+  }, [id, carregar]);
 
   return {
     pedido,

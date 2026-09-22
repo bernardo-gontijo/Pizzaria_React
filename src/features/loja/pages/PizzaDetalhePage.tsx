@@ -1,6 +1,6 @@
 ﻿import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Minus, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import { useCart } from "../../../context/CartContext";
 import { buscarPizzaPorId } from "../api/loja.service";
 import type { Pizza } from "../types/pizza";
@@ -112,3 +112,4 @@ export function PizzaDetalhePage() {
     </section>
   );
 }
+

@@ -1,5 +1,5 @@
-import { Flame } from "lucide-react";
-import { useEffect, useState } from "react";
+﻿import { Flame } from "lucide-react";
+import { useState } from "react";
 
 import type { Pizza } from "../../loja/types/pizza";
 import {
@@ -25,19 +25,22 @@ export function PromocaoDoDiaAdmin({ pizzas }: PromocaoDoDiaAdminProps) {
   const [pizzaIdSelecionada, setPizzaIdSelecionada] = useState("");
   const [percentual, setPercentual] = useState("15");
   const [salvando, setSalvando] = useState(false);
-  const [erro, setErro] = useState<string | null>(null);
+  const [erro, setErro] = useState(null as string | null);
 
-  // Sincroniza o formulário com a promoção salva sempre que ela
-  // carregar ou mudar (ex: em outra aba), mas só enquanto o admin não
-  // estiver editando ativamente um valor diferente.
-  useEffect(() => {
-    if (promocao) {
-      setPizzaIdSelecionada(promocao.pizza.id);
-      setPercentual(String(promocao.percentualDesconto));
-    } else {
-      setPizzaIdSelecionada("");
-    }
-  }, [promocao]);
+  // Sincroniza o formulario com a promocao salva sempre que ela mudar
+  // (ex: em outra aba), mas so enquanto o admin nao estiver editando
+  // ativamente um valor diferente. Ajuste feito durante a renderizacao
+  // (em vez de useEffect) para evitar um render extra desnecessario.
+  const [promocaoSincronizadaId, setPromocaoSincronizadaId] = useState(
+    null as string | null,
+  );
+  const promocaoAtualId = promocao ? promocao.pizza.id : null;
+
+  if (!loading && promocaoAtualId !== promocaoSincronizadaId) {
+    setPromocaoSincronizadaId(promocaoAtualId);
+    setPizzaIdSelecionada(promocaoAtualId ?? "");
+    setPercentual(promocao ? String(promocao.percentualDesconto) : "15");
+  }
 
   async function handleSalvar(evento: React.FormEvent) {
     evento.preventDefault();
@@ -45,7 +48,7 @@ export function PromocaoDoDiaAdmin({ pizzas }: PromocaoDoDiaAdminProps) {
     const percentualConvertido = Number(percentual);
 
     if (!pizzaIdSelecionada) {
-      setErro("Escolha uma pizza para ser a promoção do dia.");
+      setErro("Escolha uma pizza para ser a promocao do dia.");
       return;
     }
 
@@ -67,7 +70,7 @@ export function PromocaoDoDiaAdmin({ pizzas }: PromocaoDoDiaAdminProps) {
         percentualDesconto: percentualConvertido,
       });
     } catch {
-      setErro("Não foi possível salvar a promoção. Tente novamente.");
+      setErro("Nao foi possivel salvar a promocao. Tente novamente.");
     } finally {
       setSalvando(false);
     }
@@ -83,7 +86,7 @@ export function PromocaoDoDiaAdmin({ pizzas }: PromocaoDoDiaAdminProps) {
       setPizzaIdSelecionada("");
       setPercentual("15");
     } catch {
-      setErro("Não foi possível remover a promoção. Tente novamente.");
+      setErro("Nao foi possivel remover a promocao. Tente novamente.");
     } finally {
       setSalvando(false);
     }
@@ -107,12 +110,12 @@ export function PromocaoDoDiaAdmin({ pizzas }: PromocaoDoDiaAdminProps) {
       </h2>
 
       <p className="promocao-dia-admin__descricao">
-        Escolha uma pizza do cardápio para destacar como promoção do dia e
-        defina o percentual de desconto aplicado sobre o preço dela.
+        Escolha uma pizza do cardapio para destacar como promocao do dia e
+        defina o percentual de desconto aplicado sobre o preco dela.
       </p>
 
       {loading ? (
-        <p>Carregando promoção atual...</p>
+        <p>Carregando promocao atual...</p>
       ) : (
         <form onSubmit={handleSalvar} className="promocao-dia-admin__form">
           <div>
@@ -123,11 +126,11 @@ export function PromocaoDoDiaAdmin({ pizzas }: PromocaoDoDiaAdminProps) {
               value={pizzaIdSelecionada}
               onChange={(evento) => setPizzaIdSelecionada(evento.target.value)}
             >
-              <option value="">Nenhuma promoção ativa</option>
+              <option value="">Nenhuma promocao ativa</option>
 
               {pizzas.map((pizza) => (
                 <option key={pizza.id} value={pizza.id}>
-                  {pizza.nome} — {formatarMoeda(pizza.preco)}
+                  {pizza.nome} - {formatarMoeda(pizza.preco)}
                 </option>
               ))}
             </select>
@@ -148,7 +151,7 @@ export function PromocaoDoDiaAdmin({ pizzas }: PromocaoDoDiaAdminProps) {
 
           {pizzaSelecionadaPreview && precoComDescontoPreview !== null && (
             <p className="promocao-dia-admin__preview">
-              Preço promocional:{" "}
+              Preco promocional:{" "}
               <strong>{formatarMoeda(precoComDescontoPreview)}</strong>{" "}
               <span className="promocao-dia-admin__preco-original">
                 {formatarMoeda(pizzaSelecionadaPreview.preco)}
@@ -164,7 +167,7 @@ export function PromocaoDoDiaAdmin({ pizzas }: PromocaoDoDiaAdminProps) {
 
           <div className="promocao-dia-admin__acoes">
             <button type="submit" disabled={salvando}>
-              {salvando ? "Salvando..." : "Salvar promoção"}
+              {salvando ? "Salvando..." : "Salvar promocao"}
             </button>
 
             {promocao && (
@@ -174,7 +177,7 @@ export function PromocaoDoDiaAdmin({ pizzas }: PromocaoDoDiaAdminProps) {
                 disabled={salvando}
                 className="promocao-dia-admin__remover"
               >
-                Remover promoção
+                Remover promocao
               </button>
             )}
           </div>
