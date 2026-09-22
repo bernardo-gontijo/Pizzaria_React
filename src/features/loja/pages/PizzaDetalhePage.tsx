@@ -1,5 +1,6 @@
 ﻿import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { Plus } from "lucide-react";
 import { useCart } from "../../../context/CartContext";
 import { buscarPizzaPorId } from "../api/loja.service";
 import type { Pizza } from "../types/pizza";
@@ -35,7 +36,9 @@ export function PizzaDetalhePage() {
     adicionarItem({
       id: pizza.id,
       tipo: "pizza",
+      pizza,
       nome: pizza.nome,
+      imagem: pizza.imagem,
       precoUnitario: pizza.preco,
       quantidade: quantidade,
       observacoes: "",
@@ -83,7 +86,7 @@ export function PizzaDetalhePage() {
               aria-label="Aumentar quantidade"
               onClick={() => setQuantidade(quantidade + 1)}
             >
-              +
+              <Plus size={14} />
             </button>
           </div>
         </div>
@@ -109,3 +112,4 @@ export function PizzaDetalhePage() {
     </section>
   );
 }
+

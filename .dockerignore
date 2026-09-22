@@ -1,0 +1,9 @@
+﻿node_modules
+dist
+.git
+Pizzaria_React_novo
+backend/venv
+backend/pizzaria.db
+backend/.env
+backend/__pycache__
+backend/.pytest_cache

@@ -1,5 +1,6 @@
-import { useState, type FormEvent } from "react";
+import { useRef, useState, type FormEvent } from "react";
 import type { Pizza, PizzaCategory } from "../../loja/types/pizza";
+import { comprimirImagem } from "../../../utils/imagem";
 
 export type PizzaFormData = Omit<Pizza, "id">;
 
@@ -8,6 +9,12 @@ interface PizzaFormProps {
   onSubmit: (dados: PizzaFormData) => void;
   onCancel?: () => void;
 }
+
+// Limite do arquivo ORIGINAL escolhido pelo admin, antes da compressão
+// (ver comprimirImagem em utils/imagem.ts) — generoso o bastante para
+// cobrir fotos comuns de celular. O que importa de verdade é o
+// tamanho final após a compressão.
+const TAMANHO_MAXIMO_ARQUIVO_ORIGINAL_BYTES = 10 * 1024 * 1024; // 10 MB
 
 export function PizzaForm({ pizza, onSubmit, onCancel }: PizzaFormProps) {
   const [nome, setNome] = useState(pizza?.nome ?? "");
@@ -21,6 +28,9 @@ export function PizzaForm({ pizza, onSubmit, onCancel }: PizzaFormProps) {
   );
 
   const [imagem, setImagem] = useState(pizza?.imagem ?? "");
+  const [erroImagem, setErroImagem] = useState<string | null>(null);
+  const [carregandoImagem, setCarregandoImagem] = useState(false);
+  const inputArquivoRef = useRef<HTMLInputElement>(null);
 
   const [categoria, setCategoria] = useState<PizzaCategory>(
     pizza?.categoria ?? "tradicional",
@@ -34,8 +44,60 @@ export function PizzaForm({ pizza, onSubmit, onCancel }: PizzaFormProps) {
     setPreco("");
     setIngredientes("");
     setImagem("");
+    setErroImagem(null);
     setCategoria("tradicional");
     setDisponivel(true);
+  }
+
+  function aoEscolherArquivo(event: React.ChangeEvent<HTMLInputElement>) {
+    const arquivo = event.target.files?.[0];
+    event.target.value = ""; // permite escolher o mesmo arquivo de novo
+
+    if (!arquivo) return;
+
+    setErroImagem(null);
+
+    if (!arquivo.type.startsWith("image/")) {
+      setErroImagem("Escolha um arquivo de imagem (PNG, JPG...).");
+      return;
+    }
+
+    if (arquivo.size > TAMANHO_MAXIMO_ARQUIVO_ORIGINAL_BYTES) {
+      setErroImagem(
+        `Arquivo muito grande. O limite é ${(
+          TAMANHO_MAXIMO_ARQUIVO_ORIGINAL_BYTES /
+          1024 /
+          1024
+        ).toFixed(0)} MB.`,
+      );
+      return;
+    }
+
+    setCarregandoImagem(true);
+
+    comprimirImagem(arquivo, {
+      larguraMaxima: 1000,
+      alturaMaxima: 1000,
+      tamanhoMaximoBytes: 350 * 1024, // 350 KB
+    })
+      .then((dataUrlComprimida) => {
+        setImagem(dataUrlComprimida);
+      })
+      .catch((erro: unknown) => {
+        setErroImagem(
+          erro instanceof Error
+            ? erro.message
+            : "Não foi possível processar essa imagem. Tente outro arquivo.",
+        );
+      })
+      .finally(() => {
+        setCarregandoImagem(false);
+      });
+  }
+
+  function removerImagem() {
+    setImagem("");
+    setErroImagem(null);
   }
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -117,15 +179,68 @@ export function PizzaForm({ pizza, onSubmit, onCancel }: PizzaFormProps) {
         />
       </div>
 
-      <div>
-        <label htmlFor="imagem">URL da imagem</label>
+      <div className="configuracao-logo">
+        <label htmlFor="imagem">Imagem da pizza</label>
 
-        <input
-          id="imagem"
-          type="text"
-          value={imagem}
-          onChange={(event) => setImagem(event.target.value)}
-        />
+        <div className="configuracao-logo__linha">
+          {imagem ? (
+            <img
+              src={imagem}
+              alt="Pré-visualização da imagem da pizza"
+              className="configuracao-logo__preview"
+            />
+          ) : (
+            <span className="configuracao-logo__preview configuracao-logo__preview--vazia">
+              Sem imagem
+            </span>
+          )}
+
+          <div className="configuracao-logo__acoes">
+            <button
+              type="button"
+              onClick={() => inputArquivoRef.current?.click()}
+              disabled={carregandoImagem}
+            >
+              {carregandoImagem ? "Carregando..." : "Carregar imagem"}
+            </button>
+
+            {imagem && (
+              <button
+                type="button"
+                onClick={removerImagem}
+                className="configuracao-logo__remover"
+              >
+                Remover
+              </button>
+            )}
+          </div>
+
+          <input
+            id="imagem"
+            ref={inputArquivoRef}
+            type="file"
+            accept="image/*"
+            onChange={aoEscolherArquivo}
+            className="configuracao-logo__input-arquivo"
+          />
+        </div>
+
+        {erroImagem && (
+          <p className="configuracao-logo__erro" role="alert">
+            {erroImagem}
+          </p>
+        )}
+
+        <details className="configuracao-logo__url-manual">
+          <summary>Ou informar uma URL de imagem</summary>
+
+          <input
+            type="text"
+            value={imagem}
+            onChange={(event) => setImagem(event.target.value)}
+            placeholder="https://exemplo.com/imagem.png"
+          />
+        </details>
       </div>
 
       <div>

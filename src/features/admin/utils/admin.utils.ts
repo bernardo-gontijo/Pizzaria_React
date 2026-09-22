@@ -30,3 +30,15 @@ export const NOMES_STATUS_PEDIDO: Record<StatusPedidoType, string> = {
 export function formatarStatusPedido(status: StatusPedidoType): string {
   return NOMES_STATUS_PEDIDO[status];
 }
+
+const NOMES_FORMA_PAGAMENTO: Record<string, string> = {
+  dinheiro: "Dinheiro",
+  cartao_credito: "Cartão de crédito",
+  cartao_debito: "Cartão de débito",
+  pix: "Pix",
+  vale_refeicao: "Vale-refeição",
+};
+
+export function formatarFormaPagamento(formaPagamento: string): string {
+  return NOMES_FORMA_PAGAMENTO[formaPagamento] ?? formaPagamento;
+}

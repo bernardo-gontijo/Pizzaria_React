@@ -61,6 +61,12 @@ const PizzasPage = lazy(() =>
   })),
 );
 
+const BebidasAdminPage = lazy(() =>
+  import("../features/admin/pages/BebidasPage").then((m) => ({
+    default: m.BebidasPage,
+  })),
+);
+
 const CombosAdminPage = lazy(() =>
   import("../features/admin/pages/CombosAdminPage").then((m) => ({
     default: m.CombosAdminPage,
@@ -238,17 +244,6 @@ export const router = createBrowserRouter([
         Component: CarrinhoPage,
       },
 
-      /* LOGIN / CADASTRO DO CLIENTE */
-
-      {
-        path: "login",
-        Component: ClienteLoginPage,
-      },
-      {
-        path: "cadastro",
-        Component: ClienteCadastroPage,
-      },
-
       /* ROTAS PROTEGIDAS DO CLIENTE */
 
       {
@@ -278,6 +273,29 @@ export const router = createBrowserRouter([
         Component: NotFoundPage,
       },
     ],
+  },
+
+  /* =========================
+     LOGIN / CADASTRO DO CLIENTE
+     (fora do Layout da loja: sem Header/Footer, mesmo padrão
+     visual das telas de login do admin/garçom/entregador)
+  ========================= */
+
+  {
+    path: "/login",
+    element: (
+      <Suspense fallback={<Loading />}>
+        <ClienteLoginPage />
+      </Suspense>
+    ),
+  },
+  {
+    path: "/cadastro",
+    element: (
+      <Suspense fallback={<Loading />}>
+        <ClienteCadastroPage />
+      </Suspense>
+    ),
   },
 
   /* =========================
@@ -328,6 +346,10 @@ export const router = createBrowserRouter([
           {
             path: "pizzas",
             Component: PizzasPage,
+          },
+          {
+            path: "bebidas",
+            Component: BebidasAdminPage,
           },
           {
             path: "combos",

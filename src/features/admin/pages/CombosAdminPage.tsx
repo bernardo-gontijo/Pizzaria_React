@@ -15,6 +15,7 @@ function paraComboEditavel(combo: ComboResolvido): Combo {
       id: item.id,
       quantidade: item.quantidade,
     })),
+    imagem: combo.imagemPropria,
     descontoPercentual: combo.descontoPercentual,
     disponivel: combo.disponivel,
   };

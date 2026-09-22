@@ -46,6 +46,21 @@ def criar_comanda(mesa_id):
         if not nome:
             nome = None
 
+    nome_normalizado = (nome or "Comanda principal").casefold()
+
+    comanda_existente = next(
+        (
+            c
+            for c in mesa.comandas
+            if c.status == "aberta"
+            and (c.nome or "Comanda principal").casefold() == nome_normalizado
+        ),
+        None,
+    )
+
+    if comanda_existente:
+        return jsonify(comanda_existente.to_dict()), 200
+
     comanda = Comanda(
         mesa_id=mesa.id,
         nome=nome,

@@ -1,6 +1,9 @@
-﻿import { useState, type FormEvent } from "react";
+﻿import { Lock, Mail } from "lucide-react";
+import { useState, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 
+import { AuthCard } from "../../../components/AuthCard";
+import { AuthInput } from "../../../components/AuthInput";
 import { useEntregadorAuth } from "../hooks/EntregadorAuthContext";
 
 export function EntregadorLoginPage() {
@@ -8,6 +11,7 @@ export function EntregadorLoginPage() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
+  const [lembrar, setLembrar] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
 
   async function aoEnviar(e: FormEvent) {
@@ -23,34 +27,58 @@ export function EntregadorLoginPage() {
   }
 
   return (
-    <div className="mx-auto flex min-h-screen max-w-sm flex-col justify-center gap-3">
-      <h1 className="text-2xl font-bold text-white">Login do entregador</h1>
-      <form onSubmit={aoEnviar} className="space-y-3">
-        <input
+    <AuthCard
+      titulo="Login do entregador"
+      descricao="Acesse suas entregas do dia"
+    >
+      <form onSubmit={aoEnviar} className="auth-form">
+        <AuthInput
+          id="email"
+          label="E-mail"
+          icone={<Mail size={16} />}
           type="email"
-          placeholder="E-mail"
+          placeholder="exemplo@email.com"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="w-full rounded border px-3 py-2"
           required
         />
-        <input
+
+        <AuthInput
+          id="senha"
+          label="Senha"
+          icone={<Lock size={16} />}
           type="password"
-          placeholder="Senha"
+          placeholder="••••••••"
           value={senha}
           onChange={(e) => setSenha(e.target.value)}
-          className="w-full rounded border px-3 py-2"
           required
         />
-        {erro && <p className="text-sm text-red-600">{erro}</p>}
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full rounded bg-primaria px-4 py-2 font-semibold text-white disabled:opacity-50"
-        >
+
+        <div className="auth-form__opcoes">
+          <label className="auth-form__lembrar">
+            <input
+              type="checkbox"
+              checked={lembrar}
+              onChange={(e) => setLembrar(e.target.checked)}
+            />
+            Lembrar de mim
+          </label>
+
+          <a href="#" className="auth-form__esqueci">
+            Esqueci a senha?
+          </a>
+        </div>
+
+        {erro && (
+          <p className="auth-form__erro" role="alert">
+            {erro}
+          </p>
+        )}
+
+        <button type="submit" disabled={loading} className="auth-form__botao">
           {loading ? "Entrando..." : "Entrar"}
         </button>
       </form>
-    </div>
+    </AuthCard>
   );
 }

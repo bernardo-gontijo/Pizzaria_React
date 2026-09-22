@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 
 import { DashboardCard } from "../components/DasboardCard";
+import { PromocaoDoDiaCard } from "../components/PromocaododiaCard";
 import { useAdminPedidos } from "../hooks/useAdminPedidos";
 
 export function DashboardPage() {
@@ -95,6 +96,8 @@ export function DashboardPage() {
           valor={formatarMoeda(faturamentoMes)}
         />
       </section>
+
+      <PromocaoDoDiaCard />
     </main>
   );
 }

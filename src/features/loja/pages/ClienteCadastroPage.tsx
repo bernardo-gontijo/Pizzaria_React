@@ -1,6 +1,9 @@
+import { Lock, Mail, User } from "lucide-react";
 import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
+import { AuthCard } from "../../../components/AuthCard";
+import { AuthInput } from "../../../components/AuthInput";
 import { useClienteAuth } from "../hooks/ClienteAuthContext";
 
 export function ClienteCadastroPage() {
@@ -31,55 +34,55 @@ export function ClienteCadastroPage() {
   }
 
   return (
-    <section className="pagina-loja">
-      <h1>Criar conta</h1>
+    <AuthCard titulo="Criar conta" descricao="Cadastre-se para fazer pedidos">
+      <form onSubmit={handleSubmit} className="auth-form">
+        <AuthInput
+          id="nome"
+          label="Nome"
+          icone={<User size={16} />}
+          type="text"
+          placeholder="Seu nome"
+          value={nome}
+          onChange={(event) => setNome(event.target.value)}
+          required
+        />
 
-      <form onSubmit={handleSubmit}>
-        {erro && <p className="feedback feedback--erro">{erro}</p>}
+        <AuthInput
+          id="email"
+          label="E-mail"
+          icone={<Mail size={16} />}
+          type="email"
+          placeholder="exemplo@email.com"
+          value={email}
+          onChange={(event) => setEmail(event.target.value)}
+          required
+        />
 
-        <div>
-          <label htmlFor="cliente-nome">Nome</label>
+        <AuthInput
+          id="senha"
+          label="Senha"
+          icone={<Lock size={16} />}
+          type="password"
+          placeholder="••••••••"
+          value={senha}
+          onChange={(event) => setSenha(event.target.value)}
+          required
+        />
 
-          <input
-            id="cliente-nome"
-            value={nome}
-            onChange={(event) => setNome(event.target.value)}
-            required
-          />
-        </div>
+        {erro && (
+          <p className="auth-form__erro" role="alert">
+            {erro}
+          </p>
+        )}
 
-        <div>
-          <label htmlFor="cadastro-email">E-mail</label>
-
-          <input
-            id="cadastro-email"
-            type="email"
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-            required
-          />
-        </div>
-
-        <div>
-          <label htmlFor="cadastro-senha">Senha</label>
-
-          <input
-            id="cadastro-senha"
-            type="password"
-            value={senha}
-            onChange={(event) => setSenha(event.target.value)}
-            required
-          />
-        </div>
-
-        <button className="botao" type="submit" disabled={loading}>
+        <button type="submit" disabled={loading} className="auth-form__botao">
           {loading ? "Criando conta..." : "Criar conta"}
         </button>
       </form>
 
-      <p>
+      <p className="auth-card__rodape">
         Já possui conta? <Link to="/login">Entrar</Link>
       </p>
-    </section>
+    </AuthCard>
   );
 }

@@ -1,6 +1,6 @@
 import { useEffect, useState, type FormEvent } from "react";
 
-import { Minus, Plus, ShoppingCart, X } from "lucide-react";
+import { ArrowLeft, Minus, Plus, ShoppingCart, X } from "lucide-react";
 
 import { useNavigate, useParams } from "react-router-dom";
 
@@ -191,8 +191,13 @@ export function PedidoMesaPage() {
 
   return (
     <section className="pedido-mesa-page">
-      <button type="button" onClick={() => navigate("/garcom/mesas")}>
-        ← Voltar para mesas
+      <button
+        type="button"
+        className="pedido-mesa-page__voltar"
+        onClick={() => navigate("/garcom/mesas")}
+      >
+        <ArrowLeft size={16} />
+        Voltar para mesas
       </button>
 
       <h1>Mesa {mesa.numero}</h1>

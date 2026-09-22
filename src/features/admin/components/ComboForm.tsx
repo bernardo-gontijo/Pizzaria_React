@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { buscarPizzas } from "../../loja/api/loja.service";
 import { buscarBebidas } from "../../loja/api/bebidas.service";
+import { comprimirImagem } from "../../../utils/imagem";
 import type { Pizza } from "../../loja/types/pizza";
 import type { Bebida } from "../../loja/types/bebidas";
 import type { Combo, ComboItemRef } from "../../loja/types/combos";
@@ -12,6 +13,13 @@ interface ComboFormProps {
   onSubmit: (dados: ComboInput) => void;
   onCancel?: () => void;
 }
+
+// Limite do arquivo ORIGINAL escolhido pelo admin, antes da compressão
+// (ver comprimirImagem em utils/imagem.ts). Generoso o bastante para
+// cobrir fotos comuns de celular — o que importa de verdade é o
+// tamanho final após a compressão, já pensado para caber com folga no
+// localStorage (onde o combo é persistido como data URL/base64).
+const TAMANHO_MAXIMO_ARQUIVO_ORIGINAL_BYTES = 10 * 1024 * 1024; // 10 MB
 
 function itemEstaSelecionado(itens: ComboItemRef[], tipo: string, id: string) {
   return itens.some((item) => item.tipo === tipo && item.id === id);
@@ -25,6 +33,10 @@ export function ComboForm({ combo, onSubmit, onCancel }: ComboFormProps) {
   const [nome, setNome] = useState(combo?.nome ?? "");
   const [descricao, setDescricao] = useState(combo?.descricao ?? "");
   const [itens, setItens] = useState<ComboItemRef[]>(combo?.itens ?? []);
+  const [imagem, setImagem] = useState(combo?.imagem ?? "");
+  const [erroImagem, setErroImagem] = useState<string | null>(null);
+  const [carregandoImagem, setCarregandoImagem] = useState(false);
+  const inputArquivoRef = useRef<HTMLInputElement>(null);
   const [descontoPercentual, setDescontoPercentual] = useState(
     combo ? String(combo.descontoPercentual) : "10",
   );
@@ -74,6 +86,57 @@ export function ComboForm({ combo, onSubmit, onCancel }: ComboFormProps) {
     );
   }
 
+  function aoEscolherArquivo(evento: React.ChangeEvent<HTMLInputElement>) {
+    const arquivo = evento.target.files?.[0];
+    evento.target.value = ""; // permite escolher o mesmo arquivo de novo
+
+    if (!arquivo) return;
+
+    setErroImagem(null);
+
+    if (!arquivo.type.startsWith("image/")) {
+      setErroImagem("Escolha um arquivo de imagem (PNG, JPG...).");
+      return;
+    }
+
+    if (arquivo.size > TAMANHO_MAXIMO_ARQUIVO_ORIGINAL_BYTES) {
+      setErroImagem(
+        `Arquivo muito grande. O limite é ${(
+          TAMANHO_MAXIMO_ARQUIVO_ORIGINAL_BYTES /
+          1024 /
+          1024
+        ).toFixed(0)} MB.`,
+      );
+      return;
+    }
+
+    setCarregandoImagem(true);
+
+    comprimirImagem(arquivo, {
+      larguraMaxima: 1000,
+      alturaMaxima: 1000,
+      tamanhoMaximoBytes: 350 * 1024, // 350 KB — combo aparece em cards maiores que o logo
+    })
+      .then((dataUrlComprimida) => {
+        setImagem(dataUrlComprimida);
+      })
+      .catch((erro: unknown) => {
+        setErroImagem(
+          erro instanceof Error
+            ? erro.message
+            : "Não foi possível processar essa imagem. Tente outro arquivo.",
+        );
+      })
+      .finally(() => {
+        setCarregandoImagem(false);
+      });
+  }
+
+  function removerImagem() {
+    setImagem("");
+    setErroImagem(null);
+  }
+
   function handleSubmit(evento: React.FormEvent) {
     evento.preventDefault();
 
@@ -93,6 +156,7 @@ export function ComboForm({ combo, onSubmit, onCancel }: ComboFormProps) {
       nome,
       descricao: descricao || undefined,
       itens,
+      imagem: imagem || undefined,
       descontoPercentual: descontoConvertido,
       disponivel,
     });
@@ -101,6 +165,8 @@ export function ComboForm({ combo, onSubmit, onCancel }: ComboFormProps) {
       setNome("");
       setDescricao("");
       setItens([]);
+      setImagem("");
+      setErroImagem(null);
       setDescontoPercentual("10");
       setDisponivel(true);
     }
@@ -128,6 +194,75 @@ export function ComboForm({ combo, onSubmit, onCancel }: ComboFormProps) {
           value={descricao}
           onChange={(evento) => setDescricao(evento.target.value)}
         />
+      </div>
+
+      <div className="configuracao-logo">
+        <p className="mb-1 font-medium">Imagem do combo</p>
+
+        <div className="configuracao-logo__linha">
+          {imagem ? (
+            <img
+              src={imagem}
+              alt="Pré-visualização da imagem do combo"
+              className="configuracao-logo__preview"
+            />
+          ) : (
+            <span className="configuracao-logo__preview configuracao-logo__preview--vazia">
+              Sem imagem
+            </span>
+          )}
+
+          <div className="configuracao-logo__acoes">
+            <button
+              type="button"
+              onClick={() => inputArquivoRef.current?.click()}
+              disabled={carregandoImagem}
+              className="rounded border px-3 py-2 font-semibold"
+            >
+              {carregandoImagem ? "Carregando..." : "Carregar imagem"}
+            </button>
+
+            {imagem && (
+              <button
+                type="button"
+                onClick={removerImagem}
+                className="configuracao-logo__remover"
+              >
+                Remover
+              </button>
+            )}
+          </div>
+
+          <input
+            ref={inputArquivoRef}
+            type="file"
+            accept="image/*"
+            onChange={aoEscolherArquivo}
+            className="configuracao-logo__input-arquivo"
+          />
+        </div>
+
+        {erroImagem && (
+          <p className="configuracao-logo__erro" role="alert">
+            {erroImagem}
+          </p>
+        )}
+
+        <small>
+          Se nenhuma imagem for definida, a loja usa a foto do primeiro
+          item do combo como capa.
+        </small>
+
+        <details className="configuracao-logo__url-manual">
+          <summary>Ou informar uma URL de imagem</summary>
+
+          <input
+            type="text"
+            value={imagem}
+            onChange={(evento) => setImagem(evento.target.value)}
+            placeholder="https://exemplo.com/imagem.png"
+          />
+        </details>
       </div>
 
       <fieldset>
